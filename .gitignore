@@ -1,6 +1,9 @@
 # Global files to be ignored
 node_modules/
 
+.env
+
+portfolioone/
 
 # Frontend files to be ignored
 /client/logs
