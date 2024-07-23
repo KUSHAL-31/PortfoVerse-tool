@@ -6,5 +6,5 @@ const cloudinary = require("cloudinary");
 
 exports.listNewSkillType = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { heading, }
+    // const { heading, }
 });
