@@ -1,10 +1,12 @@
 const User = require("../models/Users");
 const PortfolioWebsite = require("../models/PortfolioWebsite");
+const UserMetaData = require("../models/UserMetaData");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const sendToken = require("../utility/token");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
 
+// API to register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
     let user;
     const { username, email, password } = req.body;
@@ -15,6 +17,7 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
 })
 
 
+// API to login a user
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -32,6 +35,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
 })
 
 
+// API to logout a user
 exports.logoutUser = asyncErrorHandler(async (req, res, next) => {
     res.cookie("token", null, {
         expires: new Date(Date.now()),
@@ -41,92 +45,60 @@ exports.logoutUser = asyncErrorHandler(async (req, res, next) => {
 })
 
 
-exports.getUserBasicDetails = asyncErrorHandler(async (req, res, next) => {
+// API to edit username by user id
+exports.changeUsernameByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const user = await User.findById(userId).select("username email avatar createdAt");
-    return res.status(200).json({ success: true, user, message: "User details fetched successfully" })
+    const { username } = req.body;
+    if (username === undefined) {
+        return next(new HandleError("Please provide a username", 400));
+    }
+    const user = await User.findByIdAndUpdate(userId, {
+        $set: { username }
+    }, { new: true, runValidators: true });
+    res.status(200).json({
+        success: true,
+        message: 'Username updated successfully!',
+        user,
+    });
 });
 
 
-exports.getUserSpecificSectionDetails = asyncErrorHandler(async (req, res, next) => {
+// API to change meta data by user id
+exports.changePortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const section = req.params.section;
-    const details = await PortfolioWebsite.find({ user: userId }).select(`${section}`);
-    return res.status(200).json({ success: true, details, message: "Details fetched successfully" })
-})
-
-exports.getUserResumeLink = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const resume = await User.findById(userId).select("resume");
-    return res.status(200).json({ success: true, resume, message: "Details fetched successfully" })
-})
-
-exports.isUserContactMeEnabled = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const isEnabled = await User.findById(userId).select("contactMeEnabled");
-    return res.status(200).json({ success: true, isEnabled, message: "Details fetched successfully" })
-})
-
-exports.create
-
-
-exports.editUserHeroSection = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { image, isImageEdited, title, roles, description } = req.body;
-    if (image === undefined || isImageEdited === undefined || title === undefined || (roles === undefined || roles.length === 0) || description === undefined) {
+    const { title, description, resume, image, roles, socials, isImageEdited } = req.body;
+    if (title === undefined || description === undefined || roles === undefined) {
         return next(new HandleError("Please fill all the fields", 400));
     }
-    let result;
+    let updateObject = { title, description, resume, roles, socials };
     if (isImageEdited) {
-        result = await cloudinary.v2.uploader.upload(image, {
+        if (image === undefined) {
+            return next(new HandleError("Please provide an image", 400));
+        }
+        const result = await cloudinary.v2.uploader.upload(image, {
             folder: "k31portfolios",
         });
+        updateObject.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
     }
-    const heroSectionData = {
-        title: title,
-        roles: [...roles],
-        description: description
-    }
-    const details = await PortfolioWebsite.findOneAndUpdate({ user: userId }, {
-        $set: { heroSection: heroSectionData }
+
+    const userMetaData = await UserMetaData.findByIdAndUpdate(userId, {
+        $set: updateObject
     }, { new: true, upsert: true, runValidators: true });
 
-    if (details) {
-        return res.status(200).json({ success: true, details, message: "Information updated successfully" })
-    }
-    return next(new HandleError("Something went wrong", 400));
-
+    res.status(200).json({
+        success: true,
+        message: 'Information updated successfully!',
+        userMetaData,
+    });
 });
 
 
-exports.editUserSocialUrls = asyncErrorHandler(async (req, res, next) => {
+// API to get meta data by user id
+exports.getPortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { socials } = req.body;
-    const socialDetails = await User.findByIdAndUpdate(userId, {
-        $set: { socials }
-    }, { new: true, upsert: true, runValidators: true });
-    if (socialDetails) {
-        return res.status(200).json({ success: true, socialDetails, message: "Information updated successfully" })
-    }
-    return next(new HandleError("Something went wrong", 400));
-});
-
-
-exports.changeUserResumeLink = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { resume } = req.body;
-    const resumeLink = await User.findByIdAndUpdate(userId, {
-        $set: { resume }
-    }, { new: true, upsert: true, runValidators: true });
-    if (resumeLink) {
-        return res.status(200).json({ success: true, resumeLink, message: "Information updated successfully" })
-    }
-    return next(new HandleError("Something went wrong", 400));
-});
-
-
-exports.addNewUserService = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { title, description } = req.body;
-    const details = await User.findByIdAndUpdate
+    const userMetaData = await UserMetaData.findOne({ user: userId });
+    res.status(200).json({
+        success: true,
+        userMetaData,
+    });
 });
