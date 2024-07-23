@@ -3,6 +3,7 @@ const UserServices = require("../models/UserServices");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
+const { v4: uuidv4 } = require('uuid');
 
 
 exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
