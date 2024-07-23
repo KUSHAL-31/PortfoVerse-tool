@@ -18,6 +18,9 @@ app.use(fileUpload())
 
 app.use(errMiddleware);
 
+// Defining routes
+app.use("/api/v1/user", require("./routes/user"));
+
 //handling uncaught error
 process.on("uncaughtException", (err) => {
     console.log("Error: ", err.message);

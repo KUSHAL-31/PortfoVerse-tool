@@ -1,4 +1,5 @@
 const User = require("../models/Users");
+const PortfolioWebsite = require("../models/PortfolioWebsite");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const sendToken = require("../utility/token");
 const HandleError = require("../utility/handleError");
@@ -50,7 +51,7 @@ exports.getUserBasicDetails = asyncErrorHandler(async (req, res, next) => {
 exports.getUserSpecificSectionDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
     const section = req.params.section;
-    const details = await User.findById(userId).select(`${section}`);
+    const details = await PortfolioWebsite.find({ user: userId }).select(`${section}`);
     return res.status(200).json({ success: true, details, message: "Details fetched successfully" })
 })
 
@@ -66,10 +67,15 @@ exports.isUserContactMeEnabled = asyncErrorHandler(async (req, res, next) => {
     return res.status(200).json({ success: true, isEnabled, message: "Details fetched successfully" })
 })
 
+exports.create
+
 
 exports.editUserHeroSection = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
     const { image, isImageEdited, title, roles, description } = req.body;
+    if (image === undefined || isImageEdited === undefined || title === undefined || (roles === undefined || roles.length === 0) || description === undefined) {
+        return next(new HandleError("Please fill all the fields", 400));
+    }
     let result;
     if (isImageEdited) {
         result = await cloudinary.v2.uploader.upload(image, {
@@ -77,15 +83,11 @@ exports.editUserHeroSection = asyncErrorHandler(async (req, res, next) => {
         });
     }
     const heroSectionData = {
-        image: {
-            public_id: result.public_id,
-            url: result.secure_url,
-        },
         title: title,
         roles: [...roles],
         description: description
     }
-    const details = await User.findByIdAndUpdate(userId, {
+    const details = await PortfolioWebsite.findOneAndUpdate({ user: userId }, {
         $set: { heroSection: heroSectionData }
     }, { new: true, upsert: true, runValidators: true });
 
