@@ -8,7 +8,7 @@ const userSkillsSchema = new mongoose.Schema({
         ref: "K31PortfolioUsers",
         required: true,
     },
-    skills: [
+    skillSection: [
         {
             skillId: {
                 type: String,
