@@ -14,7 +14,6 @@ portfolioone/
 /client/yarn-error.log*
 /client/pnpm-debug.log*
 /client/lerna-debug.log*
-/client/dist
 /client/dist-ssr
 /client/*.local
 /client/# Editor directories and files
@@ -27,3 +26,4 @@ portfolioone/
 /client/*.njsproj
 /client/*.sln
 /client/*.sw?
+.vercel
