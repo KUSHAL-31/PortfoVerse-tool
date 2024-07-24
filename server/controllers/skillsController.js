@@ -101,3 +101,29 @@ exports.getAllSkillSections = asyncErrorHandler(async (req, res, next) => {
         skills: skills,
     });
 });
+
+
+exports.getSkillsById = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { skillId } = req.params;
+
+    if (!skillId) {
+        return next(new HandleError("Something went wrong", 400));
+    }
+
+    // Find the user's skill details document
+    const skillDetails = await UserSkills.findOne({ user: userId });
+
+    // Find the skill by skillId
+    const skill = skillDetails.skillSection.find(s => s.skillId === skillId);
+
+    if (!skill) {
+        return next(new HandleError("Something went wrong", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Service retrieved successfully!',
+        skill
+    });
+});

@@ -128,3 +128,29 @@ exports.getAllservicesByUserId = asyncErrorHandler(async (req, res, next) => {
         services: serviceDetails.services
     });
 });
+
+
+exports.getServiceById = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { serviceId } = req.params;
+
+    if (!serviceId) {
+        return next(new HandleError("Something went wrong", 400));
+    }
+
+    // Find the user's service details document
+    const serviceDetails = await UserServices.findOne({ user: userId });
+
+    // Find the service by serviceId
+    const service = serviceDetails.services.find(s => s.serviceId === serviceId);
+
+    if (!service) {
+        return next(new HandleError("Something went wrong", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Service retrieved successfully!',
+        service
+    });
+});

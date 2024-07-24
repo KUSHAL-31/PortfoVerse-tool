@@ -9,25 +9,37 @@ const websiteSchema = new mongoose.Schema({
         required: true,
     },
     logo: {
-        type: String,
-        default: "https://via.placeholder.com/150",
+        public_id: {
+            type: String,
+            required: true,
+        },
+        url: {
+            type: String,
+            required: true,
+        }
     },
-    name: {
+    headerTitle: {
         type: String,
-        required: [true, "Please enter your website name"],
-        minlength: [5, "Website name should have more than 4 characters"],
-        maxlength: [20, "Website name should have less than 21 characters"],
+        required: false,
     },
     details: {
-        url: {
+        websiteName: {
+            type: String,
+            required: [true, "Please enter your website name"],
+            minlength: [5, "Website name should have more than 4 characters"],
+            maxlength: [20, "Website name should have less than 21 characters"],
+        },
+        websiteUrl: {
             type: String,
             required: false,
             unique: true,
         },
+
     },
     isPublished: {
         type: Boolean,
         default: false,
+        required: false,
     },
 });
 

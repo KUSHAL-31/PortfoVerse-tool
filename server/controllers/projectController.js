@@ -1,4 +1,3 @@
-const User = require("../models/Users");
 const UserProjects = require("../models/UserProjects");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
@@ -156,5 +155,30 @@ exports.getAllProjectsByUserId = asyncErrorHandler(async (req, res, next) => {
         success: true,
         message: 'Projects retrieved successfully!',
         projects: projectDetails.projects
+    });
+});
+
+exports.getProjectById = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { projectId } = req.params;
+
+    if (!projectId) {
+        return next(new HandleError("Something went wrong", 400));
+    }
+
+    // Find the user's project details document
+    const projectDetails = await UserProjects.findOne({ user: userId });
+
+    // Find the project by projectId
+    const project = projectDetails.projects.find(p => p.projectId === projectId);
+
+    if (!project) {
+        return next(new HandleError("Something went wrong", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Project retrieved successfully!',
+        project
     });
 });

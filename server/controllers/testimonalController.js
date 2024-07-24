@@ -158,3 +158,30 @@ exports.getAlltestimonialsByUserId = asyncErrorHandler(async (req, res, next) =>
         testimonials: testimonialDetails.testimonials
     });
 });
+
+
+
+exports.getTestimonialById = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { testimonialId } = req.params;
+
+    if (!testimonialId) {
+        return next(new HandleError("Something went wrong", 400));
+    }
+
+    // Find the user's testimonial details document
+    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+
+    // Find the testimonial by testimonialId
+    const testimonial = testimonialDetails.testimonials.find(t => t.testimonialId === testimonialId);
+
+    if (!testimonial) {
+        return next(new HandleError("Something went wrong", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Service retrieved successfully!',
+        testimonial
+    });
+});

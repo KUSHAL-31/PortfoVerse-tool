@@ -31,6 +31,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     if (!isPasswordTrue) {
         return next(new HandleError("Invalid email or password", 400));
     }
+    console.log(user);
     return sendToken(user, 200, res);
 })
 
@@ -62,6 +63,20 @@ exports.changeUsernameByUserId = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+
+exports.getUserDetailsById = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.params.id;
+    console.log(userId);
+    const user = await User.findById(userId).select("username email avatar createdAt");
+    if (!user) {
+        return next(new HandleError("User does not exist", 400));
+    }
+    res.status(200).json({
+        success: true,
+        message: 'User details fetched successfully',
+        user,
+    });
+});
 
 // API to change meta data by user id
 exports.changePortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
@@ -100,5 +115,18 @@ exports.getPortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) 
     res.status(200).json({
         success: true,
         userMetaData,
+    });
+});
+
+
+exports.toggleContactMeForm = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { isEnabled } = req.body;
+    await UserMetaData.findByIdAndUpdate(userId, {
+        $set: { contactMeEnabled: isEnabled }
+    }, { new: true, runValidators: true })
+    res.status(200).json({
+        success: true,
+        message: "Contact Me section updated successfully",
     });
 });

@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser, loginUser, logoutUser } = require("../controllers/userController");
+const { registerUser, loginUser, logoutUser, changePortfolioMetaDataByUserId, getUserDetailsById } = require("../controllers/userController");
 const { authUser } = require("../middlewares/auth");
 const router = express.Router();
 
@@ -7,6 +7,10 @@ const router = express.Router();
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(logoutUser);
+router.route("/details/:id").get(getUserDetailsById);
+
+// User portfolio related APIs
+router.route("/metadata/edit").post(authUser, changePortfolioMetaDataByUserId);
 
 // User meta data routes
 
