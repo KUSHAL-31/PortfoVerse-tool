@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const cookieParser = require("cookie-parser")
 const fileUpload = require("express-fileupload")
 const errMiddleware = require("./middlewares/error");
@@ -26,6 +27,11 @@ app.use(morganMiddleware);
 
 // Rate limiter 
 app.use('/api', limiter);
+
+app.use(express.static(path.join(__dirname, "../client/dist")));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+})
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
