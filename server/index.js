@@ -28,11 +28,6 @@ app.use(morganMiddleware);
 // Rate limiter 
 app.use('/api', limiter);
 
-app.use(express.static(path.join(__dirname, "../client/dist")));
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
-})
-
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
