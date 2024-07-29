@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const UserPortfolio = require("../models/PortfolioWebsite");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
@@ -58,3 +59,47 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+
+
+// API for deploying the portfolio on vercel
+
+exports.deployPortfolio = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { username } = req.body;
+    const response = await axios.post("https://api.vercel.com/v10/projects?slug=kushals-projects-d029e2c1&teamId=team_DSq1hxxsUEmeLwFsf0vl4G7d", {
+        "name": `${username}-portfolio`,
+        "environmentVariables": [
+            {
+                "key": "REACT_APP_PORTFOLIO_USER_ID",
+                "target": ["production"],
+                "value": `${userId}`
+            },
+            {
+                "key": "REACT_APP_BACKEND_HOSTED_URL",
+                "target": ["production"],
+                "value": "https://k31-portfolio-maker-backend-service.onrender.com"
+            }
+        ],
+        "gitRepository": {
+            "repo": "https://github.com/KUSHAL-31/k31-portfolio-template",
+            "type": "github"
+        },
+        "headers": {
+            "Authorization": `Bearer ${process.env.VERCEL_TOKEN}`,
+        },
+    });
+    // const response = await fetch(process.env.VERCEL_CREATE_NEW_PROJECT_API, {
+    //     "body": {
+    //         "name": `${username}-portfolio`,
+    //     },
+    //     "headers": {
+    //         "Authorization": `Bearer ${process.env.VERCEL_TOKEN}`,
+    //     },
+    //     "method": "post"
+    // });
+    // console.log(response);
+    res.status(200).json({
+        success: true,
+        message: 'Website deployed successfully!',
+    });
+});
