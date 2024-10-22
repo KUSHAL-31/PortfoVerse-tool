@@ -12,7 +12,7 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
     if (employerName === undefined || companyName === undefined || rating === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
-    let result;
+    let result = null;
     if (image) {
         result = await cloudinary.v2.uploader.upload(image, {
             folder: "k31portfolios",
@@ -20,7 +20,7 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
     }
 
     // Find the user's website document
-    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    var testimonialDetails = await UserTestimonials.findOne({ user: userId });
     if (!testimonialDetails) {
         testimonialDetails = new UserTestimonials({ user: userId, testimonials: [] });
     }
@@ -28,11 +28,11 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
     // Create a new testimonial
     const newTestimonial = {
         testimonialId: uuidv4(),
-        title,
-        description,
-        image: result ? { public_id: result.public_id, url: result.secure_url } : "",
-        url,
-        sourceCode
+        employerName,
+        companyName,
+        image: result !== null ? { public_id: result.public_id, url: result.secure_url } : "",
+        comment,
+        rating,
     };
 
     // Push the new testimonial into the testimonials array
@@ -57,7 +57,7 @@ exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
-    let result;
+    let result = null;
     if (image && isImageEdited) {
         result = await cloudinary.uploader.upload(image, {
             folder: "k31portfolios",
@@ -87,7 +87,8 @@ exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
         ...testimonialDetails.testimonials[testimonialIndex],
         employerName,
         companyName,
-        image: { public_id: result.public_id, url: result.secure_url },
+        comment,
+        image: result !== null ? { public_id: result.public_id, url: result.secure_url } : "",
         rating,
     };
 
@@ -163,7 +164,7 @@ exports.getAlltestimonialsByUserId = asyncErrorHandler(async (req, res, next) =>
 
 exports.getTestimonialById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { testimonialId } = req.params;
+    const testimonialId = req.params.id;
 
     if (!testimonialId) {
         return next(new HandleError("Something went wrong", 400));
