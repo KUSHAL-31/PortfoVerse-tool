@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         validate: [validator.isEmail, "Please enter a valid email"],
     },
+    phoneNumber: {
+        type: String,
+        validate: [validator.isMobilePhone, "Please enter a valid phone number"],
+    },
     avatar: {
         type: String,
         default: "https://via.placeholder.com/150",

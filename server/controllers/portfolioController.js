@@ -1,5 +1,11 @@
 const { default: axios } = require("axios");
 const UserPortfolio = require("../models/PortfolioWebsite");
+const UserExpEdu = require("../models/UserExperienceEducation");
+const UserProjects = require("../models/UserProjects");
+const UserSkills = require("../models/UserSkills");
+const UserServices = require("../models/UserServices");
+const userTestimonials = require("../models/UserTestimonials");
+const UserMetaData = require("../models/UserMetaData");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
@@ -101,5 +107,65 @@ exports.deployPortfolio = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: 'Website deployed successfully!',
+    });
+});
+
+// Check if Portoflio exists with the portfolio name or not 
+exports.doesPortfolioExists = asyncErrorHandler(async (req, res, next) => {
+    const { websiteName } = req.body;
+    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName });
+    if (!portfolio) {
+        return res.status(200).json({
+            success: true,
+            doesExists: false,
+            message: 'No Portfolio exists with this name',
+        });
+    }
+    res.status(200).json({
+        success: true,
+        doesExists: true,
+        portfolioId: portfolio._id,
+        message: 'Portfolio exists with this name',
+    });
+});
+
+
+// Get All Portfolio details ( for template website )
+
+exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
+    const { portfolioId } = req.body;
+
+    // Get the portfolio details based on portfolioId
+    const portfolio = await UserPortfolio.findById(portfolioId);
+
+    // Get the user experience and education details based on userId
+    const userExpEdu = await UserExpEdu.findOne({ user: portfolio.user });
+
+    // Get the user projects details based on userId
+    const userProjects = await UserProjects.findOne({ user: portfolio.user });
+
+    // Get the user skills details based on userId
+    const userSkills = await UserSkills.findOne({ user: portfolio.user });
+
+    // Get the user services details based on userId
+    const userServices = await UserServices.findOne({ user: portfolio.user });
+
+    // Get the user testimonials details based on userId
+    const userTestimonials = await UserTestimonials.findOne({ user: portfolio.user });
+
+    // Get the user meta data details based on userId
+    const userMetaData = await UserMetaData.findOne({ user: portfolio.user });
+
+
+    res.status(200).json({
+        success: true,
+        portfolio,
+        userExpEdu,
+        userProjects,
+        userSkills,
+        userServices,
+        userTestimonials,
+        userMetaData,
+        message: 'Portfolio details fetched successfully',
     });
 });

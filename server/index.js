@@ -40,6 +40,12 @@ app.use(errMiddleware);
 
 // Defining routes
 app.use("/api/v1/user", require("./routes/user"));
+app.use("/api/v1/skills", require("./routes/skills"));
+app.use("/api/v1/experience", require("./routes/experience"));
+app.use("/api/v1/education", require("./routes/education"));
+app.use("/api/v1/projects", require("./routes/projects"));
+app.use("/api/v1/testimonials", require("./routes/testimonials"));
+app.use("/api/v1/services", require("./routes/services"));
 
 //handling uncaught error
 process.on("uncaughtException", (err) => {

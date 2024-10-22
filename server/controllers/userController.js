@@ -65,7 +65,7 @@ exports.changeUsernameByUserId = asyncErrorHandler(async (req, res, next) => {
 
 
 exports.getUserDetailsById = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.params.id;
+    const userId = req.user.id;
     console.log(userId);
     const user = await User.findById(userId).select("username email avatar createdAt");
     if (!user) {
@@ -78,8 +78,35 @@ exports.getUserDetailsById = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { title, description, resume, image, roles, socials } = req.body;
+    if (title === undefined || description === undefined || roles === undefined) {
+        return next(new HandleError("Please fill all the fields", 400));
+    }
+    let objectToCreate = { title, description, resume, roles, socials };
+    if (image) {
+        const result = await cloudinary.v2.uploader.upload(image, {
+            folder: "k31portfolios",
+        });
+        objectToCreate.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
+    }
+    const userMetaData = await UserMetaData.create({
+        user: userId,
+        ...objectToCreate,
+    });
+    if (!userMetaData) {
+        return next(new HandleError("Something went wrong", 400));
+    }
+    res.status(200).json({
+        success: true,
+        message: 'Details updated successfully',
+        userMetaData,
+    });
+});
+
 // API to change meta data by user id
-exports.changePortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
+exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
     const { title, description, resume, image, roles, socials, isImageEdited } = req.body;
     if (title === undefined || description === undefined || roles === undefined) {
@@ -96,20 +123,23 @@ exports.changePortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, nex
         updateObject.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
     }
 
-    const userMetaData = await UserMetaData.findByIdAndUpdate(userId, {
+    const userMetaData = await UserMetaData.findOneAndUpdate({ user: userId }, {
         $set: updateObject
-    }, { new: true, upsert: true, runValidators: true });
+    }, { new: true, runValidators: true });
+    if (!userMetaData) {
+        return next(new HandleError("Something went wrong", 400));
+    }
 
     res.status(200).json({
         success: true,
-        message: 'Information updated successfully!',
+        message: 'Information updated successfully',
         userMetaData,
     });
 });
 
 
 // API to get meta data by user id
-exports.getPortfolioMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
+exports.getMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
     const userMetaData = await UserMetaData.findOne({ user: userId });
     res.status(200).json({
