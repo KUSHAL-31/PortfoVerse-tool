@@ -1,14 +1,9 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import PortfolioSteps from "./components/PortfolioSteps/PortfolioSteps";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <p>K31 Portfolio maker</p>
+      <PortfolioSteps />
     </>
   );
 }
