@@ -61,14 +61,15 @@ const userExperienceEducationSchema = new mongoose.Schema({
             },
             endDate: {
                 type: Date,
-                required: true,
+            },
+            isPresent: {
+                type: Boolean,
+                default: false,
             },
             description: [
                 {
-                    point: {
-                        type: String,
-                        required: true,
-                    }
+                    type: String,
+                    required: true,
                 }
             ],
             certificate: {

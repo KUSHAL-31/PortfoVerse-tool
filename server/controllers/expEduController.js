@@ -67,6 +67,7 @@ exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
 
     expEduDetails.education[educationIndex] = {
         ...expEduDetails.education[educationIndex],
+        educationId,
         degree,
         school,
         startDate,
@@ -142,7 +143,7 @@ exports.getAllEducationByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { educationId } = req.params;
+    const educationId = req.params.id;
 
     if (!educationId) {
         return next(new HandleError("Education ID is required", 400));
@@ -176,9 +177,9 @@ exports.getEducationById = asyncErrorHandler(async (req, res, next) => {
 
 exports.addNewExperience = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, company, startDate, endDate, description, certificate } = req.body;
+    const { title, company, startDate, endDate, description, certificate, isPresent } = req.body;
 
-    if (!title || !company || !startDate || !endDate || !description) {
+    if (!title || !company || !startDate || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
@@ -197,7 +198,8 @@ exports.addNewExperience = asyncErrorHandler(async (req, res, next) => {
         startDate,
         endDate,
         description,
-        certificate
+        certificate,
+        isPresent,
     };
 
     // Push the new experience into the experience array
@@ -217,9 +219,9 @@ exports.addNewExperience = asyncErrorHandler(async (req, res, next) => {
 
 exports.editExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { experienceId, title, company, startDate, endDate, description, certificate } = req.body;
+    const { experienceId, title, company, startDate, endDate, description, certificate, isPresent } = req.body;
 
-    if (!experienceId || !title || !company || !startDate || !endDate || !description) {
+    if (!experienceId || !title || !company || !startDate || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
@@ -239,12 +241,14 @@ exports.editExperienceById = asyncErrorHandler(async (req, res, next) => {
 
     expEduDetails.experience[experienceIndex] = {
         ...expEduDetails.experience[experienceIndex],
+        experienceId,
         title,
         company,
         startDate,
         endDate,
         description,
-        certificate
+        certificate,
+        isPresent,
     };
 
     // Save the updated document
@@ -315,7 +319,7 @@ exports.getAllExperienceByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { experienceId } = req.params;
+    const experienceId = req.params.id;
 
     if (!experienceId) {
         return next(new HandleError("Experience ID is required", 400));

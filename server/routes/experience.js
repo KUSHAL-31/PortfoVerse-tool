@@ -8,7 +8,7 @@ router.route("/create").post(authUser, addNewExperience);
 router.route("/edit").patch(authUser, editExperienceById);
 router.route("/getAll").get(authUser, getAllExperienceByUserId);
 router.route("/get/:id").get(authUser, getExperienceById);
-router.route("/remove").delete(authUser, deleteExperienceById);
+router.route("/remove").post(authUser, deleteExperienceById);
 
 
 

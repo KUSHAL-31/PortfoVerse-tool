@@ -8,7 +8,7 @@ router.route("/create").post(authUser, addNewEducation);
 router.route("/edit").patch(authUser, editEducationById);
 router.route("/getAll").get(authUser, getAllEducationByUserId);
 router.route("/get/:id").get(authUser, getEducationById);
-router.route("/remove").delete(authUser, deleteEducationById);
+router.route("/remove").post(authUser, deleteEducationById);
 
 
 
