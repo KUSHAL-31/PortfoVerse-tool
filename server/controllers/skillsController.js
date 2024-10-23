@@ -10,9 +10,24 @@ exports.listNewSkillSection = asyncErrorHandler(async (req, res, next) => {
     if (!heading || (!skills && skills.length !== 0)) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
-    const skillSection = [...skills];
-    const skill = await UserSkills.create({ user: userId, skillId: uuidv4(), heading: heading, list: list });
-    res.status(200).json({ success: true, skill, message: "New skill section added successfully" });
+
+    // Find the user's website document
+    var skillDetails = await UserSkills.findOne({ user: userId });
+    if (!skillDetails) {
+        skillDetails = new UserSkills({ user: userId, skillSection: [] });
+    }
+
+    // Create a new skill section
+    const newSkill = { skillId: uuidv4(), heading, list: [...skills] }
+
+    // Push the new skill into the skills array
+
+    skillDetails.skillSection.push(newSkill);
+
+    // Save the updated document
+    await skillDetails.save();
+
+    res.status(200).json({ success: true, skills: skillDetails.skillSection, message: "New skill section added successfully" });
 });
 
 exports.editSkillSection = asyncErrorHandler(async (req, res, next) => {
@@ -28,7 +43,6 @@ exports.editSkillSection = asyncErrorHandler(async (req, res, next) => {
     if (!skillDetails) {
         return next(new HandleError("Skill section not found", 404));
     }
-
     // Find the skill by skillId and update it
     const skillIndex = skillDetails.skillSection.findIndex(s => s.skillId === skillId);
 
@@ -37,8 +51,10 @@ exports.editSkillSection = asyncErrorHandler(async (req, res, next) => {
     }
 
     skillDetails.skillSection[skillIndex] = {
+        ...skillDetails.skillSection[skillIndex],
+        skillId: skillId,
         heading,
-        skills,
+        list: skills,
     };
 
     // Save the updated document
@@ -105,7 +121,7 @@ exports.getAllSkillSections = asyncErrorHandler(async (req, res, next) => {
 
 exports.getSkillsById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { skillId } = req.params;
+    const skillId = req.params.id;
 
     if (!skillId) {
         return next(new HandleError("Something went wrong", 400));
