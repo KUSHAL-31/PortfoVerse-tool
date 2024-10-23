@@ -8,7 +8,7 @@ router.route("/create").post(authUser, listNewProjectByUserId);
 router.route("/edit").patch(authUser, editProjectByUserId);
 router.route("/getAll").get(authUser, getAllProjectsByUserId);
 router.route("/get/:id").get(authUser, getProjectById);
-router.route("/remove").delete(authUser, deleteProjectByUserId);
+router.route("/remove").post(authUser, deleteProjectByUserId);
 
 
 

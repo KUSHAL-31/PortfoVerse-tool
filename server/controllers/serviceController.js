@@ -13,7 +13,7 @@ exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
     // Find the user's website document
-    const serviceDetails = await UserServices.findOne({ user: userId });
+    var serviceDetails = await UserServices.findOne({ user: userId });
     if (!serviceDetails) {
         serviceDetails = new UserServices({ user: userId, services: [] });
     }
@@ -62,6 +62,8 @@ exports.editserviceByUserId = asyncErrorHandler(async (req, res, next) => {
     }
 
     serviceDetails.services[serviceIndex] = {
+        ...serviceDetails.services[serviceIndex],
+        serviceId,
         title,
         description,
     };
@@ -132,7 +134,7 @@ exports.getAllservicesByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getServiceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { serviceId } = req.params;
+    const serviceId = req.params.id;
 
     if (!serviceId) {
         return next(new HandleError("Something went wrong", 400));

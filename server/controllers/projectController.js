@@ -10,7 +10,7 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     if (title === undefined || description === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
-    let result;
+    let result = null;
     if (image) {
         result = await cloudinary.v2.uploader.upload(image, {
             folder: "k31portfolios",
@@ -18,7 +18,7 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     }
 
     // Find the user's website document
-    const projectDetails = await UserProjects.findOne({ user: userId });
+    var projectDetails = await UserProjects.findOne({ user: userId });
     if (!projectDetails) {
         projectDetails = new UserProjects({ user: userId, projects: [] });
     }
@@ -28,7 +28,7 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
         projectId: uuidv4(),
         title,
         description,
-        image: result ? { public_id: result.public_id, url: result.secure_url } : "",
+        image: result !== null ? { public_id: result.public_id, url: result.secure_url } : "",
         url,
         sourceCode
     };
@@ -55,7 +55,7 @@ exports.editProjectByUserId = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
-    let result;
+    let result = null;
     if (image && isImageEdited) {
         result = await cloudinary.uploader.upload(image, {
             folder: "k31portfolios",
@@ -83,9 +83,10 @@ exports.editProjectByUserId = asyncErrorHandler(async (req, res, next) => {
 
     projectDetails.projects[projectIndex] = {
         ...projectDetails.projects[projectIndex],
+        projectId,
         title,
         description,
-        image: { public_id: result.public_id, url: result.secure_url },
+        image: result != null ? { public_id: result.public_id, url: result.secure_url } : "",
         url,
         sourceCode
     };
@@ -160,7 +161,7 @@ exports.getAllProjectsByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getProjectById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { projectId } = req.params;
+    const projectId = req.params.id;
 
     if (!projectId) {
         return next(new HandleError("Something went wrong", 400));
