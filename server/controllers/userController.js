@@ -108,11 +108,11 @@ exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
 // API to change meta data by user id
 exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, description, resume, image, roles, socials, isImageEdited } = req.body;
+    const { title, description, resume, image, roles, socials, isImageEdited, contactMeEnabled } = req.body;
     if (title === undefined || description === undefined || roles === undefined) {
         return next(new HandleError("Please fill all the fields", 400));
     }
-    let updateObject = { title, description, resume, roles, socials };
+    let updateObject = { title, description, resume, roles, socials, contactMeEnabled };
     if (isImageEdited) {
         if (image === undefined) {
             return next(new HandleError("Please provide an image", 400));
