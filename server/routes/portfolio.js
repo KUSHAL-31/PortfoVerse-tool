@@ -1,12 +1,13 @@
 const express = require("express");
-const { changePortfolioDetails, doesPortfolioExists, getAllPortfolioDetails } = require("../controllers/portfolioController");
+const { changePortfolioDetails, doesPortfolioExists, getAllPortfolioDetails, checkPortfolioName } = require("../controllers/portfolioController");
 const { authUser } = require("../middlewares/auth");
 const router = express.Router();
 
 // SKills API
 router.route("/update").post(authUser, changePortfolioDetails);
-router.route("/name/check").post(authUser, doesPortfolioExists);
-router.route("/details").post(authUser, getAllPortfolioDetails);
+router.route("/check").post(doesPortfolioExists);
+router.route("/details").post(getAllPortfolioDetails);
+router.route("/name/available").get(authUser, checkPortfolioName);
 
 
 module.exports = router;

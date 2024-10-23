@@ -1,4 +1,5 @@
 const { default: axios } = require("axios");
+const Users = require("../models/Users");
 const UserPortfolio = require("../models/PortfolioWebsite");
 const UserExpEdu = require("../models/UserExperienceEducation");
 const UserProjects = require("../models/UserProjects");
@@ -136,7 +137,9 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     // Get the portfolio details based on portfolioId
     const portfolio = await UserPortfolio.findById(portfolioId);
 
-    console.log(portfolio);
+    // Get user details based on userId
+
+    const user = await Users.findById(portfolio.user);
 
     // Get the user experience and education details based on userId
     const userExpEdu = await UserExpEdu.findOne({ user: portfolio.user });
@@ -160,6 +163,7 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
         success: true,
         portfolio,
+        user,
         userExpEdu,
         userProjects,
         userSkills,
@@ -167,5 +171,21 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
         userTestimonials,
         userMetaData,
         message: 'Portfolio details fetched successfully',
+    });
+});
+
+// Check if portfolio name is available for not
+
+exports.checkPortfolioName = asyncErrorHandler(async (req, res, next) => {
+    const { websiteName } = req.query;
+
+    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName });
+
+    const isAvailable = !portfolio;
+
+    res.status(200).json({
+        success: true,
+        isAvailable,
+        message: isAvailable ? 'Website name is available' : 'Website name is already taken',
     });
 });
