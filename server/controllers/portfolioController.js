@@ -4,13 +4,11 @@ const UserExpEdu = require("../models/UserExperienceEducation");
 const UserProjects = require("../models/UserProjects");
 const UserSkills = require("../models/UserSkills");
 const UserServices = require("../models/UserServices");
-const userTestimonials = require("../models/UserTestimonials");
+const UserTestimonials = require("../models/UserTestimonials");
 const UserMetaData = require("../models/UserMetaData");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
-const { v4: uuidv4 } = require('uuid');
-
 
 exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
@@ -23,24 +21,24 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     // Check if the user portfolio exists
     let portfolioData = await UserPortfolio.findOne({ user: userId });
 
-    if (isLogoEdited) {
-        if (!logo) {
-            return next(new HandleError("Please provide a logo", 400));
-        }
-        if (portfolioData.logo) {
-            await cloudinary.uploader.destroy(portfolioData.logo.public_id);
-        }
-        const result = await cloudinary.v2.uploader.upload(logo, {
-            folder: "k31portfolios",
-        });
-        updateObject.logo = { public_id: result.public_id, url: result.secure_url };
-    }
+    // if (isLogoEdited) {
+    //     if (!logo) {
+    //         return next(new HandleError("Please provide a logo", 400));
+    //     }
+    //     if (portfolioData.logo) {
+    //         await cloudinary.uploader.destroy(portfolioData.logo.public_id);
+    //     }
+    //     const result = await cloudinary.v2.uploader.upload(logo, {
+    //         folder: "k31portfolios",
+    //     });
+    //     updateObject.logo = { public_id: result.public_id, url: result.secure_url };
+    // }
 
     if (!portfolioData) {
         // If the portfolio data doesn't exist, create a new document
         portfolioData = await UserPortfolio.create({
             user: userId,
-            logo: { public_id: updateObject.image.public_id, url: updateObject.image.url },
+            // logo: { public_id: updateObject.image.public_id, url: updateObject.image.url },
             headerTitle,
             details: {
                 websiteName,
@@ -49,7 +47,7 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
         });
     } else {
         // If the portfolio data exists, update only the specified fields
-        let updateObject = { headerTitle };
+        let updateObject = { headerTitle, details: { websiteName } };
 
         portfolioData = await UserPortfolio.findByIdAndUpdate(
             portfolioData._id,
@@ -137,6 +135,8 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
 
     // Get the portfolio details based on portfolioId
     const portfolio = await UserPortfolio.findById(portfolioId);
+
+    console.log(portfolio);
 
     // Get the user experience and education details based on userId
     const userExpEdu = await UserExpEdu.findOne({ user: portfolio.user });

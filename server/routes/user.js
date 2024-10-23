@@ -1,7 +1,6 @@
 const express = require("express");
 const { registerUser, loginUser, logoutUser, getUserDetailsById, createUserMetaData, editUserMetaData, getMetaDataByUserId } = require("../controllers/userController");
 const { authUser } = require("../middlewares/auth");
-const { deployPortfolio } = require("../controllers/portfolioController");
 const router = express.Router();
 
 // User sign up routes
@@ -14,7 +13,6 @@ router.route("/details").get(authUser, getUserDetailsById);
 router.route("/metadata/create").post(authUser, createUserMetaData);
 router.route("/metadata/edit").patch(authUser, editUserMetaData);
 router.route("/metadata/details").get(authUser, getMetaDataByUserId);
-router.route("/deploy").post(authUser, deployPortfolio);
 
 // User meta data routes
 

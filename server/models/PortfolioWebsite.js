@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require('uuid');
-
 
 const websiteSchema = new mongoose.Schema({
     user: {
@@ -11,11 +9,9 @@ const websiteSchema = new mongoose.Schema({
     logo: {
         public_id: {
             type: String,
-            required: true,
         },
         url: {
             type: String,
-            required: true,
         }
     },
     headerTitle: {

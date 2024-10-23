@@ -40,6 +40,7 @@ app.use(errMiddleware);
 
 // Defining routes
 app.use("/api/v1/user", require("./routes/user"));
+app.use("/api/v1/user/portfolio", require("./routes/portfolio"));
 app.use("/api/v1/skills", require("./routes/skills"));
 app.use("/api/v1/experience", require("./routes/experience"));
 app.use("/api/v1/education", require("./routes/education"));
