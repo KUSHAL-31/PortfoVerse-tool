@@ -15,7 +15,7 @@ require("dotenv").config();
 
 // Cors policy
 app.use(cors({
-    origin: ["https://kushalsoni-portfolio.vercel.app/", "http://localhost:5173", "http://localhost:3000"],
+    origin: ["https://kushalsoni-portfolio.vercel.app", "http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
 }));
