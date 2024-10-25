@@ -8,8 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { employerName, companyName, image, comment, rating } = req.body;
-    if (employerName === undefined || companyName === undefined || rating === undefined) {
+    const { employerName, companyName, image, comment, rating, employerRole } = req.body;
+    if (employerName === undefined || companyName === undefined || rating === undefined || employerRole === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
     let result = null;
@@ -33,6 +33,7 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
         image: result !== null ? { public_id: result.public_id, url: result.secure_url } : "",
         comment,
         rating,
+        employerRole,
     };
 
     // Push the new testimonial into the testimonials array
@@ -51,7 +52,7 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
 
 exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { testimonialId, employerName, companyName, image, comment, rating, isImageEdited } = req.body;
+    const { testimonialId, employerName, companyName, image, comment, rating, isImageEdited, employerRole } = req.body;
 
     if (!testimonialId || !employerName || !companyName || !rating) {
         return next(new HandleError("Please fill the mandatory fields", 400));
@@ -90,6 +91,7 @@ exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
         comment,
         image: result !== null ? { public_id: result.public_id, url: result.secure_url } : "",
         rating,
+        employerRole,
     };
 
     // Save the updated document

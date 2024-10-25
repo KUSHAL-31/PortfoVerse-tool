@@ -18,6 +18,9 @@ const userTestimonialsSchema = new mongoose.Schema({
                 type: String,
                 required: true,
             },
+            employerRole: {
+                type: String,
+            },
             companyName: {
                 type: String,
                 required: true,
