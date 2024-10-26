@@ -1,186 +1,149 @@
-import React, { useEffect, useState } from "react";
 import "./PortfolioSteps.scss";
-// import { openLoginPanel } from "../../redux/reducers/globalReducer"
-import { useDispatch } from "react-redux";
-
-const TOTAL_STEPS = 3;
-const ANIMATION_DURATION = 5000;
+import { AssetVaultData } from "./data";
+import { useEffect, useState } from "react";
+import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
+const transparentImageUrl =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const PortfolioSteps = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const { section3 } = AssetVaultData;
+  const carouselData = [
+    // { img: transparentImageUrl },
+    ...section3.carouselData,
+    // { img: transparentImageUrl },
+  ];
 
-  useEffect(() => {
-    const handleStepChange = () => {
-      setCurrentStep((prevStep) => (prevStep + 1) % TOTAL_STEPS);
-    };
+  const [selectedSlide, setSelectedSlide] = useState(1);
+  const [slideDirection, setSlideDirection] = useState("right");
+  const totalSlides = carouselData.length;
 
-    const timeout = setTimeout(handleStepChange, ANIMATION_DURATION);
-
-    return () => clearTimeout(timeout);
-  }, [currentStep]);
-
-  const handleStepClick = (step) => {
-    setCurrentStep(step);
+  const handlePrevSlide = () => {
+    const newIndex = (selectedSlide - 1 + totalSlides) % totalSlides;
+    setSelectedSlide(newIndex);
+    setSlideDirection("left");
   };
+
+  const handleNextSlide = () => {
+    const newIndex = (selectedSlide + 1) % totalSlides;
+    setSelectedSlide(newIndex);
+    setSlideDirection("right");
+  };
+
+  // this will handle the 10s interval animation of carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newIndex = (selectedSlide % (totalSlides - 2)) + 1;
+      setSelectedSlide(newIndex);
+      setSlideDirection("right");
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [selectedSlide, totalSlides]);
+
   return (
-    <div className="homepage">
-      <div className="homepage_inner">
-        <p className="header_text">
-          Get Your Portfolio Website in <span>THREE</span> Steps
-        </p>
-        <div className="container">
-          <div className="progress">
-            <div
-              className="percent"
-              style={{
-                width: `${(currentStep * 100) / (TOTAL_STEPS - 1)}%`,
-                transition: `width ${
-                  ANIMATION_DURATION / 1000
-                }s linear, height ${ANIMATION_DURATION / 1000}s linear`,
-              }}
-            ></div>
-          </div>
-          <div className="steps">
-            {[0, 1, 2].map((step) => (
-              <div
-                key={step}
-                className={`step ${currentStep === step ? "selected" : ""} ${
-                  currentStep >= step ? "completed" : ""
-                }`}
-                onClick={() => handleStepClick(step)}
-              ></div>
-            ))}
-          </div>
-          <div className="steps-mob">
-            {[
-              {
-                key: "Create an Account",
-                value:
-                  "create a new account or login into your existing account ",
-              },
-              {
-                key: "Fill The Details",
-                value:
-                  "Fill all the details to get the best looking portfolio{",
-              },
-              {
-                key: "  Save and Deploy",
-                value: "Just save & automatically deploy your portfolio",
-              },
-            ].map((step, index) => (
-              <div
-                key={index}
-                className={`step-mob ${
-                  currentStep === index ? "selected" : ""
-                } ${currentStep >= index ? "completed" : ""}`}
-                onClick={() => handleStepClick(index)}
-              >
-                {step.key}
-              </div>
-            ))}
-          </div>
+    <div className="av_carousel">
+      {selectedSlide === 1 ? (
+        <div className="money-img">{/* <img src={MoneyImg} /> */}</div>
+      ) : null}
+      <div
+        className={`av_carousel__left-arrow ${
+          selectedSlide === 1 ? "hidden" : ""
+        }`}
+      >
+        <div onClick={handlePrevSlide}>
+          <ArrowCircleLeftIcon className="arrow__icons" />
         </div>
-        <div className="progress_texts">
-          {[
-            {
-              key: "Create an Account",
-              value: "create a new account or login into your existing account",
-            },
-            {
-              key: "Fill The Details",
-              value: "Fill all the details to get the best looking portfolio{",
-            },
-            {
-              key: "  Save and Deploy",
-              value: "Just save & automatically deploy your portfolio",
-            },
-          ].map((step, index) => {
-            console.log(
-              `Current Step is : ${currentStep} and index is ${index}`
-            );
-            return (
-              <div
-                key={index}
-                className={`texts ${currentStep === index ? "selected" : ""} ${
-                  currentStep > index ? "completed" : ""
-                }`}
-                onClick={() => handleStepClick(index)}
-              >
-                {step.key} <br />
-              </div>
-            );
-          })}
+      </div>
+      <div
+        className={`av_carousel__right-arrow ${
+          selectedSlide === totalSlides - 2 ? "hidden" : ""
+        }`}
+      >
+        <div onClick={handleNextSlide}>
+          <ArrowCircleRightIcon className="arrow__icons" />
         </div>
-        <div className="progress_texts-sec">
-          {[
-            {
-              key: "Create an Account",
-              value:
-                "create a new account or \nlogin into your existing account",
-            },
-            {
-              key: "Fill The Details",
-              value:
-                "Fill all the details to get \n  the best looking portfolio",
-            },
-            {
-              key: "Save and Deploy",
-              value:
-                "Just save and we \nwill automatically deploy your \n Portfolio Website.",
-            },
-          ].map((step, index) => (
+      </div>
+      <div className="av_carousel_content">
+        <div className="av_carousel__slide-container">
+          {carouselData.map((item, index) => (
             <div
+              className={`av_carousel__slide ${
+                index === selectedSlide
+                  ? `active-${slideDirection}`
+                  : `not-active-${slideDirection}`
+              }`}
               key={index}
-              className={`texts-sec ${"index" + index} ${
-                currentStep === index ? "selected" : ""
-              } ${currentStep >= index ? "completed" : ""}`}
-              onClick={() => handleStepClick(index)}
             >
-              {step.value.split("\n").map((line, i) => (
-                <React.Fragment key={i}>
-                  {line}
-                  <br />
-                </React.Fragment>
-              ))}{" "}
-              <br />
+              <div
+                className={`prev-img ${
+                  index === 0 || index === totalSlides - 1 ? "no-border" : ""
+                } ${index === selectedSlide - 1 ? "active-prev" : ""}`}
+              >
+                {index === selectedSlide - 1 && item.img !== "" && (
+                  <img src={item.img} />
+                )}
+              </div>
+              {index === selectedSlide && (
+                <img src={item.img} className="active-img" />
+              )}
+              <div
+                className={`next-img ${
+                  index === 0 || index === totalSlides - 1 ? "no-border" : ""
+                } ${index === selectedSlide + 1 ? "active-next" : ""}`}
+              >
+                {index === selectedSlide + 1 && item.img !== "" && (
+                  <img src={item.img} />
+                )}
+              </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
-  );
-};
-
-const NavigationBar = () => {
-  const dispatch = useDispatch();
-  const loginButtonHandler = () => {
-    dispatch({
-      type: "OPEN_LOGIN_PANEL",
-    });
-  };
-
-  return (
-    <>
-      <div className="homepage__navbar__desktop">
-        <div className="navbar__logo">
-          Portfolio <span>Get</span>
+      <div className={`ew-carousel-data-${selectedSlide}`}>
+        <div className="left">
+          {carouselData[selectedSlide].breakVal1 === 0 ? (
+            <div className="ew-carousel-data__title Lg-display-01-medium">
+              {carouselData[selectedSlide].title}
+            </div>
+          ) : (
+            <div className="ew-carousel-data__title Lg-display-01-medium">
+              <div className="ew-title-desk-content">
+                {carouselData[selectedSlide].title.substring(
+                  0,
+                  carouselData[selectedSlide].breakVal1
+                )}
+                <br />
+                {carouselData[selectedSlide].title.substring(
+                  carouselData[selectedSlide].breakVal1
+                )}
+              </div>
+              <div className="ew-title-mob-content">
+                {carouselData[selectedSlide].title}
+              </div>
+            </div>
+          )}
         </div>
-
-        <div className="navbar__options">
-          <p
-            className="text_style_2"
-            onClick={() => {
-              loginButtonHandler();
-            }}
-          >
-            Log In
-          </p>
-          <p className="text_style_2" onClick={() => {}}>
-            Create new Account
-          </p>
+        <div className="right">
+          {carouselData[selectedSlide].breakVal === 0 ? (
+            <div className="ew-carousel-data__desc Lg-body-02-regular">
+              {carouselData[selectedSlide].description}
+            </div>
+          ) : (
+            <div className="ew-carousel-data__desc Lg-body-02-regular">
+              {carouselData[selectedSlide].description.substring(
+                0,
+                carouselData[selectedSlide].breakVal
+              )}
+              <br />
+              <br />
+              {carouselData[selectedSlide].description.substring(
+                carouselData[selectedSlide].breakVal
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
