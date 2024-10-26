@@ -1,5 +1,5 @@
 import "./PortfolioSteps.scss";
-import { AssetVaultData } from "./data";
+import { AssetVaultData } from "../../data";
 import { useEffect, useState } from "react";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";

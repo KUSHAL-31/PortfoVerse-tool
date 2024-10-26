@@ -8,6 +8,28 @@
     justify-content: center;
     align-items: center;
     background-color: rgb(255, 255, 255);
+
+    .login_signup_close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        background-color: $colorOne;
+        height: 30px;
+        width: 30px;
+
+        button {
+            background-color: transparent;
+            border: none;
+            height: 30px;
+            width: 30px;
+            cursor: pointer;
+            outline: none;
+            color: white;
+            font-weight: bold;
+        }
+    }
 }
 
 .login_signup_box {

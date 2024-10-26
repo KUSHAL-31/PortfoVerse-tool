@@ -1,11 +1,9 @@
-import Login from "./components/Auth/Login";
-import PortfolioSteps from "./components/PortfolioSteps/PortfolioSteps";
+import Home from "./components/pages/Home";
 
 function App() {
   return (
     <>
-      <PortfolioSteps />
-      {/* <Login /> */}
+      <Home />
     </>
   );
 }

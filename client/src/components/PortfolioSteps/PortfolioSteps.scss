@@ -3,7 +3,7 @@
 .av_carousel {
     display: flex;
     width: 100%;
-    height: 120vh;
+    height: calc(100vh - 80px);
     position: relative;
     overflow: hidden;
     justify-content: center;
@@ -101,8 +101,8 @@
                 }
 
                 img {
-                    width: 512px;
-                    height: 512px;
+                    width: 620px;
+                    height: 450px;
                     display: block;
                     margin: auto 1.5vw;
                     object-fit: contain;

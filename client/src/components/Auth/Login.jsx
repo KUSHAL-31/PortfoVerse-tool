@@ -6,7 +6,7 @@ import { Dialog } from "@mui/material";
 // import { login, register, clearErrors } from "../../actions/userActions";
 // import { useAlert } from "react-alert";
 
-const Login = ({ history, location }) => {
+const Login = ({ history, location, setShowLogin }) => {
   // const dispatch = useDispatch();
   //   const alert = useAlert();
 
@@ -76,110 +76,113 @@ const Login = ({ history, location }) => {
   return (
     <>
       {loading ? (
-        <>
-          {" "}
-          <div className="loading">
-            <div></div>
-          </div>
-        </>
+        <div className="loading">
+          <div></div>
+        </div>
       ) : (
         <Dialog open={true} className="">
-          <>
-            <div className="login_signup_container">
-              <div className="login_signup_box">
-                <div>
-                  <div className="login_signup_toggle">
-                    <p
-                      className="login_signup_tab_text"
-                      onClick={(e) => switchTab(e, "login")}
-                    >
-                      LOGIN
-                    </p>
-                    <p
-                      className="login_signup_tab_text"
-                      onClick={(e) => switchTab(e, "register")}
-                    >
-                      REGISTER
-                    </p>
-                  </div>
-                  <button ref={tabSwitcher}></button>
-                </div>
-                <form
-                  className="login_form"
-                  onSubmit={LoginSubmit}
-                  ref={loginTab}
-                >
-                  <div className="login_email">
-                    <MailOutlineOutlined />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      required
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="login_password">
-                    <LockOpen />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      required
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                    />
-                  </div>
-                  <input type="submit" value="Login" className="login_button" />
-                  <p className="other__methods__text">OR</p>
-                </form>
-                <form
-                  className="signup_form"
-                  onSubmit={SignupSubmit}
-                  ref={registerTab}
-                  encType="multipart/form-data"
-                >
-                  <div className="signup_username">
-                    <Face />
-                    <input
-                      type="text"
-                      placeholder="Username"
-                      required
-                      value={username}
-                      name="username"
-                      onChange={signupDataChange}
-                    />
-                  </div>
-                  <div className="signup_email">
-                    <MailOutlineOutlined />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      required
-                      value={email}
-                      onChange={signupDataChange}
-                    />
-                  </div>
-                  <div className="signup_password">
-                    <LockOpen />
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      required
-                      value={password}
-                      onChange={signupDataChange}
-                    />
-                  </div>
-                  <input
-                    type="submit"
-                    value="Register"
-                    className="signup_button"
-                  />
-                </form>
-              </div>
+          <div className="login_signup_container">
+            <div className="login_signup_close">
+              <button onClick={() => setShowLogin(false)}>X</button>
             </div>
-          </>
+            <div className="login_signup_box">
+              {/* Login/Register tab */}
+              <div>
+                <div className="login_signup_toggle">
+                  <p
+                    className="login_signup_tab_text"
+                    onClick={(e) => switchTab(e, "login")}
+                  >
+                    LOGIN
+                  </p>
+                  <p
+                    className="login_signup_tab_text"
+                    onClick={(e) => switchTab(e, "register")}
+                  >
+                    REGISTER
+                  </p>
+                </div>
+                <button ref={tabSwitcher}></button>
+              </div>
+
+              {/* Login Form */}
+              <form
+                className="login_form"
+                onSubmit={LoginSubmit}
+                ref={loginTab}
+              >
+                <div className="login_email">
+                  <MailOutlineOutlined />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                  />
+                </div>
+                <div className="login_password">
+                  <LockOpen />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                  />
+                </div>
+                <input type="submit" value="Login" className="login_button" />
+                <p className="other__methods__text">OR</p>
+              </form>
+
+              {/* Signup Form */}
+              <form
+                className="signup_form"
+                onSubmit={SignupSubmit}
+                ref={registerTab}
+                encType="multipart/form-data"
+              >
+                <div className="signup_username">
+                  <Face />
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    required
+                    value={username}
+                    name="username"
+                    onChange={signupDataChange}
+                  />
+                </div>
+                <div className="signup_email">
+                  <MailOutlineOutlined />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                    value={email}
+                    onChange={signupDataChange}
+                  />
+                </div>
+                <div className="signup_password">
+                  <LockOpen />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    value={password}
+                    onChange={signupDataChange}
+                  />
+                </div>
+                <input
+                  type="submit"
+                  value="Register"
+                  className="signup_button"
+                />
+              </form>
+            </div>
+          </div>
         </Dialog>
       )}
     </>
