@@ -60,7 +60,7 @@
 }
 
 .login_signup_tab_text {
-    color: $colorTwo;
+    color: $colorThree;
 }
 
 .login_signup_box > div > button {
@@ -105,7 +105,7 @@
     border-radius: 5px;
     outline: none;
     font: 300 1.1rem "Roboto";
-    color: $colorTwo;
+    color: $colorThree;
 }
 
 .login_form > div > input::placeholder,
@@ -172,29 +172,24 @@
 
 @media screen and (max-width: 600px) {
     .login_signup_container {
-        margin-top: 90px;
+        // margin-top: 90px;
         background-color: white;
     }
     .login_signup_box {
         width: 100vw;
-        height: 95vh;
+        // height: calc(100vh - 90px);
     }
     .login_signup_toggle {
         height: 5vmax;
     }
     .login_signup_toggle > p {
-        font: 500 1rem "Roboto";
-    }
-
-    .login_form,
-    .signup_form {
-        padding: 5vmax;
+        font: 500 0.8rem "Roboto";
     }
 
     .login_form > div > input,
     .signup_form > div > input {
-        padding: 1.8vmax 5vmax;
-        font: 300 1.1rem "Roboto";
+        padding: 1vmax 5vmax;
+        font: 300 0.8rem "Roboto";
         padding-left: 45px;
     }
 
@@ -210,10 +205,10 @@
 
     .login_button,
     .signup_button {
-        font: 300 1rem "Roboto";
-        padding: 1.8vmax;
+        font: 300 0.8rem "Roboto";
+        // padding: 1.8vmax;
     }
     .other__methods__text {
-        font-size: 1.3rem !important;
+        font-size: 0.8rem !important;
     }
 }

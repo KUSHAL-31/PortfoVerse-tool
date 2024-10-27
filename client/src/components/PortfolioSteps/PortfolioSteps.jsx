@@ -1,17 +1,17 @@
 import "./PortfolioSteps.scss";
 import { AssetVaultData } from "../../data";
 import { useEffect, useState } from "react";
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
-import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
-const transparentImageUrl =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import SkillsImg from "../../assets/images/skills.png";
+import ContactImg from "../../assets/images/contact.png";
 
 const PortfolioSteps = () => {
   const { section3 } = AssetVaultData;
   const carouselData = [
-    // { img: transparentImageUrl },
+    { img: SkillsImg },
     ...section3.carouselData,
-    // { img: transparentImageUrl },
+    { img: ContactImg },
   ];
 
   const [selectedSlide, setSelectedSlide] = useState(1);
@@ -51,7 +51,7 @@ const PortfolioSteps = () => {
         }`}
       >
         <div onClick={handlePrevSlide}>
-          <ArrowCircleLeftIcon className="arrow__icons" />
+          <ArrowBackIosIcon className="arrow__icons" />
         </div>
       </div>
       <div
@@ -60,7 +60,7 @@ const PortfolioSteps = () => {
         }`}
       >
         <div onClick={handleNextSlide}>
-          <ArrowCircleRightIcon className="arrow__icons" />
+          <ArrowForwardIosIcon className="arrow__icons" />
         </div>
       </div>
       <div className="av_carousel_content">
@@ -74,25 +74,23 @@ const PortfolioSteps = () => {
               }`}
               key={index}
             >
-              <div
-                className={`prev-img ${
-                  index === 0 || index === totalSlides - 1 ? "no-border" : ""
-                } ${index === selectedSlide - 1 ? "active-prev" : ""}`}
-              >
-                {index === selectedSlide - 1 && item.img !== "" && (
-                  <img src={item.img} />
+              <div className={`prev-img`}>
+                {index === selectedSlide - 1 && (
+                  <img
+                    src={item.img}
+                    className={index === 0 || index === 4 ? "blur-img" : ""}
+                  />
                 )}
               </div>
               {index === selectedSlide && (
                 <img src={item.img} className="active-img" />
               )}
-              <div
-                className={`next-img ${
-                  index === 0 || index === totalSlides - 1 ? "no-border" : ""
-                } ${index === selectedSlide + 1 ? "active-next" : ""}`}
-              >
-                {index === selectedSlide + 1 && item.img !== "" && (
-                  <img src={item.img} />
+              <div className={`next-img`}>
+                {index === selectedSlide + 1 && (
+                  <img
+                    src={item.img}
+                    className={index === 0 || index === 4 ? "blur-img" : ""}
+                  />
                 )}
               </div>
             </div>
@@ -101,46 +99,14 @@ const PortfolioSteps = () => {
       </div>
       <div className={`ew-carousel-data-${selectedSlide}`}>
         <div className="left">
-          {carouselData[selectedSlide].breakVal1 === 0 ? (
-            <div className="ew-carousel-data__title Lg-display-01-medium">
-              {carouselData[selectedSlide].title}
-            </div>
-          ) : (
-            <div className="ew-carousel-data__title Lg-display-01-medium">
-              <div className="ew-title-desk-content">
-                {carouselData[selectedSlide].title.substring(
-                  0,
-                  carouselData[selectedSlide].breakVal1
-                )}
-                <br />
-                {carouselData[selectedSlide].title.substring(
-                  carouselData[selectedSlide].breakVal1
-                )}
-              </div>
-              <div className="ew-title-mob-content">
-                {carouselData[selectedSlide].title}
-              </div>
-            </div>
-          )}
+          <div className="carousel_title">
+            {carouselData[selectedSlide].title}
+          </div>
         </div>
         <div className="right">
-          {carouselData[selectedSlide].breakVal === 0 ? (
-            <div className="ew-carousel-data__desc Lg-body-02-regular">
-              {carouselData[selectedSlide].description}
-            </div>
-          ) : (
-            <div className="ew-carousel-data__desc Lg-body-02-regular">
-              {carouselData[selectedSlide].description.substring(
-                0,
-                carouselData[selectedSlide].breakVal
-              )}
-              <br />
-              <br />
-              {carouselData[selectedSlide].description.substring(
-                carouselData[selectedSlide].breakVal
-              )}
-            </div>
-          )}
+          <div className="carousel_description">
+            {carouselData[selectedSlide].description}
+          </div>
         </div>
       </div>
     </div>

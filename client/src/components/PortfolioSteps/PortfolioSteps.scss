@@ -15,8 +15,12 @@
     }
 
     .arrow__icons {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
+        color: rgb(0, 0, 0);
+        background-color: rgba(241, 239, 239, 0.781);
+        border-radius: 50%;
+        padding: 10px;
     }
 
     &__left-arrow,
@@ -62,7 +66,6 @@
                     scale: 0.7;
                     img {
                         border-radius: 16px;
-                        border: 2px solid #c7c9d1;
                         padding: 10px;
                     }
                 }
@@ -84,7 +87,6 @@
                     scale: 0.7;
                     img {
                         border-radius: 16px;
-                        border: 2px solid #c7c9d1;
                         padding: 10px;
                     }
                 }
@@ -101,12 +103,12 @@
                 }
 
                 img {
-                    width: 620px;
-                    height: 450px;
+                    width: 600px;
+                    height: 400px;
                     display: block;
                     margin: auto 1.5vw;
                     object-fit: contain;
-                    border: 4px solid $colorOne;
+                    // border: 4px solid $colorOne;
                     border-radius: 16px;
                     padding: 10px;
                 }
@@ -215,9 +217,31 @@
     }
 }
 
+.carousel_title {
+    font-size: 45px;
+    font-weight: 800;
+    line-height: 30px;
+    color: $colorOneDark;
+    margin-bottom: 2%;
+    font-family: "Roboto";
+}
+
+.carousel_description {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 30px;
+    color: $colorOneDark;
+    margin-bottom: 2%;
+    font-family: "Roboto";
+}
+
+.blur-img {
+    opacity: 0.4;
+}
+
 @media screen and (max-width: 800px) {
     .av_carousel {
-        height: max-content;
+        height: calc(100vh - 80px);
         margin: 15% auto;
         .money-img {
             display: none;
@@ -235,15 +259,6 @@
         .av_carousel_content {
             .av_carousel__slide-container {
                 .av_carousel__slide {
-                    .prev-img::before {
-                        left: 0;
-                        background: linear-gradient(to right, white 85%, transparent);
-                    }
-                    .next-img::before {
-                        left: 0;
-                        background: linear-gradient(to left, white 85%, transparent);
-                        z-index: 1;
-                    }
                     .prev-img,
                     .next-img {
                         img {
