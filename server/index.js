@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const path = require("path");
 const cookieParser = require("cookie-parser")
 const fileUpload = require("express-fileupload")
 const errMiddleware = require("./middlewares/error");
@@ -15,7 +14,7 @@ require("dotenv").config();
 
 // Cors policy
 app.use(cors({
-    origin: ["https://k31-portfolio-template.vercel.app/", "http://localhost:5173", "http://localhost:3000"],
+    origin: ["https://k31-portfolio-template.vercel.app/", "https://k31-portfolio-template.vercel.app", "http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
 }));
@@ -26,7 +25,7 @@ app.use(Helmet());
 app.use(morganMiddleware);
 
 // Rate limiter 
-// app.use('/api', limiter);
+app.use('/api', limiter);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
