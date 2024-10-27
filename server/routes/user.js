@@ -6,7 +6,7 @@ const router = express.Router();
 // User sign up routes
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
-router.route("/logout").post(logoutUser);
+router.route("/logout").get(logoutUser);
 router.route("/details").get(authUser, getUserDetailsById);
 
 // User portfolio related APIs

@@ -17,7 +17,6 @@ function App() {
   }, []);
 
   if (loading === undefined || loading) {
-    console.log("loading", loading);
     return <div>Loading...</div>;
   }
 

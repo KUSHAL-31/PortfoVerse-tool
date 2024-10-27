@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { Dialog } from "@mui/material";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
 import { registerUser, loginUser } from "../../redux/actions/userActions";
+import { useNavigate } from "react-router-dom";
 // import { login, register, clearErrors } from "../../actions/userActions";
 // import { useAlert } from "react-alert";
 
@@ -28,11 +29,14 @@ const Login = ({ history, location }) => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   const { username, email, password } = user;
 
   const LoginSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email: loginEmail, password: loginPassword }));
+    navigate("/create-profile");
   };
 
   const SignupSubmit = (e) => {
@@ -42,6 +46,7 @@ const Login = ({ history, location }) => {
     // myForm.set("email", email);
     // myForm.set("password", password);
     dispatch(registerUser({ username, email, password }));
+    navigate("/create-profile");
   };
 
   const signupDataChange = (e) => {

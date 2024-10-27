@@ -1,14 +1,13 @@
 import {
     LOAD_USER_SUCCESS, LOAD_USER_REQUEST, LOAD_USER_FAILURE, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_FAILURE, LOGOUT_REQUEST,
-    LOGOUT_SUCCESS, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS
+    LOGOUT_SUCCESS, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS,
+    TOGGLE_LOGIN_BOX
 } from "../constants"
 
 import axios from "axios";
-import { getUserDetailsUrl, loginUrl, registerUrl } from "../service/api_url";
-import { redirect, useNavigate } from "react-router-dom";
+import { getUserDetailsUrl, loginUrl, registerUrl, userLogoutUrl } from "../service/api_url";
 
 export const registerUser = (user) => async (dispatch) => {
-    const navigate = useNavigate();
 
     try {
         dispatch({ type: REGISTER_REQUEST });
@@ -20,11 +19,8 @@ export const registerUser = (user) => async (dispatch) => {
 
         dispatch({ type: REGISTER_SUCCESS, payload: data.user });
 
-        // Use navigate instead of redirect for in-app navigation
-        navigate("/create-profile");
+        dispatch({ type: TOGGLE_LOGIN_BOX });
 
-        // Optionally, call loadUser if you want to fetch and update the user state
-        // dispatch(loadUser());
     } catch (error) {
         dispatch({
             type: REGISTER_FAILURE,
@@ -44,15 +40,10 @@ export const loginUser = (user) => async (dispatch) => {
             withCredentials: true, // This allows cross-origin cookies to be set
         });
 
-        console.log(data);
-
         dispatch({ type: LOGIN_SUCCESS, payload: data.user });
 
-        // Use navigate instead of redirect for React Router navigation
-        // navigate("/create-profile");
+        dispatch({ type: TOGGLE_LOGIN_BOX });
 
-        // Uncomment if loadUser is needed
-        // dispatch(loadUser());
     } catch (error) {
         dispatch({
             type: LOGIN_FAILURE,
@@ -63,7 +54,6 @@ export const loginUser = (user) => async (dispatch) => {
 
 
 export const loadUser = () => async (dispatch) => {
-    // const navigate = useNavigate();
     try {
         dispatch({ type: LOAD_USER_REQUEST });
 
@@ -74,8 +64,6 @@ export const loadUser = () => async (dispatch) => {
 
         dispatch({ type: LOAD_USER_SUCCESS, payload: data.user });
 
-        // Use navigate instead of redirect for smooth in-app navigation
-        // navigate("/create-profile");
     } catch (error) {
         dispatch({
             type: LOAD_USER_FAILURE,
@@ -83,3 +71,22 @@ export const loadUser = () => async (dispatch) => {
         });
     }
 };
+
+export const logoutUser = () => async (dispatch) => {
+    try {
+        dispatch({ type: LOGOUT_REQUEST });
+
+        // Set withCredentials to include cookies in the request
+        await axios.get(userLogoutUrl, {
+            withCredentials: true, // Ensures cookies are included
+        });
+
+        dispatch({ type: LOGOUT_SUCCESS });
+
+    } catch (error) {
+        dispatch({
+            type: LOGOUT_FAILURE,
+            payload: error.response?.data?.message || "An error occurred",
+        });
+    }
+}

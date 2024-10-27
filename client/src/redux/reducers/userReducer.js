@@ -2,7 +2,6 @@ import { createReducer } from "@reduxjs/toolkit";
 import { LOAD_USER_FAILURE, LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_FAILURE, LOGOUT_SUCCESS, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS } from "../constants";
 
 const initialState = {
-    user: {},
 };
 
 export const userReducer = createReducer(initialState, (builder) => {

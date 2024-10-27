@@ -37,6 +37,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
 
 // API to logout a user
 exports.logoutUser = asyncErrorHandler(async (req, res, next) => {
+    console.log("Logout user");
     res.cookie("token", null, {
         expires: new Date(Date.now()),
         httpOnly: true,
