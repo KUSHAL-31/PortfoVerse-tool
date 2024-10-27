@@ -31,7 +31,6 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     if (!isPasswordTrue) {
         return next(new HandleError("Invalid email or password", 400));
     }
-    console.log(user);
     return sendToken(user, 200, res);
 })
 

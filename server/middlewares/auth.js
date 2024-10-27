@@ -5,6 +5,7 @@ const HandleError = require("../utility/handleError");
 
 exports.authUser = asyncErrorHandler(async (req, res, next) => {
     const { token } = req.cookies;
+    console.log(token);
     if (!token) {
         return next(new HandleError("Please login to access this feature", 401));
     }

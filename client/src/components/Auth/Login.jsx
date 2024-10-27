@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Login.scss";
 import { MailOutlineOutlined, LockOpen, Face } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { Dialog } from "@mui/material";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
+import { registerUser, loginUser } from "../../redux/actions/userActions";
 // import { login, register, clearErrors } from "../../actions/userActions";
 // import { useAlert } from "react-alert";
 
@@ -31,16 +32,16 @@ const Login = ({ history, location }) => {
 
   const LoginSubmit = (e) => {
     e.preventDefault();
-    // dispatch(login(loginEmail, loginPassword));
+    dispatch(loginUser({ email: loginEmail, password: loginPassword }));
   };
 
   const SignupSubmit = (e) => {
     e.preventDefault();
-    const myForm = new FormData();
-    myForm.set("username", username);
-    myForm.set("email", email);
-    myForm.set("password", password);
-    // dispatch(register(myForm));
+    // const myForm = new FormData();
+    // myForm.set("username", username);
+    // myForm.set("email", email);
+    // myForm.set("password", password);
+    dispatch(registerUser({ username, email, password }));
   };
 
   const signupDataChange = (e) => {

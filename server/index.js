@@ -15,7 +15,7 @@ require("dotenv").config();
 
 // Cors policy
 app.use(cors({
-    origin: ["https://kushalsoni-portfolio.vercel.app", "http://localhost:5173", "http://localhost:3000"],
+    origin: ["https://k31-portfolio-maker.vercel.app", "http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
 }));
@@ -26,7 +26,7 @@ app.use(Helmet());
 app.use(morganMiddleware);
 
 // Rate limiter 
-app.use('/api', limiter);
+// app.use('/api', limiter);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
