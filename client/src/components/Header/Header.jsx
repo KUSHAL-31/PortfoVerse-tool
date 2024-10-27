@@ -1,8 +1,12 @@
 import React from "react";
 import "./Header.scss";
 import "../../design/Buttons.scss";
+import { useDispatch } from "react-redux";
+import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
 
-const Header = ({ setShowLogin }) => {
+const Header = () => {
+  const dispatch = useDispatch();
+
   return (
     <div className="header">
       <div className="header_left">
@@ -12,7 +16,10 @@ const Header = ({ setShowLogin }) => {
         </h3>
       </div>
       <div className="header_right">
-        <button className="button1" onClick={() => setShowLogin(true)}>
+        <button
+          className="button1"
+          onClick={() => dispatch({ type: TOGGLE_LOGIN_BOX })}
+        >
           Login
         </button>
       </div>

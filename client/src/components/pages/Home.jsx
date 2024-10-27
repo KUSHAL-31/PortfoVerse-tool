@@ -1,17 +1,14 @@
-import React, { useState } from "react";
-import Header from "../../components/Header/Header";
+import React from "react";
 import PortfolioSteps from "../../components/PortfolioSteps/PortfolioSteps";
 import Login from "../../components/Auth/Login";
+import { useSelector } from "react-redux";
 
 const Home = () => {
-  const [showLogin, setShowLogin] = useState(false);
+  const { showLoginBox } = useSelector((state) => state.globalReducer);
 
   return (
     <>
-      {showLogin && <Login setShowLogin={setShowLogin} />}
-
-      {/* {showLogin && <Login />} */}
-      <Header setShowLogin={setShowLogin} />
+      {showLoginBox && <Login />}
       <PortfolioSteps />
     </>
   );

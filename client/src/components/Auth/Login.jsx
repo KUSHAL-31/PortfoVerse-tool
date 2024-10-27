@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Login.scss";
 import { MailOutlineOutlined, LockOpen, Face } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Dialog } from "@mui/material";
+import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
 // import { login, register, clearErrors } from "../../actions/userActions";
 // import { useAlert } from "react-alert";
 
-const Login = ({ history, location, setShowLogin }) => {
-  // const dispatch = useDispatch();
+const Login = ({ history, location }) => {
+  const dispatch = useDispatch();
   //   const alert = useAlert();
 
   // const { error, loading, authUser } = useSelector((state) => state.user);
@@ -83,7 +84,9 @@ const Login = ({ history, location, setShowLogin }) => {
         <Dialog open={true} className="">
           <div className="login_signup_container">
             <div className="login_signup_close">
-              <button onClick={() => setShowLogin(false)}>X</button>
+              <button onClick={() => dispatch({ type: TOGGLE_LOGIN_BOX })}>
+                X
+              </button>
             </div>
             <div className="login_signup_box">
               {/* Login/Register tab */}
