@@ -14,11 +14,11 @@ require("dotenv").config();
 // Defining express middlewares
 
 // Cors policy
-app.use(cors({
-    origin: ["https://k31-portfolio-maker.vercel.app", "http://localhost:5173", "http://localhost:3000"],
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    credentials: true,
-}));
+// app.use(cors({
+//     origin: ["https://k31-portfolio-maker.vercel.app", "http://localhost:5173", "http://localhost:3000"],
+//     methods: ["GET", "POST", "PATCH", "DELETE"],
+//     credentials: true,
+// }));
 
 app.use(Helmet());
 
