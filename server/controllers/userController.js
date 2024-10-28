@@ -80,11 +80,11 @@ exports.getUserDetailsById = asyncErrorHandler(async (req, res, next) => {
 
 exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, description, resume, image, roles, socials } = req.body;
+    const { portfolioId, title, description, resume, image, roles, socials } = req.body;
     if (title === undefined || description === undefined || roles === undefined) {
         return next(new HandleError("Please fill all the fields", 400));
     }
-    let objectToCreate = { title, description, resume, roles, socials };
+    let objectToCreate = { title, description, resume, roles, socials, images: [image] };
     if (image) {
         const result = await cloudinary.v2.uploader.upload(image, {
             folder: "k31portfolios",
@@ -93,6 +93,7 @@ exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
     }
     const userMetaData = await UserMetaData.create({
         user: userId,
+        portfolio: portfolioId,
         ...objectToCreate,
     });
     if (!userMetaData) {
@@ -108,7 +109,7 @@ exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
 // API to change meta data by user id
 exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, description, resume, image, roles, socials, isImageEdited, contactMeEnabled } = req.body;
+    const { portfolioId, title, description, resume, image, roles, socials, isImageEdited, contactMeEnabled } = req.body;
     if (title === undefined || description === undefined || roles === undefined) {
         return next(new HandleError("Please fill all the fields", 400));
     }
@@ -123,7 +124,7 @@ exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
         updateObject.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
     }
 
-    const userMetaData = await UserMetaData.findOneAndUpdate({ user: userId }, {
+    const userMetaData = await UserMetaData.findOneAndUpdate({ user: userId, portfolio: portfolioId }, {
         $set: updateObject
     }, { new: true, runValidators: true });
     if (!userMetaData) {
@@ -141,7 +142,8 @@ exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
 // API to get meta data by user id
 exports.getMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const userMetaData = await UserMetaData.findOne({ user: userId });
+    const portfolioId = req.params.id;
+    const userMetaData = await UserMetaData.findOne({ user: userId, portfolio: portfolioId });
     res.status(200).json({
         success: true,
         userMetaData,
@@ -151,8 +153,9 @@ exports.getMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.toggleContactMeForm = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
     const { isEnabled } = req.body;
-    await UserMetaData.findByIdAndUpdate(userId, {
+    await UserMetaData.findByIdAndUpdate(portfolioId, {
         $set: { contactMeEnabled: isEnabled }
     }, { new: true, runValidators: true })
     res.status(200).json({

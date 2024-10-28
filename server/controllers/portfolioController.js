@@ -13,7 +13,7 @@ const cloudinary = require("cloudinary");
 
 exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { logo, headerTitle, websiteName, isLogoEdited } = req.body;
+    const { logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
 
     if (!headerTitle) {
         return next(new HandleError("Please fill all the fields", 400));
@@ -43,12 +43,13 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
             headerTitle,
             details: {
                 websiteName,
+                websiteUrl
             },
-            isPublished: true, // Default value if not provided
+            isPublished, // Default value if not provided
         });
     } else {
         // If the portfolio data exists, update only the specified fields
-        let updateObject = { headerTitle, details: { websiteName } };
+        let updateObject = { headerTitle, isPublished, details: { websiteName, websiteUrl } };
 
         portfolioData = await UserPortfolio.findByIdAndUpdate(
             portfolioData._id,

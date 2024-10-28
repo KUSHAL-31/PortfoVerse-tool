@@ -12,7 +12,7 @@ router.route("/details").get(authUser, getUserDetailsById);
 // User portfolio related APIs
 router.route("/metadata/create").post(authUser, createUserMetaData);
 router.route("/metadata/edit").patch(authUser, editUserMetaData);
-router.route("/metadata/details").get(authUser, getMetaDataByUserId);
+router.route("/metadata/details/:id").get(authUser, getMetaDataByUserId);
 
 // User meta data routes
 
