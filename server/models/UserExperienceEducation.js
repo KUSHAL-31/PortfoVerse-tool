@@ -7,6 +7,11 @@ const userExperienceEducationSchema = new mongoose.Schema({
         ref: "K31PortfolioUsers",
         required: true,
     },
+    portfolio: {
+        type: mongoose.Schema.ObjectId,
+        ref: "K31PortfolioUsers",
+        required: true,
+    },
     education: [
         {
             educationId: {

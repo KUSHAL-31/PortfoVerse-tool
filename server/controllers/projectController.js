@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, description, image, url, sourceCode } = req.body;
+    const { portfolioId, title, description, image, url, sourceCode } = req.body;
     if (title === undefined || description === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
@@ -18,9 +18,9 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     }
 
     // Find the user's website document
-    var projectDetails = await UserProjects.findOne({ user: userId });
+    var projectDetails = await UserProjects.findOne({ user: userId, portfolio: portfolioId });
     if (!projectDetails) {
-        projectDetails = new UserProjects({ user: userId, projects: [] });
+        projectDetails = new UserProjects({ user: userId, portfolio: portfolioId, projects: [] });
     }
 
     // Create a new project
@@ -49,7 +49,7 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.editProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { projectId, title, description, image, url, sourceCode, isImageEdited } = req.body;
+    const { portfolioId, projectId, title, description, image, url, sourceCode, isImageEdited } = req.body;
 
     if (!projectId || !title || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
@@ -63,7 +63,7 @@ exports.editProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     }
 
     // Find the user's project details document
-    const projectDetails = await UserProjects.findOne({ user: userId });
+    const projectDetails = await UserProjects.findOne({ user: userId, portfolio: portfolioId });
 
     if (!projectDetails) {
         return next(new HandleError("User project details not found", 404));
@@ -104,14 +104,14 @@ exports.editProjectByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { projectId } = req.body;
+    const { portfolioId, projectId } = req.body;
 
     if (!projectId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's project details document
-    const projectDetails = await UserProjects.findOne({ user: userId });
+    const projectDetails = await UserProjects.findOne({ user: userId, portfolio: portfolioId });
 
     if (!projectDetails) {
         return next(new HandleError("Project not found", 404));
@@ -145,8 +145,9 @@ exports.deleteProjectByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllProjectsByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
     // Find the user's project details document
-    const projectDetails = await UserProjects.findOne({ user: userId });
+    const projectDetails = await UserProjects.findOne({ user: userId, portfolio: portfolioId });
 
     if (!projectDetails) {
         return next(new HandleError("No projects found", 404));
@@ -161,14 +162,15 @@ exports.getAllProjectsByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getProjectById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const projectId = req.params.id;
+    const projectId = req.query.projectId;
+    const portfolioId = req.query.portfolioId;
 
     if (!projectId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's project details document
-    const projectDetails = await UserProjects.findOne({ user: userId });
+    const projectDetails = await UserProjects.findOne({ user: userId, portfolio: portfolioId });
 
     // Find the project by projectId
     const project = projectDetails.projects.find(p => p.projectId === projectId);

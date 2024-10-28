@@ -6,8 +6,8 @@ const router = express.Router();
 // SKills API
 router.route("/create").post(authUser, listNewProjectByUserId);
 router.route("/edit").patch(authUser, editProjectByUserId);
-router.route("/getAll").get(authUser, getAllProjectsByUserId);
-router.route("/get/:id").get(authUser, getProjectById);
+router.route("/getAll/:id").get(authUser, getAllProjectsByUserId);
+router.route("/get").get(authUser, getProjectById);
 router.route("/remove").post(authUser, deleteProjectByUserId);
 
 

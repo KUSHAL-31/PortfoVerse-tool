@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { employerName, companyName, image, comment, rating, employerRole } = req.body;
+    const { portfolioId, employerName, companyName, image, comment, rating, employerRole } = req.body;
     if (employerName === undefined || companyName === undefined || rating === undefined || employerRole === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
@@ -20,9 +20,9 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
     }
 
     // Find the user's website document
-    var testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    var testimonialDetails = await UserTestimonials.findOne({ user: userId, portfolio: portfolioId });
     if (!testimonialDetails) {
-        testimonialDetails = new UserTestimonials({ user: userId, testimonials: [] });
+        testimonialDetails = new UserTestimonials({ user: userId, testimonials: [], portfolio: portfolioId });
     }
 
     // Create a new testimonial
@@ -52,7 +52,7 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
 
 exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { testimonialId, employerName, companyName, image, comment, rating, isImageEdited, employerRole } = req.body;
+    const { portfolioId, testimonialId, employerName, companyName, image, comment, rating, isImageEdited, employerRole } = req.body;
 
     if (!testimonialId || !employerName || !companyName || !rating) {
         return next(new HandleError("Please fill the mandatory fields", 400));
@@ -66,7 +66,7 @@ exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     }
 
     // Find the user's testimonial details document
-    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    const testimonialDetails = await UserTestimonials.findOne({ user: userId, portfolio: portfolioId });
 
     if (!testimonialDetails) {
         return next(new HandleError("User testimonial details not found", 404));
@@ -107,14 +107,14 @@ exports.editTestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.deletetestimonialByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { testimonialId } = req.body;
+    const { portfolioId, testimonialId } = req.body;
 
     if (!testimonialId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's testimonial details document
-    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    const testimonialDetails = await UserTestimonials.findOne({ user: userId, portfolio: portfolioId });
 
     if (!testimonialDetails) {
         return next(new HandleError("testimonial not found", 404));
@@ -148,8 +148,9 @@ exports.deletetestimonialByUserId = asyncErrorHandler(async (req, res, next) => 
 
 exports.getAlltestimonialsByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
     // Find the user's testimonial details document
-    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    const testimonialDetails = await UserTestimonials.findOne({ user: userId, portfolio: portfolioId });
 
     if (!testimonialDetails) {
         return next(new HandleError("No testimonials found", 404));
@@ -166,14 +167,15 @@ exports.getAlltestimonialsByUserId = asyncErrorHandler(async (req, res, next) =>
 
 exports.getTestimonialById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const testimonialId = req.params.id;
+    const testimonialId = req.query.testimonialId;
+    const portfolioId = req.query.portfolioId;
 
     if (!testimonialId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's testimonial details document
-    const testimonialDetails = await UserTestimonials.findOne({ user: userId });
+    const testimonialDetails = await UserTestimonials.findOne({ user: userId, portfolio: portfolioId });
 
     // Find the testimonial by testimonialId
     const testimonial = testimonialDetails.testimonials.find(t => t.testimonialId === testimonialId);

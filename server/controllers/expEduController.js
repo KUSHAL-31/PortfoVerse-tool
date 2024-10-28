@@ -5,17 +5,17 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.addNewEducation = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { degree, school, startDate, endDate, result, comments } = req.body;
+    const { portfolioId, degree, school, startDate, endDate, result, comments } = req.body;
 
     if (!degree || !school || !startDate || !endDate || !result) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
     // Find the user's education and experience document
-    let expEduDetails = await UserExpEdu.findOne({ user: userId });
+    let expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
-        expEduDetails = new UserExpEdu({ user: userId, education: [], experience: [] });
+        expEduDetails = new UserExpEdu({ user: userId, portfolio: portfolioId, education: [], experience: [] });
     }
 
     // Create a new education entry
@@ -45,14 +45,14 @@ exports.addNewEducation = asyncErrorHandler(async (req, res, next) => {
 
 exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { educationId, degree, school, startDate, endDate, result, comments } = req.body;
+    const { portfolioId, educationId, degree, school, startDate, endDate, result, comments } = req.body;
 
-    if (!educationId || !degree || !school || !startDate || !endDate || !result) {
+    if (!educationId || !degree || !school || !startDate || !endDate || !result || !portfolioId) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
     // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User education details not found", 404));
@@ -89,14 +89,14 @@ exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { educationId } = req.body;
+    const { portfolioId, educationId } = req.body;
 
     if (!educationId) {
         return next(new HandleError("Education ID is required", 400));
     }
 
     // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User education details not found", 404));
@@ -125,9 +125,10 @@ exports.deleteEducationById = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllEducationByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
 
     // Find the user's education details document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("No education found", 404));
@@ -143,14 +144,15 @@ exports.getAllEducationByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const educationId = req.params.id;
+    const educationId = req.query.educationId;
+    const portfolioId = req.query.portfolioId;
 
     if (!educationId) {
         return next(new HandleError("Education ID is required", 400));
     }
 
     // Find the user's education details document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User education details not found", 404));
@@ -177,17 +179,17 @@ exports.getEducationById = asyncErrorHandler(async (req, res, next) => {
 
 exports.addNewExperience = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, company, startDate, endDate, description, certificate, isPresent } = req.body;
+    const { portfolioId, title, company, startDate, endDate, description, certificate, isPresent } = req.body;
 
     if (!title || !company || !startDate || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
     // Find the user's education and experience document
-    let expEduDetails = await UserExpEdu.findOne({ user: userId });
+    let expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
-        expEduDetails = new UserExpEdu({ user: userId, education: [], experience: [] });
+        expEduDetails = new UserExpEdu({ user: userId, portfolio: portfolioId, education: [], experience: [] });
     }
 
     // Create a new experience entry
@@ -219,14 +221,14 @@ exports.addNewExperience = asyncErrorHandler(async (req, res, next) => {
 
 exports.editExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { experienceId, title, company, startDate, endDate, description, certificate, isPresent } = req.body;
+    const { portfolioId, experienceId, title, company, startDate, endDate, description, certificate, isPresent } = req.body;
 
     if (!experienceId || !title || !company || !startDate || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
     // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User experience details not found", 404));
@@ -265,14 +267,14 @@ exports.editExperienceById = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { experienceId } = req.body;
+    const { portfolioId, experienceId } = req.body;
 
     if (!experienceId) {
         return next(new HandleError("Experience ID is required", 400));
     }
 
     // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User experience details not found", 404));
@@ -301,9 +303,10 @@ exports.deleteExperienceById = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllExperienceByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
 
     // Find the user's experience details document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("No experience found", 404));
@@ -319,14 +322,15 @@ exports.getAllExperienceByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const experienceId = req.params.id;
+    const experienceId = req.query.experienceId;
+    const portfolioId = req.query.portfolioId;
 
     if (!experienceId) {
         return next(new HandleError("Experience ID is required", 400));
     }
 
     // Find the user's experience details document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId });
+    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
 
     if (!expEduDetails) {
         return next(new HandleError("User experience details not found", 404));

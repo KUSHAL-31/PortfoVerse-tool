@@ -8,14 +8,14 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { title, description } = req.body;
+    const { portfolioId, title, description } = req.body;
     if (title === undefined || description === undefined) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
     // Find the user's website document
-    var serviceDetails = await UserServices.findOne({ user: userId });
+    var serviceDetails = await UserServices.findOne({ user: userId, portfolio: portfolioId });
     if (!serviceDetails) {
-        serviceDetails = new UserServices({ user: userId, services: [] });
+        serviceDetails = new UserServices({ user: userId, portfolio: portfolioId, services: [] });
     }
 
     // Create a new service
@@ -41,14 +41,14 @@ exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.editserviceByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { serviceId, title, description } = req.body;
+    const { portfolioId, serviceId, title, description } = req.body;
 
     if (!serviceId || !title || !description) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }
 
     // Find the user's service details document
-    const serviceDetails = await UserServices.findOne({ user: userId });
+    const serviceDetails = await UserServices.findOne({ user: userId, portfolio: portfolioId });
 
     if (!serviceDetails) {
         return next(new HandleError("Service not found", 404));
@@ -81,14 +81,14 @@ exports.editserviceByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteserviceByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { serviceId } = req.body;
+    const { portfolioId, serviceId } = req.body;
 
     if (!serviceId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's service details document
-    const serviceDetails = await UserServices.findOne({ user: userId });
+    const serviceDetails = await UserServices.findOne({ user: userId, portfolio: portfolioId });
 
     if (!serviceDetails) {
         return next(new HandleError("service not found", 404));
@@ -117,8 +117,9 @@ exports.deleteserviceByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllservicesByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
+    const portfolioId = req.params.id;
     // Find the user's service details document
-    const serviceDetails = await UserServices.findOne({ user: userId });
+    const serviceDetails = await UserServices.findOne({ user: userId, portfolio: portfolioId });
 
     if (!serviceDetails) {
         return next(new HandleError("No services found", 404));
@@ -134,14 +135,15 @@ exports.getAllservicesByUserId = asyncErrorHandler(async (req, res, next) => {
 
 exports.getServiceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const serviceId = req.params.id;
+    const serviceId = req.query.serviceId;
+    const portfolioId = req.query.portfolioId;
 
     if (!serviceId) {
         return next(new HandleError("Something went wrong", 400));
     }
 
     // Find the user's service details document
-    const serviceDetails = await UserServices.findOne({ user: userId });
+    const serviceDetails = await UserServices.findOne({ user: userId, portfolio: portfolioId });
 
     // Find the service by serviceId
     const service = serviceDetails.services.find(s => s.serviceId === serviceId);
