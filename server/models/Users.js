@@ -19,10 +19,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         validate: [validator.isMobilePhone, "Please enter a valid phone number"],
     },
-    avatar: {
-        type: String,
-        default: "https://via.placeholder.com/150",
-    },
     password: {
         type: String,
         required: [true, "Please enter your password"],

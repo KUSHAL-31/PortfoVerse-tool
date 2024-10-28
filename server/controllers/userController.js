@@ -9,9 +9,9 @@ const cloudinary = require("cloudinary");
 // API to register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
     let user;
-    const { username, email, password } = req.body;
+    const { username, email, password, phoneNumber } = req.body;
     user = await User.create({
-        username, email, password
+        username, email, password, phoneNumber
     })
     sendToken(user, 201, res);
 })

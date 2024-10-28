@@ -1,6 +1,11 @@
 import React, { useRef, useState } from "react";
 import "./Login.scss";
-import { MailOutlineOutlined, LockOpen, Face } from "@mui/icons-material";
+import {
+  MailOutlineOutlined,
+  LockOpen,
+  Face,
+  Phone,
+} from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { Dialog } from "@mui/material";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
@@ -22,11 +27,13 @@ const Login = ({ history, location }) => {
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const [user, setUser] = useState({
     username: "",
     email: "",
     password: "",
+    phoneNumber: "",
   });
 
   const navigate = useNavigate();
@@ -36,7 +43,7 @@ const Login = ({ history, location }) => {
   const LoginSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email: loginEmail, password: loginPassword }));
-    navigate("/create-profile");
+    navigate("/edit-profile");
   };
 
   const SignupSubmit = (e) => {
@@ -45,8 +52,8 @@ const Login = ({ history, location }) => {
     // myForm.set("username", username);
     // myForm.set("email", email);
     // myForm.set("password", password);
-    dispatch(registerUser({ username, email, password }));
-    navigate("/create-profile");
+    dispatch(registerUser({ username, email, password, phoneNumber }));
+    navigate("/edit-profile");
   };
 
   const signupDataChange = (e) => {
@@ -182,6 +189,15 @@ const Login = ({ history, location }) => {
                     required
                     value={password}
                     onChange={signupDataChange}
+                  />
+                </div>
+                <div className="login_phoneNumber">
+                  <Phone />
+                  <input
+                    type="number"
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                   />
                 </div>
                 <input

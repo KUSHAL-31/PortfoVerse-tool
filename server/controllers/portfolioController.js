@@ -189,3 +189,13 @@ exports.checkPortfolioName = asyncErrorHandler(async (req, res, next) => {
         message: isAvailable ? 'Website name is available' : 'Website name is already taken',
     });
 });
+
+exports.getAllUserPortfolios = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const portfolios = await UserPortfolio.find({ user: userId });
+    res.status(200).json({
+        success: true,
+        portfolios,
+        message: "User Portfolios fetched successfully",
+    });
+});
