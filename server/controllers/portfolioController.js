@@ -52,14 +52,14 @@ exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
 
 exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
+    const { portfolioId, logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
 
     if (!headerTitle) {
         return next(new HandleError("Please fill all the fields", 400));
     }
 
     // Check if the user portfolio exists
-    let portfolioData = await UserPortfolio.findOne({ user: userId });
+    let portfolioData = await UserPortfolio.findOne({ user: userId, _id: portfolioId });
 
     // if (isLogoEdited) {
     //     if (!logo) {
@@ -77,6 +77,7 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     if (!portfolioData) {
         // If the portfolio data doesn't exist, create a new document
         portfolioData = await UserPortfolio.create({
+            logo,
             user: userId,
             // logo: { public_id: updateObject.image.public_id, url: updateObject.image.url },
             headerTitle,
@@ -88,7 +89,7 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
         });
     } else {
         // If the portfolio data exists, update only the specified fields
-        let updateObject = { headerTitle, isPublished, details: { websiteName, websiteUrl } };
+        let updateObject = { headerTitle, isPublished, logo, details: { websiteName, websiteUrl } };
 
         portfolioData = await UserPortfolio.findByIdAndUpdate(
             portfolioData._id,

@@ -85,12 +85,12 @@ exports.createUserMetaData = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("Please fill all the fields", 400));
     }
     let objectToCreate = { title, description, resume, roles, socials, images: [image] };
-    if (image) {
-        const result = await cloudinary.v2.uploader.upload(image, {
-            folder: "k31portfolios",
-        });
-        objectToCreate.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
-    }
+    // if (image) {
+    //     const result = await cloudinary.v2.uploader.upload(image, {
+    //         folder: "k31portfolios",
+    //     });
+    //     objectToCreate.image = { public_id: result.public_id, url: result.secure_url, type: "image" };
+    // }
     const userMetaData = await UserMetaData.create({
         user: userId,
         portfolio: portfolioId,

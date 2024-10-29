@@ -10,6 +10,7 @@ import "./UserPortfolios.scss";
 import { Dialog } from "@mui/material";
 import { SET_CURRENT_PORTFOLIO } from "../../redux/constants";
 import { useNavigate } from "react-router-dom";
+import { Modal1, Modal2 } from "../../design/modals/Modals";
 
 const UserPortfolio = () => {
   const dispatch = useDispatch();
@@ -58,32 +59,23 @@ const UserPortfolio = () => {
             <h3>New</h3>
             <p>Click here to create a new portfolio</p>
           </div>
-          <Dialog
-            open={showModal}
-            className=""
-            onClose={() => setShowModal(false)}
-          >
-            <div className="new-portfolio-modal">
-              {userPortfolios.length === 0 ? (
-                <>
-                  <p>Do you really want to proceed ? </p>
-                  <button onClick={handleYesClick} className="btn btn-primary">
-                    Yes
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => setShowModal(false)}
-                  >
-                    No
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p>Only one portfolio available </p>
-                </>
-              )}
-            </div>
-          </Dialog>
+          {userPortfolios.length === 0 ? (
+            <Modal1
+              showModal={showModal}
+              setShowModal={setShowModal}
+              title={"Do you really want to proceed ?"}
+              button1Text={"Yes"}
+              button2Text={"No"}
+              onClick1={handleYesClick}
+              onClick2={() => setShowModal(false)}
+            />
+          ) : (
+            <Modal2
+              showModal={showModal}
+              setShowModal={setShowModal}
+              title={"Only one free portfolio available"}
+            />
+          )}
         </div>
       )}
     </div>
