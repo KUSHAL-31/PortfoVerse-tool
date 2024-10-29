@@ -11,6 +11,45 @@ const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
 
+
+exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const { logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
+
+    if (!headerTitle || !websiteName || !websiteUrl) {
+        return next(new HandleError("Please fill all the fields", 400));
+    }
+    // if (isLogoEdited) {
+    //     if (!logo) {
+    //         return next(new HandleError("Please provide a logo", 400));
+    //     }
+    //     if (portfolioData.logo) {
+    //         await cloudinary.uploader.destroy(portfolioData.logo.public_id);
+    //     }
+    //     const result = await cloudinary.v2.uploader.upload(logo, {
+    //         folder: "k31portfolios",
+    //     });
+    //     updateObject.logo = { public_id: result.public_id, url: result.secure_url };
+    // }
+    // If the portfolio data doesn't exist, create a new document
+    await UserPortfolio.create({
+        user: userId,
+        // logo: { public_id: updateObject.image.public_id, url: updateObject.image.url },
+        headerTitle,
+        details: {
+            websiteName,
+            websiteUrl
+        },
+        isPublished, // Default value if not provided
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'New portfolio created successfully!',
+    });
+});
+
+
 exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
     const { logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;

@@ -8,7 +8,7 @@ const userMetaDataSchema = new mongoose.Schema({
     },
     portfolio: {
         type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+        ref: "K31PortfolioWebsite",
         required: true,
     },
     resume: {

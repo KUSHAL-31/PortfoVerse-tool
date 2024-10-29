@@ -9,7 +9,7 @@ const userTestimonialsSchema = new mongoose.Schema({
     },
     portfolio: {
         type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+        ref: "K31PortfolioWebsite",
         required: true,
     },
     testimonials: [
@@ -17,7 +17,6 @@ const userTestimonialsSchema = new mongoose.Schema({
             testimonialId: {
                 type: String,
                 default: uuidv4,
-                unique: true
             },
             employerName: {
                 type: String,

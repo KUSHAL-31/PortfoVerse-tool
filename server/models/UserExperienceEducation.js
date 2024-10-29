@@ -9,15 +9,14 @@ const userExperienceEducationSchema = new mongoose.Schema({
     },
     portfolio: {
         type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+        ref: "K31PortfolioWebsite",
         required: true,
     },
     education: [
         {
             educationId: {
                 type: String,
-                default: uuidv4,
-                unique: true
+                default: () => uuidv4(),
             },
             degree: {
                 type: String,
@@ -49,8 +48,7 @@ const userExperienceEducationSchema = new mongoose.Schema({
         {
             experienceId: {
                 type: String,
-                default: uuidv4,
-                unique: true
+                default: () => uuidv4(),
             },
             title: {
                 type: String,

@@ -43,7 +43,7 @@ const Login = ({ history, location }) => {
   const LoginSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email: loginEmail, password: loginPassword }));
-    navigate("/edit-profile");
+    navigate("/view-portfolio");
   };
 
   const SignupSubmit = (e) => {
@@ -53,7 +53,7 @@ const Login = ({ history, location }) => {
     // myForm.set("email", email);
     // myForm.set("password", password);
     dispatch(registerUser({ username, email, password, phoneNumber }));
-    navigate("/edit-profile");
+    navigate("/view-portfolio");
   };
 
   const signupDataChange = (e) => {

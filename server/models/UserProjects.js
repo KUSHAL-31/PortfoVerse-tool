@@ -10,7 +10,7 @@ const userWebsiteSchema = new mongoose.Schema({
     },
     portfolio: {
         type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+        ref: "K31PortfolioWebsite",
         required: true,
     },
     projects: [
@@ -18,7 +18,6 @@ const userWebsiteSchema = new mongoose.Schema({
             projectId: {
                 type: String,
                 default: uuidv4,
-                unique: true
             },
             title: {
                 type: String,

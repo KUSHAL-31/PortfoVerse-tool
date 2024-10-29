@@ -1,13 +1,15 @@
 import {
+    CREATE_NEW_PORTFOLIO_FAILURE,
+    CREATE_NEW_PORTFOLIO_REQUEST,
+    CREATE_NEW_PORTFOLIO_SUCCESS,
     GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS
 } from "../constants"
 
 import axios from "axios";
-import { getAllUserPortfolioUrl } from "../service/api_url";
+import { createNewPortfolioUrl, getAllUserPortfolioUrl } from "../service/api_url";
+import store from "../store";
 
 export const getAllUserPortfolios = () => async (dispatch) => {
-
-    console.log("getAllUserPortfolios");
 
     try {
         dispatch({ type: GET_ALL_USER_PORTFOLIO_REQUEST });
@@ -17,15 +19,45 @@ export const getAllUserPortfolios = () => async (dispatch) => {
             withCredentials: true, // This ensures cookies are saved from the response
         });
 
-        console.log(data);
-
         dispatch({ type: GET_ALL_USER_PORTFOLIO_SUCCESS, payload: data.portfolios });
 
     } catch (error) {
-        console.log(error);
         dispatch({
             type: GET_ALL_USER_PORTFOLIO_FAILURE,
             payload: error.response?.data?.message || "An error occurred",
         });
     }
 };
+
+
+export const createNewPortfolio = () => async (dispatch) => {
+    dispatch({ type: CREATE_NEW_PORTFOLIO_REQUEST })
+    try {
+        const { user } = store.getState().user;
+        const username = user.username;
+        const headerTitle = user.username;
+        const websiteName = username.split(' ').join('-');
+        const randomDigits = Math.floor(100000 + Math.random() * 900000);
+        const websiteNameWithDigits = `${websiteName}-${randomDigits}`;
+        const websiteUrl = `${import.meta.env.VITE_REACT_APP_PORTFOLIO_URL}/${websiteNameWithDigits}`;
+        const { data } = await axios.post(createNewPortfolioUrl, {
+            headerTitle,
+            websiteName: websiteNameWithDigits,
+            websiteUrl,
+            isPublished: false,
+        }, {
+            withCredentials: true,
+        });
+
+        // console.log(data);
+
+        dispatch({ type: CREATE_NEW_PORTFOLIO_SUCCESS, payload: data });
+
+        dispatch(getAllUserPortfolios());
+    } catch (error) {
+        dispatch({
+            type: CREATE_NEW_PORTFOLIO_FAILURE,
+            payload: error.response?.data?.message || "An error occurred",
+        });
+    }
+}

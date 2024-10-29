@@ -10,7 +10,7 @@ const userSkillsSchema = new mongoose.Schema({
     },
     portfolio: {
         type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+        ref: "K31PortfolioWebsite",
         required: true,
     },
     skillSection: [
@@ -18,7 +18,6 @@ const userSkillsSchema = new mongoose.Schema({
             skillId: {
                 type: String,
                 default: uuidv4,
-                unique: true
             },
             heading: {
                 type: String,

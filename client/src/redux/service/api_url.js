@@ -11,3 +11,7 @@ export const userLogoutUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v
 // User portfolio and website related URLs
 
 export const getAllUserPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/getAll`;
+
+export const createNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/create`;
+
+export const updateNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/update`;
