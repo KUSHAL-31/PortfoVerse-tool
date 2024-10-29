@@ -15,3 +15,5 @@ export const getAllUserPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_U
 export const createNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/create`;
 
 export const updateNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/update`;
+
+export const getPortfolioDetailByIdUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/details`;

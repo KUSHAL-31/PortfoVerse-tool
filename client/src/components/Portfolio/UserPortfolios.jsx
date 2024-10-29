@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createNewPortfolio,
   getAllUserPortfolios,
+  getPortfolioDetailById,
 } from "../../redux/actions/portfolioActions";
 import PortfolioCard from "./portfolioCard";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -37,6 +38,7 @@ const UserPortfolio = () => {
 
   const handlePortfolioClick = (portfolio) => {
     dispatch({ type: SET_CURRENT_PORTFOLIO, payload: portfolio });
+    dispatch(getPortfolioDetailById(portfolio._id));
     navigate("/metadata");
   };
 

@@ -2,11 +2,14 @@ import {
     CREATE_NEW_PORTFOLIO_FAILURE,
     CREATE_NEW_PORTFOLIO_REQUEST,
     CREATE_NEW_PORTFOLIO_SUCCESS,
-    GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS
+    GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS,
+    GET_PORTFOLIO_DETAILS_FAILURE,
+    GET_PORTFOLIO_DETAILS_REQUEST,
+    GET_PORTFOLIO_DETAILS_SUCCESS
 } from "../constants"
 
 import axios from "axios";
-import { createNewPortfolioUrl, getAllUserPortfolioUrl } from "../service/api_url";
+import { createNewPortfolioUrl, getAllUserPortfolioUrl, getPortfolioDetailByIdUrl } from "../service/api_url";
 import store from "../store";
 
 export const getAllUserPortfolios = () => async (dispatch) => {
@@ -57,6 +60,26 @@ export const createNewPortfolio = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: CREATE_NEW_PORTFOLIO_FAILURE,
+            payload: error.response?.data?.message || "An error occurred",
+        });
+    }
+}
+
+export const getPortfolioDetailById = (portfolioId) => async (dispatch) => {
+    try {
+        dispatch({ type: GET_PORTFOLIO_DETAILS_REQUEST });
+        // Set `withCredentials` to allow cross-origin cookies
+        const { data } = await axios.post(getPortfolioDetailByIdUrl, {
+            portfolioId,
+        }, {
+            withCredentials: true, // This ensures cookies are saved from the response
+        });
+
+        dispatch({ type: GET_PORTFOLIO_DETAILS_SUCCESS, payload: data });
+
+    } catch (error) {
+        dispatch({
+            type: GET_PORTFOLIO_DETAILS_FAILURE,
             payload: error.response?.data?.message || "An error occurred",
         });
     }

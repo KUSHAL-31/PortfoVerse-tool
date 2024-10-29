@@ -1,0 +1,18 @@
+@use "../_CustomColors.scss" as *;
+
+.button1 {
+    cursor: pointer;
+    color: white;
+    background-color: $colorOne;
+    font: 400 1.2rem "Roboto";
+    width: 100%;
+    transition: all 0.3s;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 17px;
+
+    &:hover {
+        background-color: $colorOneDark;
+    }
+}
