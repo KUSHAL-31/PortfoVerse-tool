@@ -183,22 +183,22 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const user = await Users.findById(portfolio.user);
 
     // Get the user experience and education details based on userId
-    const userExpEdu = await UserExpEdu.findOne({ user: portfolio.user });
+    const userExpEdu = await UserExpEdu.findOne({ user: portfolio.user, portfolio: portfolioId });
 
     // Get the user projects details based on userId
-    const userProjects = await UserProjects.findOne({ user: portfolio.user });
+    const userProjects = await UserProjects.findOne({ user: portfolio.user, portfolio: portfolioId });
 
     // Get the user skills details based on userId
-    const userSkills = await UserSkills.findOne({ user: portfolio.user });
+    const userSkills = await UserSkills.findOne({ user: portfolio.user, portfolio: portfolioId });
 
     // Get the user services details based on userId
-    const userServices = await UserServices.findOne({ user: portfolio.user });
+    const userServices = await UserServices.findOne({ user: portfolio.user, portfolio: portfolioId });
 
     // Get the user testimonials details based on userId
-    const userTestimonials = await UserTestimonials.findOne({ user: portfolio.user });
+    const userTestimonials = await UserTestimonials.findOne({ user: portfolio.user, portfolio: portfolioId });
 
     // Get the user meta data details based on userId
-    const userMetaData = await UserMetaData.findOne({ user: portfolio.user });
+    const userMetaData = await UserMetaData.findOne({ user: portfolio.user, portfolio: portfolioId });
 
 
     res.status(200).json({

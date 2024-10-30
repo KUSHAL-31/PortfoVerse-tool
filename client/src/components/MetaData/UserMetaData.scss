@@ -1,5 +1,17 @@
 @use "../../design/_CustomColors.scss" as *;
 
+.metadata_section {
+    min-height: calc(100vh - 90px);
+
+    .metadata_left_section {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+}
+
 .remove_button {
     color: rgb(158, 158, 158);
     cursor: pointer;

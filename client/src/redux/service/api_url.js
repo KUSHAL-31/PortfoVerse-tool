@@ -17,3 +17,10 @@ export const createNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_UR
 export const updateNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/update`;
 
 export const getPortfolioDetailByIdUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/details`;
+
+
+// User meta data related URLs
+
+export const createUserMetaDataUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/metadata/create`;
+
+export const updateUserMetaDataUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/metadata/edit`;

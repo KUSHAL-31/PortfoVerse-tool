@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE } from "../constants";
+import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE, UPDATE_USER_META_DATA_REQUEST, UPDATE_USER_META_DATA_SUCCESS, UPDATE_USER_META_DATA_FAILURE } from "../constants";
 
 const initialState = {
 };
@@ -47,6 +47,17 @@ export const portfolioReducer = createReducer(initialState, (builder) => {
         state.portfolioMetaData = action.payload.userMetaData;
     });
     builder.addCase(GET_PORTFOLIO_DETAILS_FAILURE, (state, action) => {
+        state.portfolioLoading = false;
+        state.portfolioError = action.payload;
+    });
+    builder.addCase(UPDATE_USER_META_DATA_REQUEST, (state) => {
+        state.portfolioLoading = true;
+    });
+    builder.addCase(UPDATE_USER_META_DATA_SUCCESS, (state, action) => {
+        state.portfolioLoading = false;
+        state.portfolioMetaData = action.payload;
+    });
+    builder.addCase(UPDATE_USER_META_DATA_FAILURE, (state, action) => {
         state.portfolioLoading = false;
         state.portfolioError = action.payload;
     });

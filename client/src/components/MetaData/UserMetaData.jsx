@@ -1,16 +1,23 @@
 import { Button, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./UserMetaData.scss";
 import { Button1 } from "../../design/buttons/Buttons";
+import { updateUserMetaData } from "../../redux/actions/userActions";
 
 const UserMetaData = () => {
-  const { portfolioLoading, portfolioMetaData } = useSelector(
+  const { portfolioLoading, portfolioMetaData, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
 
+  const dispatch = useDispatch();
+
   const [roles, setRoles] = useState([]);
   const [socials, setSocials] = useState([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [resume, setResume] = useState("");
+
   const socialMediaOptions = [
     "LinkedIn",
     "Github",
@@ -73,123 +80,159 @@ const UserMetaData = () => {
 
   // Initialize roles when portfolioMetaData changes
   useEffect(() => {
-    if (portfolioMetaData && portfolioMetaData.roles && !roles.length) {
-      setRoles(
-        portfolioMetaData.roles.map((role) => ({
-          id: Date.now() + Math.random(),
-          text: role,
-        }))
-      );
+    if (portfolioLoading === false && portfolioMetaData) {
+      setTitle(portfolioMetaData.title);
+      setDescription(portfolioMetaData.description);
+      setResume(portfolioMetaData.resume);
+      if (portfolioMetaData.roles && !roles.length) {
+        setRoles(
+          portfolioMetaData.roles.map((role) => ({
+            id: Date.now() + Math.random(),
+            text: role,
+          }))
+        );
+      }
+      if (portfolioMetaData.socials && !socials.length) {
+        setSocials(
+          portfolioMetaData.socials.map((social) => ({
+            id: Date.now() + Math.random(), // To ensure unique IDs
+            selected: social.name,
+            url: social.url,
+          }))
+        );
+      }
     }
-  }, [portfolioMetaData]);
+  }, [portfolioMetaData, portfolioLoading]);
+
+  const saveMetaData = async () => {
+    const portfolioData = {
+      portfolioId: portfolio._id,
+      title,
+      description,
+      resume,
+      roles: roles.map((role) => role.text),
+      socials: socials.map((social) => ({
+        name: social.selected,
+        url: social.url,
+      })),
+    };
+    const doesExist = portfolioMetaData !== null ? true : false;
+    dispatch(updateUserMetaData(doesExist, portfolioData));
+  };
 
   if (portfolioLoading === undefined || portfolioLoading) {
     return <h1>Loading...</h1>;
   }
   return (
-    <div>
-      <div className="metadata_section">
-        <h2>Fill the following details and click on save to proceed</h2>
-        <div className="metadata_left_section">
-          <TextField
-            id="outlined-basic"
-            label="Enter the title"
+    <div className="metadata_section">
+      <h2>Fill the following details and click on save to proceed</h2>
+      <div className="metadata_left_section">
+        <TextField
+          id="outlined-basic"
+          label="Enter the title"
+          variant="outlined"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <TextField
+          id="outlined-multiline-static"
+          label="Enter the description"
+          multiline
+          rows={4}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Resume Link"
+          variant="outlined"
+          value={resume}
+          onChange={(e) => setResume(e.target.value)}
+        />
+        <div>
+          <Button
             variant="outlined"
-          />
-          <TextField
-            id="outlined-multiline-static"
-            label="Enter the description"
-            multiline
-            rows={4}
-            defaultValue=""
-          />
-          <div>
-            <Button
-              variant="outlined"
-              onClick={addRole}
-              disabled={roles.length >= 4}
-            >
-              Add +
-            </Button>
-            {roles.map((role) => (
-              <div key={role.id} style={{ marginBottom: "10px" }}>
-                <TextField
-                  id="outlined-basic"
-                  label="Role"
-                  autoComplete="off"
-                  variant="outlined"
-                  value={role.text}
-                  onChange={(e) =>
-                    handleRoleTextChange(role.id, e.target.value.slice(0, 25))
-                  }
-                  // helperText={`${role.text.length}/25`} // Display character count
-                  FormHelperTextProps={{
-                    style: { textAlign: "right", marginTop: "5px" },
-                  }}
-                />
-                <button
-                  className="remove_button"
-                  onClick={() => removeRole(role.id)}
-                >
-                  -
-                </button>
-              </div>
-            ))}
-          </div>
-          <div>
-            <Button
-              variant="outlined"
-              onClick={addSocial}
-              disabled={socials.length >= socialMediaOptions.length}
-            >
-              Add +
-            </Button>
-            {socials.map((social) => (
-              <div key={social.id} style={{ marginBottom: "10px" }}>
-                <InputLabel id={`select-label-${social.id}`}>
-                  Social type
-                </InputLabel>
-                <Select
-                  labelId={`select-label-${social.id}`}
-                  id={`select-${social.id}`}
-                  value={social.selected}
-                  onChange={(e) =>
-                    handleSelectChange(social.id, e.target.value)
-                  }
-                >
-                  {socialMediaOptions
-                    .filter(
-                      (option) =>
-                        !socials.map((s) => s.selected).includes(option) ||
-                        option === social.selected
-                    )
-                    .map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                </Select>
-                <TextField
-                  id={`outlined-basic-${social.id}`}
-                  label="URL"
-                  variant="outlined"
-                  style={{ marginLeft: "10px" }}
-                  value={social.url}
-                  onChange={(e) => handleUrlChange(social.id, e.target.value)}
-                />
-                <button
-                  className="remove_button"
-                  onClick={() => removeSocial(social.id)}
-                >
-                  -
-                </button>
-              </div>
-            ))}
-          </div>
+            onClick={addRole}
+            disabled={roles.length >= 4}
+          >
+            Add +
+          </Button>
+          {roles.map((role) => (
+            <div key={role.id} style={{ marginBottom: "10px" }}>
+              <TextField
+                id="outlined-basic"
+                label="Role"
+                autoComplete="off"
+                variant="outlined"
+                value={role.text}
+                onChange={(e) =>
+                  handleRoleTextChange(role.id, e.target.value.slice(0, 25))
+                }
+                helperText={role?.text ? `${role.text.length}/25` : ""} // Display character count
+                FormHelperTextProps={{
+                  style: { textAlign: "right", marginTop: "5px" },
+                }}
+              />
+              <button
+                className="remove_button"
+                onClick={() => removeRole(role.id)}
+              >
+                -
+              </button>
+            </div>
+          ))}
         </div>
-        <div className="metadata_right_section"></div>
-        <Button1 text={"Save and continue"} onClick={() => {}} />
+        <div>
+          <Button
+            variant="outlined"
+            onClick={addSocial}
+            disabled={socials.length >= socialMediaOptions.length}
+          >
+            Add +
+          </Button>
+          {socials.map((social) => (
+            <div key={social.id} style={{ marginBottom: "10px" }}>
+              <InputLabel id={`select-label-${social.id}`}>
+                Social type
+              </InputLabel>
+              <Select
+                labelId={`select-label-${social.id}`}
+                id={`select-${social.id}`}
+                value={social.selected}
+                onChange={(e) => handleSelectChange(social.id, e.target.value)}
+              >
+                {socialMediaOptions
+                  .filter(
+                    (option) =>
+                      !socials.map((s) => s.selected).includes(option) ||
+                      option === social.selected
+                  )
+                  .map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+              </Select>
+              <TextField
+                id={`outlined-basic-${social.id}`}
+                label="URL"
+                variant="outlined"
+                style={{ marginLeft: "10px" }}
+                value={social.url}
+                onChange={(e) => handleUrlChange(social.id, e.target.value)}
+              />
+              <button
+                className="remove_button"
+                onClick={() => removeSocial(social.id)}
+              >
+                -
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
+      <div className="metadata_right_section"></div>
+      <Button1 text={"Save and continue"} onClick={() => saveMetaData()} />
     </div>
   );
 };

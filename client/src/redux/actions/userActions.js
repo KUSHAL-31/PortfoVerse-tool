@@ -1,11 +1,14 @@
 import {
     LOAD_USER_SUCCESS, LOAD_USER_REQUEST, LOAD_USER_FAILURE, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_FAILURE, LOGOUT_REQUEST,
     LOGOUT_SUCCESS, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS,
-    TOGGLE_LOGIN_BOX
+    TOGGLE_LOGIN_BOX,
+    UPDATE_USER_META_DATA_FAILURE,
+    UPDATE_USER_META_DATA_REQUEST,
+    UPDATE_USER_META_DATA_SUCCESS
 } from "../constants"
 
 import axios from "axios";
-import { getUserDetailsUrl, loginUrl, registerUrl, userLogoutUrl } from "../service/api_url";
+import { createUserMetaDataUrl, getUserDetailsUrl, loginUrl, registerUrl, updateUserMetaDataUrl, userLogoutUrl } from "../service/api_url";
 
 export const registerUser = (user) => async (dispatch) => {
 
@@ -87,6 +90,44 @@ export const logoutUser = () => async (dispatch) => {
         dispatch({
             type: LOGOUT_FAILURE,
             payload: error.response?.data?.message || "An error occurred",
+        });
+    }
+}
+
+// Meta data related actions
+export const createUserMetaData = (portfolioData) => async (dispatch) => {
+    try {
+        dispatch({ type: CREATE_USER_META_DATA_REQUEST });
+
+        dispatch({ type: CREATE_USER_META_DATA_SUCCESS, payload: data.userMetaData });
+    } catch (error) {
+        dispatch({
+            type: CREATE_USER_META_DATA_FAILURE,
+            payload: error.response?.data?.message || "Some error occurred",
+        });
+    }
+}
+
+export const updateUserMetaData = (doesExist, portfolioData) => async (dispatch) => {
+    console.log(doesExist, "doesExist");
+    console.log(portfolioData, "portfolioData");
+    try {
+        dispatch({ type: UPDATE_USER_META_DATA_REQUEST });
+        var data;
+        if (doesExist) {
+            data = await axios.patch(updateUserMetaDataUrl, portfolioData, {
+                withCredentials: true,
+            });
+        } else {
+            data = await axios.post(createUserMetaDataUrl, portfolioData, {
+                withCredentials: true,
+            });
+        }
+        dispatch({ type: UPDATE_USER_META_DATA_SUCCESS, payload: data.userMetaData });
+    } catch (error) {
+        dispatch({
+            type: UPDATE_USER_META_DATA_FAILURE,
+            payload: error.response?.data?.message || "Some error occurred",
         });
     }
 }

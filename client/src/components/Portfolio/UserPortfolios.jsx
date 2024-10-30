@@ -24,7 +24,9 @@ const UserPortfolio = () => {
   );
 
   useEffect(() => {
-    dispatch(getAllUserPortfolios());
+    if (userPortfolios.length === 0) {
+      dispatch(getAllUserPortfolios());
+    }
   }, []);
 
   const handleModalClick = () => {

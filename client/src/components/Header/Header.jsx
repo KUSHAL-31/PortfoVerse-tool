@@ -42,13 +42,13 @@ const Header = () => {
       <div className="header_right">
         {authUser === undefined || authUser === false ? (
           <button
-            className="button1"
+            className="login_button"
             onClick={() => dispatch({ type: TOGGLE_LOGIN_BOX })}
           >
             Login
           </button>
         ) : (
-          <button className="button1" onClick={() => setShowModal(true)}>
+          <button className="login_button" onClick={() => setShowModal(true)}>
             Logout
           </button>
         )}
