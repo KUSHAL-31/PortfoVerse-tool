@@ -1,0 +1,37 @@
+.edu_and_exp_section {
+    width: 100%;
+    padding: 20px 5%;
+    display: flex;
+    justify-content: space-between;
+    font-family: "Roboto", sans-serif !important;
+
+    .education_section {
+        width: 45%;
+        max-width: 600px;
+    }
+
+    .experience_section {
+        width: 45%;
+        max-width: 600px;
+    }
+}
+
+.education_dates_container {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media screen and (max-width: 1024px) {
+    .edu_and_exp_section {
+        flex-direction: column;
+        align-items: center;
+
+        .education_section {
+            width: 100%;
+        }
+
+        .experience_section {
+            width: 100%;
+        }
+    }
+}

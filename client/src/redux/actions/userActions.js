@@ -4,7 +4,8 @@ import {
     TOGGLE_LOGIN_BOX,
     UPDATE_USER_META_DATA_FAILURE,
     UPDATE_USER_META_DATA_REQUEST,
-    UPDATE_USER_META_DATA_SUCCESS
+    UPDATE_USER_META_DATA_SUCCESS,
+    RESET_ALL_PORTFOLIO_DETAILS
 } from "../constants"
 
 import axios from "axios";
@@ -85,6 +86,8 @@ export const logoutUser = () => async (dispatch) => {
         });
 
         dispatch({ type: LOGOUT_SUCCESS });
+
+        dispatch({ type: RESET_ALL_PORTFOLIO_DETAILS });
 
     } catch (error) {
         dispatch({

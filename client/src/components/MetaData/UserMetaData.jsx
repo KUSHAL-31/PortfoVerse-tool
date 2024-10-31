@@ -126,7 +126,6 @@ const UserMetaData = () => {
   }
   return (
     <>
-      <CreatePortfolioSteps activeStep={0} />
       <h2 className="metadata_title">
         Fill the following details and click on save to proceed
       </h2>
@@ -167,6 +166,7 @@ const UserMetaData = () => {
               variant="outlined"
               onClick={addRole}
               disabled={roles.length >= 4}
+              className="add_meta_buttons"
             >
               Add +
             </Button>
@@ -204,12 +204,18 @@ const UserMetaData = () => {
               variant="outlined"
               onClick={addSocial}
               disabled={socials.length >= socialMediaOptions.length}
+              className="add_meta_buttons"
             >
               Add +
             </Button>
             {socials.map((social) => (
-              <div key={social.id} style={{ marginBottom: "10px" }}>
+              <div
+                key={social.id}
+                style={{ marginBottom: "10px" }}
+                className="meta_right_socials"
+              >
                 <Select
+                  className="meta_right_socials_dropdown"
                   labelId={`select-label-${social.id}`}
                   id={`select-${social.id}`}
                   value={social.selected}
@@ -230,6 +236,7 @@ const UserMetaData = () => {
                     ))}
                 </Select>
                 <TextField
+                  className="metadata_right_social_inputs"
                   id={`outlined-basic-${social.id}`}
                   label="URL"
                   variant="outlined"

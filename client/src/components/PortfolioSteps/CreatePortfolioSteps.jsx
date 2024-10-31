@@ -5,6 +5,8 @@ import {
   Newspaper,
   RateReview,
   Language,
+  DesignServices,
+  School,
 } from "@mui/icons-material";
 import React from "react";
 import "./CreatePortfolioSteps.scss";
@@ -16,12 +18,20 @@ const CreatePortfolioSteps = ({ activeStep }) => {
       icon: <Person />,
     },
     {
+      label: <Typography>Education & Experience</Typography>,
+      icon: <School />,
+    },
+    {
       label: <Typography>Skills</Typography>,
       icon: <Psychology />,
     },
     {
       label: <Typography>Projects</Typography>,
       icon: <Newspaper />,
+    },
+    {
+      label: <Typography>Services</Typography>,
+      icon: <DesignServices />,
     },
     {
       label: <Typography>Testimonials</Typography>,
@@ -37,6 +47,7 @@ const CreatePortfolioSteps = ({ activeStep }) => {
     boxSizing: "border-box",
     width: "100%",
     marginTop: "80px",
+    flexWrap: "wrap",
   };
 
   return (

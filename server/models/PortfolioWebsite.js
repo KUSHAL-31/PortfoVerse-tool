@@ -23,7 +23,7 @@ const websiteSchema = new mongoose.Schema({
             type: String,
             // required: [true, "Please enter your website name"],
             minlength: [5, "Website name should have more than 4 characters"],
-            maxlength: [20, "Website name should have less than 21 characters"],
+            maxlength: [30, "Website name should have less than 21 characters"],
         },
         websiteUrl: {
             type: String,

@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE, UPDATE_USER_META_DATA_REQUEST, UPDATE_USER_META_DATA_SUCCESS, UPDATE_USER_META_DATA_FAILURE } from "../constants";
+import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE, UPDATE_USER_META_DATA_REQUEST, UPDATE_USER_META_DATA_SUCCESS, UPDATE_USER_META_DATA_FAILURE, RESET_ALL_PORTFOLIO_DETAILS } from "../constants";
 
 const initialState = {
 };
@@ -39,7 +39,7 @@ export const portfolioReducer = createReducer(initialState, (builder) => {
     builder.addCase(GET_PORTFOLIO_DETAILS_SUCCESS, (state, action) => {
         state.portfolioLoading = false;
         state.portfolio = action.payload.portfolio;
-        state.portfolioExpAndEdu = action.payload.expAndEdu;
+        state.portfolioExpAndEdu = action.payload.userExpEdu;
         state.portfolioProjects = action.payload.userProjects;
         state.portfolioSkills = action.payload.userSkills;
         state.portfolioServices = action.payload.userServices;
@@ -60,6 +60,9 @@ export const portfolioReducer = createReducer(initialState, (builder) => {
     builder.addCase(UPDATE_USER_META_DATA_FAILURE, (state, action) => {
         state.portfolioLoading = false;
         state.portfolioError = action.payload;
+    });
+    builder.addCase(RESET_ALL_PORTFOLIO_DETAILS, () => {
+        return initialState;
     });
 });
 

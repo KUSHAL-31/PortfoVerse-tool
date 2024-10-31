@@ -41,7 +41,7 @@ const UserPortfolio = () => {
   const handlePortfolioClick = (portfolio) => {
     dispatch({ type: SET_CURRENT_PORTFOLIO, payload: portfolio });
     dispatch(getPortfolioDetailById(portfolio._id));
-    navigate("/metadata");
+    navigate("/portfolio/details");
   };
 
   return (

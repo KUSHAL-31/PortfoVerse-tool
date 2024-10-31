@@ -1,13 +1,24 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { TOGGLE_LOGIN_BOX } from "../constants.js";
+import { DECREMENT_PAGE_COUNT, INCREMENT_PAGE_COUNT, TOGGLE_LOGIN_BOX } from "../constants.js";
 
 const initialState = {
     showLoginBox: false,
+    pageCount: 2,
 };
 
 export const globalReducer = createReducer(initialState, (builder) => {
     builder.addCase(TOGGLE_LOGIN_BOX, (state) => {
         state.showLoginBox = !state.showLoginBox;
+    });
+    builder.addCase(INCREMENT_PAGE_COUNT, (state) => {
+        if (state.pageCount < 7) {
+            state.pageCount++;
+        }
+    });
+    builder.addCase(DECREMENT_PAGE_COUNT, (state) => {
+        if (state.pageCount > 1) {
+            state.pageCount--;
+        }
     });
 });
 
