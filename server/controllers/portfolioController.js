@@ -153,7 +153,7 @@ exports.deployPortfolio = asyncErrorHandler(async (req, res, next) => {
 // Check if Portoflio exists with the portfolio name or not 
 exports.doesPortfolioExists = asyncErrorHandler(async (req, res, next) => {
     const { websiteName } = req.body;
-    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName });
+    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName, isPublished: true });
     if (!portfolio) {
         return res.status(200).json({
             success: true,
@@ -220,7 +220,7 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
 exports.checkPortfolioName = asyncErrorHandler(async (req, res, next) => {
     const { websiteName } = req.query;
 
-    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName });
+    const portfolio = await UserPortfolio.findOne({ "details.websiteName": websiteName, isPublished: true });
 
     const isAvailable = !portfolio;
 
