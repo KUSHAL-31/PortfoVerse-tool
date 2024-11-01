@@ -51,7 +51,7 @@ exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
 
 exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { portfolioId, logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
+    const { portfolioId, logo, headerTitle, websiteName, isPublished, isLogoEdited } = req.body;
 
     if (!headerTitle) {
         return next(new HandleError("Please fill all the fields", 400));
@@ -82,13 +82,12 @@ exports.changePortfolioDetails = asyncErrorHandler(async (req, res, next) => {
             headerTitle,
             details: {
                 websiteName,
-                websiteUrl
             },
             isPublished, // Default value if not provided
         });
     } else {
         // If the portfolio data exists, update only the specified fields
-        let updateObject = { headerTitle, isPublished, logo, details: { websiteName, websiteUrl } };
+        let updateObject = { headerTitle, isPublished, logo, details: { websiteName } };
 
         portfolioData = await UserPortfolio.findByIdAndUpdate(
             portfolioData._id,
