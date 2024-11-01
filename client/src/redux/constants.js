@@ -3,6 +3,7 @@ export const TOGGLE_LOGIN_BOX = "TOGGLE_LOGIN_BOX";
 
 export const INCREMENT_PAGE_COUNT = "INCREMENT_PAGE_COUNT";
 export const DECREMENT_PAGE_COUNT = "DECREMENT_PAGE_COUNT";
+export const RESET_PAGE_COUNT = "RESET_PAGE_COUNT";
 
 // Constants for User reducer
 export const LOGIN_REQUEST = "LOGIN_REQUEST";

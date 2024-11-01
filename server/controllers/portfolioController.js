@@ -14,7 +14,7 @@ const cloudinary = require("cloudinary");
 
 exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { logo, headerTitle, websiteName, websiteUrl, isPublished, isLogoEdited } = req.body;
+    const { logo, headerTitle, websiteName, isPublished, isLogoEdited } = req.body;
 
     if (!headerTitle || !websiteName || !websiteUrl) {
         return next(new HandleError("Please fill all the fields", 400));
@@ -38,7 +38,6 @@ exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
         headerTitle,
         details: {
             websiteName,
-            websiteUrl
         },
         isPublished, // Default value if not provided
     });

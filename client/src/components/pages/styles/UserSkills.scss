@@ -1,0 +1,21 @@
+@use "../../../design/_CustomColors.scss" as *;
+
+.skill_section {
+    width: 100%;
+    padding: 20px 5%;
+    font-family: "Roboto", sans-serif !important;
+
+    .skill_cards_section {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: left;
+        align-items: start;
+
+        .skill_card {
+            width: 450px !important;
+            margin: 30px;
+            margin-left: 0;
+        }
+    }
+}

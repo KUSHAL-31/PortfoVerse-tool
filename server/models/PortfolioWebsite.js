@@ -25,12 +25,6 @@ const websiteSchema = new mongoose.Schema({
             minlength: [5, "Website name should have more than 4 characters"],
             maxlength: [30, "Website name should have less than 21 characters"],
         },
-        websiteUrl: {
-            type: String,
-            required: false,
-            unique: true,
-        },
-
     },
     isPublished: {
         type: Boolean,

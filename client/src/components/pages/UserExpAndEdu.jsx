@@ -11,11 +11,16 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import DatePickerComponent from "../../utils/DatePicker";
 import "./styles/UserExpAndEdu.scss";
+import { Button1 } from "../../design/buttons/Buttons";
+import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 const UserExpAndEdu = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { portfolioLoading, portfolio, portfolioExpAndEdu } = useSelector(
     (state) => state.userPortfolio
   );
@@ -103,6 +108,20 @@ const UserExpAndEdu = () => {
         comments: edu.comments,
       }));
       setEducations(newEducations);
+    }
+    if (portfolioLoading === false && portfolioExpAndEdu) {
+      const experience = portfolioExpAndEdu.experience;
+      const newExperiences = experience.map((exp) => ({
+        id: Date.now() + Math.random(),
+        title: exp.title,
+        company: exp.company,
+        startDate: new Date(exp.startDate),
+        endDate: exp.isPresent ? null : new Date(exp.endDate),
+        description: exp.description,
+        isPresent: exp.isPresent,
+        certificate: exp.certificate,
+      }));
+      setExperiences(newExperiences);
     }
   }, [portfolioLoading, portfolioExpAndEdu]);
 
@@ -339,6 +358,12 @@ const UserExpAndEdu = () => {
             Add Experience
           </Button>
         </div>
+      </div>
+      <div className="section_save_button">
+        <Button1
+          text={"Save and proceed"}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
+        />
       </div>
     </>
   );

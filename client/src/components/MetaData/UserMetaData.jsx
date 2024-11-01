@@ -5,6 +5,7 @@ import "./UserMetaData.scss";
 import { Button1 } from "../../design/buttons/Buttons";
 import { updateUserMetaData } from "../../redux/actions/userActions";
 import CreatePortfolioSteps from "../PortfolioSteps/CreatePortfolioSteps";
+import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 const UserMetaData = () => {
   const { portfolioLoading, portfolioMetaData, portfolio } = useSelector(
@@ -119,6 +120,7 @@ const UserMetaData = () => {
     };
     const doesExist = portfolioMetaData !== null ? true : false;
     dispatch(updateUserMetaData(doesExist, portfolioData));
+    dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
   if (portfolioLoading === undefined || portfolioLoading) {
