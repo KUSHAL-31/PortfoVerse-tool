@@ -14,7 +14,7 @@ require("dotenv").config();
 
 // Cors policy
 app.use(cors({
-    origin: ["https://k31-portfolio-template.vercel.app/", "https://k31-portfolio-template.vercel.app", "http://localhost:5173", "http://localhost:3000"],
+    origin: ["https://k31-portfolio-template.vercel.app/", "https://k31-portfolio-template.vercel.app", "http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
 }));

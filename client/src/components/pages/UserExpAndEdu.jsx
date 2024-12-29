@@ -1,9 +1,11 @@
 import {
+  Box,
   Button,
   Card,
   CardActions,
   CardContent,
   FormControlLabel,
+  Grid,
   Radio,
   RadioGroup,
   TextField,
@@ -126,143 +128,122 @@ const UserExpAndEdu = () => {
   }, [portfolioLoading, portfolioExpAndEdu]);
 
   return (
-    <>
-      <div className="edu_and_exp_section">
-        <div className="education_section">
-          <h1>Experience details</h1>
+    <Box sx={{ padding: 3 }}>
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ fontWeight: "bold" }}
+      >
+        Education & Experience Details
+      </Typography>
+
+      {/* Education Section */}
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Education Details
+        </Typography>
+        <Grid container spacing={5}>
           {educations.map((education, index) => (
-            <Card
-              key={education.id}
-              variant="outlined"
-              style={{ marginBottom: "20px", width: "100%" }}
-            >
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  #{index + 1}
-                </Typography>
-                {/* <Typography variant="subtitle1">Degree / Course</Typography> */}
-                <TextField
-                  fullWidth
-                  label="Enter your degree / course name"
-                  variant="outlined"
-                  value={education.degree}
-                  onChange={(e) =>
-                    handleEducationChange(index, "degree", e.target.value)
-                  }
-                  style={{ marginBottom: "10px" }}
-                />
-                {/* <Typography variant="subtitle1">School / University</Typography> */}
-                <TextField
-                  fullWidth
-                  label="Enter your school / university name"
-                  variant="outlined"
-                  value={education.school}
-                  onChange={(e) =>
-                    handleEducationChange(index, "school", e.target.value)
-                  }
-                  style={{ marginBottom: "10px" }}
-                />
-                <div className="education_dates_container">
-                  <div>
-                    <Typography variant="subtitle1">Start Date</Typography>
+            <Grid item xs={12} md={6} key={education.id}>
+              <Card sx={{ borderLeft: "5px solid #4caf50" }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Education #{index + 1}
+                  </Typography>
+                  <TextField
+                    label="Degree / Course"
+                    fullWidth
+                    margin="dense"
+                    value={education.degree}
+                    onChange={(e) =>
+                      handleEducationChange(index, "degree", e.target.value)
+                    }
+                  />
+                  <TextField
+                    label="School / University"
+                    fullWidth
+                    margin="dense"
+                    value={education.school}
+                    onChange={(e) =>
+                      handleEducationChange(index, "school", e.target.value)
+                    }
+                  />
+                  <Box display="flex" gap={2}>
                     <DatePickerComponent
                       selectedDate={education.startDate}
                       setSelectedDate={(date) =>
                         handleEducationChange(index, "startDate", date)
                       }
+                      label="Start Date"
                     />
-                  </div>
-                  <div>
-                    <Typography variant="subtitle1">End Date</Typography>
                     <DatePickerComponent
                       selectedDate={education.endDate}
                       setSelectedDate={(date) =>
                         handleEducationChange(index, "endDate", date)
                       }
+                      label="End Date"
                     />
-                  </div>
-                </div>
-
-                {/* <Typography variant="subtitle1">Result</Typography> */}
-                <TextField
-                  fullWidth
-                  label="Enter your result"
-                  variant="outlined"
-                  value={education.result}
-                  onChange={(e) =>
-                    handleEducationChange(index, "result", e.target.value)
-                  }
-                  inputProps={{
-                    inputMode: "decimal",
-                    pattern: "[0-9]*[.]?[0-9]*",
-                  }}
-                  style={{ marginBottom: "10px", marginTop: "20px" }}
-                />
-                {/* <Typography variant="subtitle1">
-                  Any achievements or comments
-                </Typography> */}
-                <TextField
-                  fullWidth
-                  label="Achievements or comments"
-                  multiline
-                  rows={4}
-                  value={education.comments}
-                  onChange={(e) =>
-                    handleEducationChange(index, "comments", e.target.value)
-                  }
-                  style={{ marginBottom: "10px" }}
-                />
-              </CardContent>
-              <CardActions>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => removeEducation(education.id)}
-                >
-                  Remove Education
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
-          <Button variant="outlined" onClick={addEducation}>
-            Add Education
-          </Button>
-        </div>
-        <div className="experience_section">
-          <h1>Experience details</h1>
-          {experiences.map((experience, index) => (
-            <>
-              <Card
-                key={experience.id}
-                variant="outlined"
-                style={{ marginBottom: "20px", width: "100%" }}
-              >
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    #{index + 1}
-                  </Typography>
+                  </Box>
                   <TextField
                     fullWidth
-                    label="Enter your job title"
+                    label="Achievements or comments"
+                    multiline
+                    rows={4}
+                    value={education.comments}
+                    onChange={(e) =>
+                      handleEducationChange(index, "comments", e.target.value)
+                    }
+                    style={{ marginBottom: "10px" }}
+                  />
+                </CardContent>
+                <CardActions>
+                  <Button
                     variant="outlined"
+                    color="error"
+                    onClick={() => removeEducation(education.id)}
+                  >
+                    Remove Education
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+        <Button onClick={addEducation} variant="contained" sx={{ mt: 2 }}>
+          Add Education
+        </Button>
+      </Box>
+
+      {/* Experience Section */}
+      <Box mt={4}>
+        <Typography variant="h5" gutterBottom>
+          Experience Details
+        </Typography>
+        <Grid container spacing={2}>
+          {experiences.map((experience, index) => (
+            <Grid item xs={12} md={6} key={experience.id}>
+              <Card sx={{ borderLeft: "5px solid #FF9800" }}>
+                <CardContent>
+                  <Typography variant="h6">Experience #{index + 1}</Typography>
+                  <TextField
+                    label="Job Title"
+                    fullWidth
+                    margin="dense"
                     value={experience.title}
                     onChange={(e) =>
                       handleExperienceChange(index, "title", e.target.value)
                     }
-                    style={{ marginBottom: "10px" }}
                   />
                   <TextField
+                    label="Company"
                     fullWidth
-                    label="Enter your company name"
-                    variant="outlined"
+                    margin="dense"
                     value={experience.company}
                     onChange={(e) =>
                       handleExperienceChange(index, "company", e.target.value)
                     }
-                    style={{ marginBottom: "10px" }}
                   />
-
-                  <Typography variant="subtitle1">Present</Typography>
                   <RadioGroup
                     row
                     value={experience.isPresent ? "yes" : "no"}
@@ -271,47 +252,32 @@ const UserExpAndEdu = () => {
                     <FormControlLabel
                       value="yes"
                       control={<Radio />}
-                      label="Yes"
+                      label="Present"
                     />
                     <FormControlLabel
                       value="no"
                       control={<Radio />}
-                      label="No"
+                      label="Not Present"
                     />
                   </RadioGroup>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: "10px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ width: "48%" }}>
-                      <Typography variant="subtitle1">Start Date</Typography>
+                  <Box display="flex" gap={2}>
+                    <DatePickerComponent
+                      selectedDate={experience.startDate}
+                      setSelectedDate={(date) =>
+                        handleExperienceChange(index, "startDate", date)
+                      }
+                      label="Start Date"
+                    />
+                    {!experience.isPresent && (
                       <DatePickerComponent
-                        selectedDate={experience.startDate}
+                        selectedDate={experience.endDate}
                         setSelectedDate={(date) =>
-                          handleExperienceChange(index, "startDate", date)
+                          handleExperienceChange(index, "endDate", date)
                         }
+                        label="End Date"
                       />
-                    </div>
-
-                    <div style={{ width: "48%" }}>
-                      <div>
-                        <Typography variant="subtitle1">End Date</Typography>
-                        <DatePickerComponent
-                          isDisabled={experience.isPresent}
-                          selectedDate={experience.endDate}
-                          setSelectedDate={(date) =>
-                            handleExperienceChange(index, "endDate", date)
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
+                    )}
+                  </Box>
                   <TextField
                     fullWidth
                     label="Enter your job description"
@@ -328,19 +294,6 @@ const UserExpAndEdu = () => {
                     }
                     style={{ margin: "20px 0" }}
                   />
-                  <TextField
-                    fullWidth
-                    label="Enter your certificate link"
-                    variant="outlined"
-                    value={experience.certificate}
-                    onChange={(e) =>
-                      handleExperienceChange(
-                        index,
-                        "certificateLink",
-                        e.target.value
-                      )
-                    }
-                  />
                 </CardContent>
                 <CardActions>
                   <Button
@@ -348,24 +301,25 @@ const UserExpAndEdu = () => {
                     color="error"
                     onClick={() => removeExperience(experience.id)}
                   >
-                    Remove Job
+                    Remove Experience
                   </Button>
                 </CardActions>
               </Card>
-            </>
+            </Grid>
           ))}
-          <Button variant="outlined" onClick={addExperience}>
-            Add Experience
-          </Button>
-        </div>
-      </div>
-      <div className="section_save_button">
+        </Grid>
+        <Button onClick={addExperience} variant="contained" sx={{ mt: 2 }}>
+          Add Experience
+        </Button>
+      </Box>
+
+      <Box mt={4} textAlign="center">
         <Button1
-          text={"Save and proceed"}
+          text="Save and Proceed"
           onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
         />
-      </div>
-    </>
+      </Box>
+    </Box>
   );
 };
 

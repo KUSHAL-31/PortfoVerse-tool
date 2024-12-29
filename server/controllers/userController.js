@@ -1,10 +1,12 @@
 const User = require("../models/Users");
-const PortfolioWebsite = require("../models/PortfolioWebsite");
+// const PortfolioWebsite = require("../models/PortfolioWebsite");
 const UserMetaData = require("../models/UserMetaData");
+const EmailOtp = require("../models/EmailOtp");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const sendToken = require("../utility/token");
 const HandleError = require("../utility/handleError");
 const cloudinary = require("cloudinary");
+const { sendOtpMail } = require("../middlewares/sendEmail");
 
 // API to register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
@@ -43,6 +45,62 @@ exports.logoutUser = asyncErrorHandler(async (req, res, next) => {
         httpOnly: true,
     });
     res.status(200).json({ success: true, message: "Logout successfully" });
+})
+
+// Generate OTP for email verification
+
+exports.generateOtp = asyncErrorHandler(async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return next(new HandleError("Please provide an email", 400));
+    }
+    //find if there's already one otp present for the email
+    const checkIfOtpExists = await EmailOtp.findOne({ email: email });
+    if (checkIfOtpExists) {
+        await EmailOtp.deleteOne({ email: email })
+    }
+
+    // Generate a random 5 digit OTP
+    const otp = Math.floor(10000 + Math.random() * 90000);
+
+    // Create a new OTP
+    await EmailOtp.create({
+        email: email,
+        otp: otp,
+        // OTP expires in 2 minutes
+        expiryAt: new Date(Date.now() + 2 * 60 * 1000)
+    })
+
+    sendOtpMail(email, otp)
+    return res.status(200).json({
+        success: true,
+        message: "OTP sent to your email",
+    });
+})
+
+// Verify OTP for email verification
+
+exports.verifyOtp = asyncErrorHandler(async (req, res, next) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return next(new HandleError("Please provide an email and otp", 400));
+    }
+    const otpDetails = await EmailOtp.findOne({ email: email });
+    if (!otpDetails) {
+        return next(new HandleError("OTP not found", 400));
+    }
+    if (otpDetails.expiryAt < new Date()) {
+        return next(new HandleError("OTP expired", 400));
+    }
+    if (otpDetails.otp !== otp) {
+        return next(new HandleError("Invalid OTP", 400));
+    }
+    await EmailOtp.deleteMany({ email: email });
+    return res.status(200).json({
+        success: true,
+        message: "OTP verified successfully",
+    });
+
 })
 
 

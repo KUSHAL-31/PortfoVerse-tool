@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RangeSlider from "../../utils/RangeSlider";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,17 +9,35 @@ import {
   CardContent,
   TextField,
   Typography,
+  Grid,
 } from "@mui/material";
 import "./styles/UserSkills.scss";
+import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { Button1 } from "../../design/buttons/Buttons";
 
 const UserSkills = () => {
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio, portfolioExpAndEdu } = useSelector(
+  const { portfolioLoading, portfolioSkills } = useSelector(
     (state) => state.userPortfolio
   );
+
   const [skills, setSkills] = useState([]);
 
-  // Add a new skill card
+  useEffect(() => {
+    if (!portfolioLoading && portfolioSkills) {
+      const loadedSkills = portfolioSkills.skillSection.map((skill) => ({
+        id: skill.skillId,
+        heading: skill.heading,
+        list: skill.list.map((item) => ({
+          id: item._id,
+          name: item.name,
+          rating: item.rating,
+        })),
+      }));
+      setSkills(loadedSkills);
+    }
+  }, [portfolioLoading, portfolioSkills]);
+
   const addSkillCard = () => {
     if (skills.length < 6) {
       setSkills([
@@ -35,13 +53,10 @@ const UserSkills = () => {
     }
   };
 
-  // Remove a skill card
-
   const removeSkillCard = (id) => {
     setSkills(skills.filter((skill) => skill.id !== id));
   };
 
-  // Handle changes for the skill title, skill names, and proficiency levels
   const handleSkillChange = (index, field, value, listItemIndex = null) => {
     const updatedSkills = [...skills];
     if (listItemIndex === null) {
@@ -54,7 +69,6 @@ const UserSkills = () => {
     setSkills(updatedSkills);
   };
 
-  // Add a new sub-skill
   const addSkillToList = (index) => {
     const updatedSkills = [...skills];
     updatedSkills[index].list.push({
@@ -65,8 +79,7 @@ const UserSkills = () => {
     setSkills(updatedSkills);
   };
 
-  // Remove a sub-skill
-  const remmoveItemFromSkillList = (index, listItemIndex) => {
+  const removeItemFromSkillList = (index, listItemIndex) => {
     const updatedSkills = [...skills];
     updatedSkills[index].list = updatedSkills[index].list.filter(
       (item) => item.id !== updatedSkills[index].list[listItemIndex].id
@@ -82,88 +95,140 @@ const UserSkills = () => {
       <Button variant="outlined" onClick={addSkillCard}>
         Add New Skill
       </Button>
-      <div className="skill_cards_section">
-        {skills.map((skill, index) => (
-          <Card
-            className="skill_card"
-            key={skill.id}
-            variant="outlined"
-            style={{ marginBottom: "20px", width: "100%" }}
-          >
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                #{index + 1}
-              </Typography>
-              <TextField
-                fullWidth
-                label="Enter the skill title"
-                variant="outlined"
-                value={skill.heading}
-                onChange={(e) =>
-                  handleSkillChange(index, "heading", e.target.value)
-                }
-                style={{ marginBottom: "10px" }}
-              />
-              <Button
-                variant="outlined"
-                onClick={() => addSkillToList(index)}
-                style={{ marginTop: "10px" }}
-              >
-                Add Skill
-              </Button>
-              {skill.list.map((listItem, listItemIndex) => (
-                <Box key={listItem.id} style={{ marginBottom: "10px" }}>
-                  <div>
-                    <TextField
-                      label="Enter the skill name"
-                      variant="outlined"
-                      value={listItem.name}
-                      onChange={(e) =>
-                        handleSkillChange(
-                          index,
-                          "listItemName",
-                          e.target.value,
-                          listItemIndex
-                        )
-                      }
-                      style={{ marginBottom: "10px" }}
-                    />
-                    <button
-                      className="remove_button"
-                      onClick={() =>
-                        remmoveItemFromSkillList(index, listItemIndex)
-                      }
-                    >
-                      -
-                    </button>
-                  </div>
 
-                  <RangeSlider
-                    selectedValue={listItem.rating}
-                    onChange={(e, value) =>
-                      handleSkillChange(
-                        index,
-                        "listItemLevel",
-                        value,
-                        listItemIndex
-                      )
-                    }
-                  />
-                </Box>
-              ))}
-            </CardContent>
-            <CardActions>
-              <Button
+      <div className="skill_cards_section">
+        <Grid container spacing={5}>
+          {skills.map((skill, index) => (
+            <Grid item xs={12} sm={6} md={4} key={skill.id}>
+              <Card
+                className="skill_card"
                 variant="outlined"
-                color="error"
-                onClick={() => removeSkillCard(skill.id)}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
               >
-                Remove Skill Card
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    #{index + 1}
+                  </Typography>
+
+                  {/* Skill Title */}
+                  <TextField
+                    fullWidth
+                    label="Enter the skill title"
+                    variant="outlined"
+                    value={skill.heading}
+                    onChange={(e) =>
+                      handleSkillChange(index, "heading", e.target.value)
+                    }
+                    style={{ marginBottom: "10px", flexGrow: 1, minWidth: 0 }}
+                  />
+
+                  {/* Add Skill Button */}
+                  <Button
+                    variant="outlined"
+                    onClick={() => addSkillToList(index)}
+                    style={{ marginTop: "10px", marginBottom: "20px" }}
+                  >
+                    Add Skill
+                  </Button>
+
+                  {/* List of Skills */}
+                  {skill.list.map((listItem, listItemIndex) => (
+                    <Box key={listItem.id} style={{ marginBottom: "10px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* Skill Name */}
+                        <TextField
+                          label="Enter the skill name"
+                          variant="outlined"
+                          value={listItem.name}
+                          onChange={(e) =>
+                            handleSkillChange(
+                              index,
+                              "listItemName",
+                              e.target.value,
+                              listItemIndex
+                            )
+                          }
+                          style={{
+                            marginBottom: "10px",
+                            flexGrow: 1,
+                            minWidth: 0, // Ensures the text field doesn't overflow
+                          }}
+                        />
+
+                        {/* Remove Skill Button */}
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() =>
+                            removeItemFromSkillList(index, listItemIndex)
+                          }
+                          style={{
+                            marginLeft: "10px",
+                            height: "fit-content",
+                            padding: "0 10px",
+                            borderRadius: "50%",
+                            minWidth: "auto",
+                          }}
+                        >
+                          -
+                        </Button>
+                      </div>
+
+                      {/* Range Slider */}
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <RangeSlider
+                          selectedValue={listItem.rating}
+                          onChange={(e, value) =>
+                            handleSkillChange(
+                              index,
+                              "listItemLevel",
+                              value,
+                              listItemIndex
+                            )
+                          }
+                        />
+                      </div>
+                    </Box>
+                  ))}
+                </CardContent>
+
+                <CardActions>
+                  {/* Remove Skill Card Button */}
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => removeSkillCard(skill.id)}
+                  >
+                    Remove Skill Card
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </div>
+      <Box mt={4} textAlign="center">
+        <Button1
+          text="Save and Proceed"
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
+        />
+      </Box>
     </div>
   );
 };

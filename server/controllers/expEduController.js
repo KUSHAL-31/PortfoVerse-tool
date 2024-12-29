@@ -45,10 +45,10 @@ exports.addNewEducation = asyncErrorHandler(async (req, res, next) => {
 
 exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { portfolioId, educationId, degree, school, startDate, endDate, result, comments } = req.body;
+    const { portfolioId, educations } = req.body;
 
-    if (!educationId || !degree || !school || !startDate || !endDate || !result || !portfolioId) {
-        return next(new HandleError("Please fill the mandatory fields", 400));
+    if (educations.length === 0) {
+        return next(new HandleError("Education ID is required", 400));
     }
 
     // Find the user's education and experience document
@@ -58,23 +58,28 @@ exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("User education details not found", 404));
     }
 
-    // Find the education entry by educationId and update it
-    const educationIndex = expEduDetails.education.findIndex(e => e.educationId === educationId);
+    // Loop through the educations array and update each education entry
+    for (var education of educations) {
+        const { educationId, degree, school, startDate, endDate, result, comments } = education;
 
-    if (educationIndex === -1) {
-        return next(new HandleError("Education not found", 404));
+        // Find the education entry by educationId and update it
+        const educationIndex = expEduDetails.education.findIndex(e => e.educationId === educationId);
+
+        if (educationIndex === -1) {
+            return next(new HandleError("Education not found", 404));
+        }
+
+        expEduDetails.education[educationIndex] = {
+            ...expEduDetails.education[educationIndex],
+            educationId,
+            degree,
+            school,
+            startDate,
+            endDate,
+            result,
+            comments
+        };
     }
-
-    expEduDetails.education[educationIndex] = {
-        ...expEduDetails.education[educationIndex],
-        educationId,
-        degree,
-        school,
-        startDate,
-        endDate,
-        result,
-        comments
-    };
 
     // Save the updated document
     await expEduDetails.save();
@@ -89,9 +94,9 @@ exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteEducationById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { portfolioId, educationId } = req.body;
+    const { portfolioId, educationIds } = req.body;
 
-    if (!educationId) {
+    if (educationIds.length === 0) {
         return next(new HandleError("Education ID is required", 400));
     }
 
@@ -102,15 +107,8 @@ exports.deleteEducationById = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("User education details not found", 404));
     }
 
-    // Find the index of the education to delete
-    const educationIndex = expEduDetails.education.findIndex(e => e.educationId === educationId);
-
-    if (educationIndex === -1) {
-        return next(new HandleError("Education not found", 404));
-    }
-
     // Remove the education from the array
-    expEduDetails.education.splice(educationIndex, 1);
+    expEduDetails.education = expEduDetails.education.filter(e => !educationIds.includes(e.educationId));
 
     // Save the updated document
     await expEduDetails.save();
@@ -267,9 +265,9 @@ exports.editExperienceById = asyncErrorHandler(async (req, res, next) => {
 
 exports.deleteExperienceById = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { portfolioId, experienceId } = req.body;
+    const { portfolioId, experienceIds } = req.body;
 
-    if (!experienceId) {
+    if (experienceIds.length === 0) {
         return next(new HandleError("Experience ID is required", 400));
     }
 
@@ -280,15 +278,8 @@ exports.deleteExperienceById = asyncErrorHandler(async (req, res, next) => {
         return next(new HandleError("User experience details not found", 404));
     }
 
-    // Find the index of the experience to delete
-    const experienceIndex = expEduDetails.experience.findIndex(e => e.experienceId === experienceId);
-
-    if (experienceIndex === -1) {
-        return next(new HandleError("Experience not found", 404));
-    }
-
     // Remove the experience from the array
-    expEduDetails.experience.splice(experienceIndex, 1);
+    expEduDetails.experience = expEduDetails.experience.filter(e => !experienceIds.includes(e.experienceId));
 
     // Save the updated document
     await expEduDetails.save();
