@@ -6,11 +6,14 @@ import UserTestimonials from "./pages/UserTestimonials";
 import UserExpAndEdu from "./pages/UserExpAndEdu";
 import UserWebsite from "./pages/UserWebsite";
 import CreatePortfolioSteps from "./PortfolioSteps/CreatePortfolioSteps";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  // useDispatch,
+  useSelector,
+} from "react-redux";
 import UserServices from "./pages/UserServices";
 
 const PortfolioWebsiteDetails = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const { pageCount } = useSelector((state) => state.globalReducer);
 
   const pages = [
