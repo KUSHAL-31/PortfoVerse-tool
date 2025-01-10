@@ -1,11 +1,12 @@
 const express = require("express");
-const { registerUser, loginUser, logoutUser, getUserDetailsById, createUserMetaData, editUserMetaData, getMetaDataByUserId } = require("../controllers/userController");
+const { registerUser, loginUser, logoutUser, getUserDetailsById, createUserMetaData, editUserMetaData, getMetaDataByUserId, generateOtp } = require("../controllers/userController");
 const { authUser } = require("../middlewares/auth");
 const router = express.Router();
 
 // User sign up routes
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
+router.route("/otp").get(generateOtp);
 router.route("/logout").get(logoutUser);
 router.route("/details").get(authUser, getUserDetailsById);
 
