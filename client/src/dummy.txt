@@ -1,0 +1,2 @@
+This is TECH-101 code
+Consider it as  a frontend components
