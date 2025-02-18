@@ -1,0 +1,6 @@
+This is TECH-101 code
+Consider it as  a frontend components
+
+
+This is TECH-102 code
+Consider it as a new code in the file
