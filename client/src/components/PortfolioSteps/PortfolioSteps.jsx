@@ -5,6 +5,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SkillsImg from "../../assets/images/skills.png";
 import ContactImg from "../../assets/images/contact.png";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PortfolioSteps = () => {
   const { section3 } = AssetVaultData;
@@ -41,73 +42,103 @@ const PortfolioSteps = () => {
   }, [selectedSlide, totalSlides]);
 
   return (
-    <div className="av_carousel">
-      {selectedSlide === 1 ? (
-        <div className="money-img">{/* <img src={MoneyImg} /> */}</div>
-      ) : null}
-      <div
-        className={`av_carousel__left-arrow ${
-          selectedSlide === 1 ? "hidden" : ""
-        }`}
-      >
-        <div onClick={handlePrevSlide}>
-          <ArrowBackIosIcon className="arrow__icons" />
+    <div className="portfolio-carousel">
+      <div className="portfolio-carousel__container">
+        <div
+          className={`portfolio-carousel__arrow portfolio-carousel__arrow--left ${
+            selectedSlide === 1 ? "hidden" : ""
+          }`}
+          onClick={handlePrevSlide}
+        >
+          <ArrowBackIosIcon />
         </div>
-      </div>
-      <div
-        className={`av_carousel__right-arrow ${
-          selectedSlide === totalSlides - 2 ? "hidden" : ""
-        }`}
-      >
-        <div onClick={handleNextSlide}>
-          <ArrowForwardIosIcon className="arrow__icons" />
-        </div>
-      </div>
-      <div className="av_carousel_content">
-        <div className="av_carousel__slide-container">
-          {carouselData.map((item, index) => (
-            <div
-              className={`av_carousel__slide ${
-                index === selectedSlide
-                  ? `active-${slideDirection}`
-                  : `not-active-${slideDirection}`
-              }`}
-              key={index}
-            >
-              <div className={`prev-img`}>
+
+        <div className="portfolio-carousel__content">
+          <div className="portfolio-carousel__slides">
+            {carouselData.map((item, index) => (
+              <div
+                className={`portfolio-carousel__slide ${
+                  index === selectedSlide ? "active" : ""
+                } ${slideDirection === "right" ? "slide-right" : "slide-left"}`}
+                key={index}
+              >
                 {index === selectedSlide - 1 && (
-                  <img
-                    src={item.img}
-                    className={index === 0 || index === 4 ? "blur-img" : ""}
-                  />
+                  <div className="portfolio-carousel__preview portfolio-carousel__preview--prev">
+                    <img
+                      src={item.img}
+                      alt="Previous slide"
+                      className={index === 0 || index === 4 ? "blur" : ""}
+                    />
+                  </div>
                 )}
-              </div>
-              {index === selectedSlide && (
-                <img src={item.img} className="active-img" />
-              )}
-              <div className={`next-img`}>
+
+                {index === selectedSlide && (
+                  <div className="portfolio-carousel__current">
+                    <img
+                      src={item.img}
+                      alt="Current slide"
+                      className="active-img"
+                    />
+                  </div>
+                )}
+
                 {index === selectedSlide + 1 && (
-                  <img
-                    src={item.img}
-                    className={index === 0 || index === 4 ? "blur-img" : ""}
-                  />
+                  <div className="portfolio-carousel__preview portfolio-carousel__preview--next">
+                    <img
+                      src={item.img}
+                      alt="Next slide"
+                      className={index === 0 || index === 4 ? "blur" : ""}
+                    />
+                  </div>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedSlide}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="portfolio-carousel__info"
+            >
+              <div className="portfolio-carousel__info-container">
+                <div className="portfolio-carousel__title">
+                  {carouselData[selectedSlide].title}
+                </div>
+                <div className="portfolio-carousel__description">
+                  {carouselData[selectedSlide].description}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div
+          className={`portfolio-carousel__arrow portfolio-carousel__arrow--right ${
+            selectedSlide === totalSlides - 2 ? "hidden" : ""
+          }`}
+          onClick={handleNextSlide}
+        >
+          <ArrowForwardIosIcon />
         </div>
       </div>
-      <div className={`ew-carousel-data-${selectedSlide}`}>
-        <div className="left">
-          <div className="carousel_title">
-            {carouselData[selectedSlide].title}
-          </div>
-        </div>
-        <div className="right">
-          <div className="carousel_description">
-            {carouselData[selectedSlide].description}
-          </div>
-        </div>
+
+      <div className="portfolio-carousel__indicators">
+        {Array.from({ length: totalSlides - 2 }).map((_, index) => (
+          <div
+            key={index}
+            className={`portfolio-carousel__indicator ${
+              selectedSlide === index + 1 ? "active" : ""
+            }`}
+            onClick={() => {
+              setSelectedSlide(index + 1);
+              setSlideDirection(index + 1 > selectedSlide ? "right" : "left");
+            }}
+          />
+        ))}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -28,6 +28,11 @@ const ServiceSection = () => {
   const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
+
+   const userServices = useSelector(
+     (state) => state.userPortfolio.portfolioServices
+   );
+    
 
   const [services, setServices] = useState([]);
 
@@ -70,6 +75,18 @@ const ServiceSection = () => {
     // alert("Services saved successfully!");
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
+
+  useEffect(() => {
+      if (userServices && userServices.services.length > 0) {
+        console.log("User projects:", userServices.services);
+        const formattedServices = userServices.services.map((service) => ({
+          id: service.serviceId,
+          title: service.title,
+          description: service.description,
+        }));
+        setServices(formattedServices);
+      }
+    }, [portfolio]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

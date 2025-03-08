@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -34,6 +34,10 @@ const ProjectSection = () => {
     (state) => state.userPortfolio
   );
 
+  const userProjects = useSelector(
+    (state) => state.userPortfolio.portfolioProjects
+  );
+  
   const [projects, setProjects] = useState([]);
   const fileInputRefs = useRef({});
 
@@ -96,6 +100,22 @@ const ProjectSection = () => {
     // alert("Projects saved successfully!");
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
+
+
+  useEffect(() => {
+    if (userProjects && userProjects.projects.length > 0) {
+      console.log("User projects:", userProjects.projects);
+      const formattedSections = userProjects.projects.map((project) => ({
+        id: project.projectId,
+        title: project.title,
+        description: project.description,
+        imageUrl: project.image ? project.image.url : null,
+        demoUrl: project.url,
+        sourceCodeUrl: project.sourceCode,
+      }));
+      setProjects(formattedSections);
+    }
+  }, [portfolio]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

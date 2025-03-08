@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -37,6 +37,10 @@ const TestimonialsSection = () => {
   const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
+
+     const userTestimonials = useSelector(
+       (state) => state.userPortfolio.portfolioTestimonials
+     );
 
   const [testimonials, setTestimonials] = useState([]);
   const fileInputRefs = useRef({});
@@ -103,6 +107,24 @@ const TestimonialsSection = () => {
     // alert("Testimonials saved successfully!");
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
+
+  useEffect(() => {
+     console.log(portfolio);
+        if (userTestimonials && userTestimonials.testimonials.length > 0) {
+          const formattedServices = userTestimonials.testimonials.map(
+            (review) => ({
+              id: review.testimonialId,
+              employerName: review.employerName,
+              employerRole: review.employerRole,
+              companyName: review.companyName,
+              imageUrl: review.image ? review.image.url : null,
+              comment: review.comment,
+              rating: review.rating
+            })
+          );
+          setTestimonials(formattedServices);
+        }
+      }, [portfolio]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

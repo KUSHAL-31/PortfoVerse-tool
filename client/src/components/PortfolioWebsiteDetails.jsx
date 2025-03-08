@@ -20,7 +20,6 @@ const PortfolioWebsiteDetails = () => {
     <UserProjects />,
     <UserServices />,
     <UserTestimonials />,
-    <UserExpAndEdu />,
     <UserWebsite />,
   ];
 

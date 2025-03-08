@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -27,9 +27,12 @@ const UserSkills = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio, portfolioExpAndEdu } = useSelector(
+  const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
+
+  const userSkills = useSelector((state) => state.userPortfolio.portfolioSkills);
+
 
   const [skillSections, setSkillSections] = useState([
     {
@@ -170,6 +173,32 @@ const UserSkills = () => {
     { value: 50, label: "Int" },
     { value: 100, label: "Exp" },
   ];
+   
+   useEffect(() => {
+     if (userSkills && userSkills.skillSection.length > 0) {
+       // Transform backend data to component state format
+       const formattedSections = userSkills.skillSection.map((section) => ({
+         id: section.skillId,
+         title: section.heading,
+         skills: section.list.map((skill) => ({
+           id: skill._id,
+           name: skill.name,
+           rating: skill.rating,
+         })),
+       }));
+
+       setSkillSections(formattedSections);
+     } else if (skillSections.length === 0) {
+       // If no data and no sections, initialize with one empty section
+       setSkillSections([
+         {
+           id: Date.now(),
+           title: "Professional Skills",
+           skills: [],
+         },
+       ]);
+     }
+   }, [portfolio]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

@@ -11,7 +11,7 @@ export const globalReducer = createReducer(initialState, (builder) => {
         state.showLoginBox = !state.showLoginBox;
     });
     builder.addCase(INCREMENT_PAGE_COUNT, (state) => {
-        if (state.pageCount <= 7) {
+        if (state.pageCount < 7) {
             state.pageCount++;
         }
     });

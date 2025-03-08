@@ -34,7 +34,7 @@ const PortfolioWebsiteDetails = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio, websiteDetails } = useSelector(
+  const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
 
@@ -47,13 +47,13 @@ const PortfolioWebsiteDetails = () => {
 
   // Load existing data from backend if available
   useEffect(() => {
-    if (portfolioLoading === false && websiteDetails) {
-      setHeaderTitle(websiteDetails.headerTitle || "");
-      setWebsiteName(websiteDetails.websiteName || "");
-      setIsPublished(websiteDetails.isPublished || false);
-      setLogoImage(websiteDetails.logoImage || null);
+    if (portfolio) {
+      setLogoImage(portfolio.logo.url ? portfolio.logo.url : null);
+      setHeaderTitle(portfolio.headerTitle);
+      setWebsiteName(portfolio.details.websiteName);
+      setIsPublished(portfolio.isPublished);
     }
-  }, [websiteDetails, portfolioLoading]);
+  }, [portfolio]);
 
   // Handle logo image upload
   const handleImageUpload = (event) => {

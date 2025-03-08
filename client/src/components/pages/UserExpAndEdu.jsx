@@ -40,7 +40,7 @@ const EducationExperienceSection = () => {
   );
 
   // Get user experience and education data from redux
-  const userExpEdu = useSelector((state) => state.userPortfolio.userExpEdu);
+  const userExpEdu = useSelector((state) => state.userPortfolio.portfolioExpAndEdu);
 
   // Education state
   const [educations, setEducations] = useState([]);
@@ -60,6 +60,7 @@ const EducationExperienceSection = () => {
         result: edu.result || "",
         comments: edu.comments || "",
       }));
+      console.log(formattedEducations);
       setEducations(formattedEducations);
     }
 

@@ -112,8 +112,6 @@ export const createUserMetaData = (portfolioData) => async (dispatch) => {
 }
 
 export const updateUserMetaData = (doesExist, portfolioData) => async (dispatch) => {
-    console.log(doesExist, "doesExist");
-    console.log(portfolioData, "portfolioData");
     try {
         dispatch({ type: UPDATE_USER_META_DATA_REQUEST });
         var data;
