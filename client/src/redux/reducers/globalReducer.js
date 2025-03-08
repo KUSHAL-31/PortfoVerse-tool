@@ -3,7 +3,7 @@ import { DECREMENT_PAGE_COUNT, INCREMENT_PAGE_COUNT, RESET_PAGE_COUNT, TOGGLE_LO
 
 const initialState = {
     showLoginBox: false,
-    pageCount: 3,
+    pageCount: 1,
 };
 
 export const globalReducer = createReducer(initialState, (builder) => {
@@ -11,7 +11,7 @@ export const globalReducer = createReducer(initialState, (builder) => {
         state.showLoginBox = !state.showLoginBox;
     });
     builder.addCase(INCREMENT_PAGE_COUNT, (state) => {
-        if (state.pageCount < 7) {
+        if (state.pageCount <= 7) {
             state.pageCount++;
         }
     });

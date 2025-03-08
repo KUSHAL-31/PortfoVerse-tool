@@ -1,13 +1,34 @@
-import { Button, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import "./UserMetaData.scss";
-import { Button1 } from "../../design/buttons/Buttons";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SaveIcon from "@mui/icons-material/Save";
+import WorkIcon from "@mui/icons-material/Work";
+import LinkIcon from "@mui/icons-material/Link";
 import { updateUserMetaData } from "../../redux/actions/userActions";
-import CreatePortfolioSteps from "../PortfolioSteps/CreatePortfolioSteps";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 const UserMetaData = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
   const { portfolioLoading, portfolioMetaData, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
@@ -28,12 +49,12 @@ const UserMetaData = () => {
     "Leetcode",
   ];
 
-  // Function to add a new component
+  // Function to add a new role
   const addRole = () => {
     setRoles([...roles, { id: Date.now(), text: "" }]);
   };
 
-  // Function to remove a specific component
+  // Function to remove a specific role
   const removeRole = (id) => {
     setRoles(roles.filter((role) => role.id !== id));
   };
@@ -44,6 +65,7 @@ const UserMetaData = () => {
     );
   };
 
+  // Function to add a new social media link
   const addSocial = () => {
     const selectedValues = socials.map((social) => social.selected);
     const firstAvailableOption = socialMediaOptions.find(
@@ -58,8 +80,8 @@ const UserMetaData = () => {
     }
   };
 
+  // Function to remove a specific social media link
   const removeSocial = (id) => {
-    // Remove the social item with the matching id
     setSocials(socials.filter((social) => social.id !== id));
   };
 
@@ -77,10 +99,7 @@ const UserMetaData = () => {
     );
   };
 
-  // // Get selected values to filter out from dropdown options
-  // const selectedValues = socials.map((social) => social.selected);
-
-  // Initialize roles when portfolioMetaData changes
+  // Initialize data when portfolioMetaData changes
   useEffect(() => {
     if (portfolioLoading === false && portfolioMetaData) {
       setTitle(portfolioMetaData.title);
@@ -97,7 +116,7 @@ const UserMetaData = () => {
       if (portfolioMetaData.socials && !socials.length) {
         setSocials(
           portfolioMetaData.socials.map((social) => ({
-            id: Date.now() + Math.random(), // To ensure unique IDs
+            id: Date.now() + Math.random(),
             selected: social.name,
             url: social.url,
           }))
@@ -106,6 +125,7 @@ const UserMetaData = () => {
     }
   }, [portfolioMetaData, portfolioLoading]);
 
+  // Save metadata function
   const saveMetaData = async () => {
     const portfolioData = {
       portfolioId: portfolio._id,
@@ -124,143 +144,335 @@ const UserMetaData = () => {
   };
 
   if (portfolioLoading === undefined || portfolioLoading) {
-    return <h1>Loading...</h1>;
+    return (
+      <Box sx={{ textAlign: "center", py: 5 }}>
+        <Typography variant="h5">Loading...</Typography>
+      </Box>
+    );
   }
+
   return (
-    <>
-      <h2 className="metadata_title">
-        Fill the following details and click on save to proceed
-      </h2>
-      <div className="metadata_section">
-        <div className="metadata_left_section">
-          <TextField
-            className="metadata_left_inputs"
-            id="outlined-basic"
-            label="Enter the title"
-            variant="outlined"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TextField
-            className="metadata_left_inputs"
-            id="outlined-multiline-static"
-            label="Enter the description"
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <TextField
-            className="metadata_left_inputs"
-            id="outlined-basic"
-            label="Resume Link"
-            variant="outlined"
-            value={resume}
-            onChange={(e) => setResume(e.target.value)}
-          />
-        </div>
-        <div className="metadata_right_section">
-          <div>
-            <InputLabel id="demo-simple-select-label">
-              Add your roles
-            </InputLabel>
-            <Button
-              variant="outlined"
-              onClick={addRole}
-              disabled={roles.length >= 4}
-              className="add_meta_buttons"
-            >
-              Add +
-            </Button>
-            {roles.map((role) => (
-              <div key={role.id} style={{ marginBottom: "10px" }}>
-                <TextField
-                  className="metadata_right_inputs"
-                  id="outlined-basic"
-                  label="Role"
-                  autoComplete="off"
-                  variant="outlined"
-                  value={role.text}
-                  onChange={(e) =>
-                    handleRoleTextChange(role.id, e.target.value.slice(0, 25))
-                  }
-                  helperText={role?.text ? `${role.text.length}/25` : ""} // Display character count
-                  FormHelperTextProps={{
-                    style: { textAlign: "right", marginTop: "5px" },
-                  }}
-                />
-                <button
-                  className="remove_button"
-                  onClick={() => removeRole(role.id)}
-                >
-                  -
-                </button>
-              </div>
-            ))}
-          </div>
-          <div>
-            <InputLabel id="demo-simple-select-label">
-              Add your social media URLs
-            </InputLabel>
-            <Button
-              variant="outlined"
-              onClick={addSocial}
-              disabled={socials.length >= socialMediaOptions.length}
-              className="add_meta_buttons"
-            >
-              Add +
-            </Button>
-            {socials.map((social) => (
-              <div
-                key={social.id}
-                style={{ marginBottom: "10px" }}
-                className="meta_right_socials"
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          align="center"
+          sx={{
+            fontWeight: "bold",
+            color: theme.palette.primary.main,
+            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+          }}
+        >
+          Portfolio Details
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="textSecondary"
+          sx={{ mb: 4 }}
+        >
+          Fill the following details and click on save to proceed
+        </Typography>
+      </Box>
+
+      <Grid container spacing={4}>
+        {/* Basic Information Section */}
+        <Grid item xs={12}>
+          <Card
+            elevation={3}
+            sx={{
+              borderRadius: 2,
+              overflow: "visible",
+              transition: "all 0.3s",
+              "&:hover": {
+                boxShadow: 6,
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography
+                variant="h5"
+                component="div"
+                fontWeight="bold"
+                sx={{ mb: 3 }}
               >
-                <Select
-                  className="meta_right_socials_dropdown"
-                  labelId={`select-label-${social.id}`}
-                  id={`select-${social.id}`}
-                  value={social.selected}
-                  onChange={(e) =>
-                    handleSelectChange(social.id, e.target.value)
-                  }
+                Basic Information
+              </Typography>
+
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    id="portfolio-title"
+                    label="Portfolio Title"
+                    variant="outlined"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    sx={{ mb: 3 }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    id="resume-link"
+                    label="Resume Link"
+                    variant="outlined"
+                    value={resume}
+                    onChange={(e) => setResume(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <LinkIcon sx={{ mr: 1, color: "text.secondary" }} />
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    id="portfolio-description"
+                    label="Portfolio Description"
+                    multiline
+                    rows={6}
+                    variant="outlined"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Professional Roles Section */}
+        <Grid item xs={12}>
+          <Card
+            elevation={3}
+            sx={{
+              borderRadius: 2,
+              overflow: "visible",
+              transition: "all 0.3s",
+              "&:hover": {
+                boxShadow: 6,
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
+                <Typography variant="h5" component="div" fontWeight="bold">
+                  Professional Roles
+                </Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddCircleIcon />}
+                  onClick={addRole}
+                  disabled={roles.length >= 4}
+                  size={isMobile ? "small" : "medium"}
                 >
-                  {socialMediaOptions
-                    .filter(
-                      (option) =>
-                        !socials.map((s) => s.selected).includes(option) ||
-                        option === social.selected
-                    )
-                    .map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                </Select>
-                <TextField
-                  className="metadata_right_social_inputs"
-                  id={`outlined-basic-${social.id}`}
-                  label="URL"
-                  variant="outlined"
-                  style={{ marginLeft: "10px" }}
-                  value={social.url}
-                  onChange={(e) => handleUrlChange(social.id, e.target.value)}
-                />
-                <button
-                  className="remove_button"
-                  onClick={() => removeSocial(social.id)}
+                  Add Role
+                </Button>
+              </Box>
+
+              {roles.length === 0 && (
+                <Box
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    border: "1px dashed grey",
+                    borderRadius: 2,
+                    mb: 2,
+                  }}
                 >
-                  -
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="section_save_button">
-        <Button1 text={"Save and proceed"} onClick={() => saveMetaData()} />
-      </div>
-    </>
+                  <Typography variant="body1" color="textSecondary">
+                    No roles added yet. Click the button above to add your
+                    professional roles.
+                  </Typography>
+                </Box>
+              )}
+
+              <Grid container spacing={2}>
+                {roles.map((role) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={role.id}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 2,
+                      }}
+                    >
+                      <WorkIcon sx={{ mr: 1, color: "text.secondary" }} />
+                      <TextField
+                        fullWidth
+                        label="Role"
+                        variant="outlined"
+                        value={role.text}
+                        onChange={(e) =>
+                          handleRoleTextChange(
+                            role.id,
+                            e.target.value.slice(0, 25)
+                          )
+                        }
+                        helperText={role?.text ? `${role.text.length}/25` : ""}
+                        FormHelperTextProps={{
+                          style: { textAlign: "right", marginTop: "5px" },
+                        }}
+                      />
+                      <IconButton
+                        color="error"
+                        onClick={() => removeRole(role.id)}
+                        edge="end"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Social Media Links Section */}
+        <Grid item xs={12}>
+          <Card
+            elevation={3}
+            sx={{
+              borderRadius: 2,
+              overflow: "visible",
+              transition: "all 0.3s",
+              "&:hover": {
+                boxShadow: 6,
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
+                <Typography variant="h5" component="div" fontWeight="bold">
+                  Social Media Links
+                </Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddCircleIcon />}
+                  onClick={addSocial}
+                  disabled={socials.length >= socialMediaOptions.length}
+                  size={isMobile ? "small" : "medium"}
+                >
+                  Add Link
+                </Button>
+              </Box>
+
+              {socials.length === 0 && (
+                <Box
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    border: "1px dashed grey",
+                    borderRadius: 2,
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="body1" color="textSecondary">
+                    No social media links added yet. Click the button above to
+                    add your profiles.
+                  </Typography>
+                </Box>
+              )}
+
+              <Grid container spacing={3}>
+                {socials.map((social) => (
+                  <Grid item xs={12} md={6} key={social.id}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Select
+                        value={social.selected}
+                        onChange={(e) =>
+                          handleSelectChange(social.id, e.target.value)
+                        }
+                        variant="outlined"
+                        sx={{ minWidth: 120, mr: 2 }}
+                      >
+                        {socialMediaOptions
+                          .filter(
+                            (option) =>
+                              !socials
+                                .map((s) => s.selected)
+                                .includes(option) || option === social.selected
+                          )
+                          .map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                      <TextField
+                        fullWidth
+                        label="URL"
+                        variant="outlined"
+                        value={social.url}
+                        onChange={(e) =>
+                          handleUrlChange(social.id, e.target.value)
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <LinkIcon sx={{ mr: 1, color: "text.secondary" }} />
+                          ),
+                        }}
+                      />
+                      <IconButton
+                        color="error"
+                        onClick={() => removeSocial(social.id)}
+                        edge="end"
+                        sx={{ ml: 1 }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
+        <Button
+          variant="contained"
+          size="large"
+          color="success"
+          startIcon={<SaveIcon />}
+          onClick={saveMetaData}
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 2,
+            fontSize: "1.1rem",
+            boxShadow: 3,
+          }}
+        >
+          Save and Proceed
+        </Button>
+      </Box>
+    </Container>
   );
 };
 
