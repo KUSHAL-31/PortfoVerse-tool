@@ -1,39 +1,29 @@
-const User = require("../models/Users");
 const UserServices = require("../models/UserServices");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
-const cloudinary = require("cloudinary");
 const { v4: uuidv4 } = require("uuid");
 
 exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { portfolioId, services } = req.body;
+  const { title, description } = req.body;
+  if (title === undefined || description === undefined) {
+    return next(new HandleError("Please fill the mandatory fields", 400));
+  }
   // Find the user's website document
-  var serviceDetails = await UserServices.findOne({
-    user: userId,
-    portfolio: portfolioId,
-  });
+  var serviceDetails = await UserServices.findOne({ user: userId });
   if (!serviceDetails) {
-    serviceDetails = new UserServices({
-      user: userId,
-      portfolio: portfolioId,
-      services: [],
-    });
+    serviceDetails = new UserServices({ user: userId, services: [] });
   }
 
-  for (var service of services) {
-    const { title, description } = service;
+  // Create a new service
+  const newService = {
+    serviceId: uuidv4(),
+    title,
+    description,
+  };
 
-    if (title === undefined || description === undefined) {
-      return next(new HandleError("Please fill the mandatory fields", 400));
-    }
-
-    const serviceId = uuidv4();
-    if (!title || !description) {
-      return next(new HandleError("Please fill the mandatory fields", 400));
-    }
-    serviceDetails.services.push({ serviceId, title, description });
-  }
+  // Push the new service into the services array
+  serviceDetails.services.push(newService);
 
   // Save the updated document
   await serviceDetails.save();
@@ -45,119 +35,80 @@ exports.listNewServiceByUserId = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-exports.editServicesByUserId = asyncErrorHandler(async (req, res, next) => {
+exports.editserviceByUserId = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { portfolioId, services } = req.body;
+  const { serviceId, title, description } = req.body;
 
-  if (!portfolioId || !services || !Array.isArray(services)) {
-    return next(
-      new HandleError("Please provide portfolioId and services array", 400)
-    );
-  }
-
-  // Validate services array - each entry should have serviceId, title and description
-  const isValidServicesArray = services.every(
-    (service) => service.serviceId && service.title && service.description
-  );
-
-  if (!isValidServicesArray) {
-    return next(
-      new HandleError(
-        "Each service must contain serviceId, title and description",
-        400
-      )
-    );
+  if (!serviceId || !title || !description) {
+    return next(new HandleError("Please fill the mandatory fields", 400));
   }
 
   // Find the user's service details document
-  const serviceDetails = await UserServices.findOne({
-    user: userId,
-    portfolio: portfolioId,
-  });
+  const serviceDetails = await UserServices.findOne({ user: userId });
+
   if (!serviceDetails) {
-    return next(
-      new HandleError("Service details not found for this portfolio", 404)
-    );
+    return next(new HandleError("Service not found", 404));
   }
 
-  // Update each service in the array
-  for (const updatedService of services) {
-    const serviceIndex = serviceDetails.services.findIndex(
-      (s) => s.serviceId === updatedService.serviceId
-    );
+  // Find the service by serviceId and update it
+  const serviceIndex = serviceDetails.services.findIndex(
+    (s) => s.serviceId === serviceId
+  );
 
-    if (serviceIndex === -1) {
-      return next(
-        new HandleError(
-          `Service with id ${updatedService.serviceId} not found`,
-          404
-        )
-      );
-    }
-
-    // Update the service while preserving other fields
-    serviceDetails.services[serviceIndex] = {
-      ...serviceDetails.services[serviceIndex],
-      title: updatedService.title,
-      description: updatedService.description,
-    };
+  if (serviceIndex === -1) {
+    return next(new HandleError("Service not found", 404));
   }
+
+  serviceDetails.services[serviceIndex] = {
+    ...serviceDetails.services[serviceIndex],
+    serviceId,
+    title,
+    description,
+  };
 
   // Save the updated document
   await serviceDetails.save();
 
   res.status(200).json({
     success: true,
-    message: "Services updated successfully!",
+    message: "service updated successfully!",
     services: serviceDetails.services,
   });
 });
 
-exports.deleteServicesByUserId = asyncErrorHandler(async (req, res, next) => { 
+exports.deleteserviceByUserId = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { portfolioId, serviceIds } = req.body;
+  const { serviceId } = req.body;
 
-  if (!serviceIds || !Array.isArray(serviceIds) || serviceIds.length === 0) {
-    return next(
-      new HandleError("Please provide an array of serviceIds to delete", 400)
-    );
+  if (!serviceId) {
+    return next(new HandleError("Something went wrong", 400));
   }
 
   // Find the user's service details document
-  const serviceDetails = await UserServices.findOne({
-    user: userId,
-    portfolio: portfolioId,
-  });
+  const serviceDetails = await UserServices.findOne({ user: userId });
 
   if (!serviceDetails) {
-    return next(new HandleError("Services not found for this portfolio", 404));
+    return next(new HandleError("service not found", 404));
   }
 
-  // Check if all serviceIds exist
-  const nonExistentServiceIds = serviceIds.filter(
-    (id) => !serviceDetails.services.some((s) => s.serviceId === id)
+  // Find the index of the service to delete
+  const serviceIndex = serviceDetails.services.findIndex(
+    (s) => s.serviceId === serviceId
   );
 
-  if (nonExistentServiceIds.length > 0) {
-    return next(
-      new HandleError(
-        `Some services not found: ${nonExistentServiceIds.join(", ")}`,
-        404
-      )
-    );
+  if (serviceIndex === -1) {
+    return next(new HandleError("Service not found", 404));
   }
 
-  // Filter out the services that need to be deleted
-  serviceDetails.services = serviceDetails.services.filter(
-    (service) => !serviceIds.includes(service.serviceId)
-  );
+  // Remove the service from the array
+  serviceDetails.services.splice(serviceIndex, 1);
 
   // Save the updated document
   await serviceDetails.save();
 
   res.status(200).json({
     success: true,
-    message: "Services deleted successfully!",
+    message: "service deleted successfully!",
     services: serviceDetails.services,
   });
 });
