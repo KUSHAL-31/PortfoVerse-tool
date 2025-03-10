@@ -29,19 +29,15 @@ import ImageIcon from "@mui/icons-material/Image";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import EditIcon from "@mui/icons-material/Edit";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { getPortfolioProjectsDetails } from "../../redux/actions/portfolioActions";
 
 const ProjectSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio } = useSelector(
+  const { currentPortfolio, portfolioProjects } = useSelector(
     (state) => state.userPortfolio
-  );
-
-  const userProjects = useSelector(
-    (state) => state.userPortfolio.portfolioProjects
   );
 
   const [projects, setProjects] = useState([]);
@@ -140,12 +136,10 @@ const ProjectSection = () => {
 
   useEffect(() => {
     if (
-      userProjects &&
-      userProjects.projects &&
-      userProjects.projects.length > 0
+      portfolioProjects &&
+      portfolioProjects.length > 0
     ) {
-      console.log("User projects:", userProjects.projects);
-      const formattedSections = userProjects.projects.map((project) => ({
+      const formattedSections = portfolioProjects.map((project) => ({
         id: project.projectId,
         title: project.title,
         description: project.description,
@@ -154,8 +148,10 @@ const ProjectSection = () => {
         sourceCodeUrl: project.sourceCode,
       }));
       setProjects(formattedSections);
+    } else {
+      dispatch(getPortfolioProjectsDetails(currentPortfolio._id));
     }
-  }, [portfolio, userProjects]);
+  }, [dispatch, portfolioProjects]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

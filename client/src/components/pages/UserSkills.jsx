@@ -26,6 +26,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { getPortfolioSkillsDetails } from "../../redux/actions/portfolioActions";
 
 const UserSkills = () => {
   const theme = useTheme();
@@ -33,21 +34,11 @@ const UserSkills = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio } = useSelector(
+  const { portfolioLoading, portfolioSkills, currentPortfolio } = useSelector(
     (state) => state.userPortfolio
   );
 
-  const userSkills = useSelector(
-    (state) => state.userPortfolio.portfolioSkills
-  );
-
-  const [skillSections, setSkillSections] = useState([
-    {
-      id: Date.now(),
-      title: "Professional Skills",
-      skills: [],
-    },
-  ]);
+  const [skillSections, setSkillSections] = useState([]);
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
@@ -193,12 +184,12 @@ const UserSkills = () => {
 
   useEffect(() => {
     if (
-      userSkills &&
-      userSkills.skillSection &&
-      userSkills.skillSection.length > 0
+      portfolioSkills &&
+      portfolioSkills.skillSection &&
+      portfolioSkills.skillSection.length > 0
     ) {
       // Transform backend data to component state format
-      const formattedSections = userSkills.skillSection.map((section) => ({
+      const formattedSections = portfolioSkills.skillSection.map((section) => ({
         id: section.skillId,
         title: section.heading,
         skills: section.list.map((skill) => ({
@@ -209,17 +200,10 @@ const UserSkills = () => {
       }));
 
       setSkillSections(formattedSections);
-    } else if (skillSections.length === 0) {
-      // If no data and no sections, initialize with one empty section
-      setSkillSections([
-        {
-          id: Date.now(),
-          title: "Professional Skills",
-          skills: [],
-        },
-      ]);
+    } else {
+      dispatch(getPortfolioSkillsDetails(currentPortfolio._id));
     }
-  }, [portfolio, userSkills]);
+  }, [dispatch, portfolioSkills]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

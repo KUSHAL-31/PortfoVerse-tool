@@ -1,10 +1,14 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE, UPDATE_USER_META_DATA_REQUEST, UPDATE_USER_META_DATA_SUCCESS, UPDATE_USER_META_DATA_FAILURE, RESET_ALL_PORTFOLIO_DETAILS, ADD_NEW_EDUCATION, EDIT_EDUCATION } from "../constants";
+import { CLEAR_CURRENT_PORTFOLIO, CREATE_NEW_PORTFOLIO_FAILURE, CREATE_NEW_PORTFOLIO_REQUEST, CREATE_NEW_PORTFOLIO_SUCCESS, GET_ALL_USER_PORTFOLIO_FAILURE, GET_ALL_USER_PORTFOLIO_REQUEST, GET_ALL_USER_PORTFOLIO_SUCCESS, SET_CURRENT_PORTFOLIO, GET_PORTFOLIO_DETAILS_REQUEST, GET_PORTFOLIO_DETAILS_SUCCESS, GET_PORTFOLIO_DETAILS_FAILURE, UPDATE_USER_META_DATA_REQUEST, UPDATE_USER_META_DATA_SUCCESS, UPDATE_USER_META_DATA_FAILURE, RESET_ALL_PORTFOLIO_DETAILS, ADD_NEW_EDUCATION, EDIT_EDUCATION, PORTFOLIO_METADATA_REQUEST, PORTFOLIO_METADATA_SUCCESS, PORTFOLIO_METADATA_FAILURE, PORTFOLIO_ALL_EDUCATION_REQUEST, PORTFOLIO_ALL_EDUCATION_SUCCESS, PORTFOLIO_ALL_EDUCATION_FAILURE, PORTFOLIO_ALL_EXPERIENCE_REQUEST, PORTFOLIO_ALL_EXPERIENCE_SUCCESS, PORTFOLIO_ALL_EXPERIENCE_FAILURE, PORTFOLIO_SKILLS_REQUEST, PORTFOLIO_SKILLS_SUCCESS, PORTFOLIO_SKILLS_FAILURE, PORTFOLIO_PROJECTS_REQUEST, PORTFOLIO_PROJECTS_SUCCESS, PORTFOLIO_PROJECTS_FAILURE, PORTFOLIO_SERVICES_REQUEST, PORTFOLIO_SERVICES_SUCCESS, PORTFOLIO_SERVICES_FAILURE, PORTFOLIO_TESTIMONIALS_REQUEST, PORTFOLIO_TESTIMONIALS_SUCCESS, PORTFOLIO_TESTIMONIALS_FAILURE } from "../constants";
 
 const initialState = {
-    newlyAddedEducations: [],
-    editedEducations: [],
-    newlyAddedExperience: [],
+  portfolioMetaData: [],
+  portfolioEducations: [],
+  portfolioExperiences: [],
+  portfolioSkills: [],
+  portfolioProjects: [],
+  portfolioServices: [],
+  portfolioTestimonials: [],
 };
 
 export const portfolioReducer = createReducer(initialState, (builder) => {
@@ -42,12 +46,6 @@ export const portfolioReducer = createReducer(initialState, (builder) => {
     builder.addCase(GET_PORTFOLIO_DETAILS_SUCCESS, (state, action) => {
         state.portfolioLoading = false;
         state.portfolio = action.payload.portfolio;
-        state.portfolioExpAndEdu = action.payload.userExpEdu;
-        state.portfolioProjects = action.payload.userProjects;
-        state.portfolioSkills = action.payload.userSkills;
-        state.portfolioServices = action.payload.userServices;
-        state.portfolioTestimonials = action.payload.userTestimonials;
-        state.portfolioMetaData = action.payload.userMetaData;
     });
     builder.addCase(GET_PORTFOLIO_DETAILS_FAILURE, (state, action) => {
         state.portfolioLoading = false;
@@ -67,11 +65,82 @@ export const portfolioReducer = createReducer(initialState, (builder) => {
     builder.addCase(RESET_ALL_PORTFOLIO_DETAILS, () => {
         return initialState;
     });
-    builder.addCase(ADD_NEW_EDUCATION, (state,action) => {
-        state.newlyAddedEducations.push(action.payload);
+    builder.addCase(PORTFOLIO_METADATA_REQUEST, (state, action) => {
+        state.portfolioLoading = true;
     });
-    builder.addCase(EDIT_EDUCATION, (state, action) => {
-      state.editedEducations.push(action.payload);
+    builder.addCase(PORTFOLIO_METADATA_SUCCESS, (state, action) => {
+        state.portfolioLoading = false;
+        state.portfolioMetaData = action.payload;
+    });
+    builder.addCase(PORTFOLIO_METADATA_FAILURE, (state, action) => {
+        state.portfolioLoading = false;
+        state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_ALL_EDUCATION_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_ALL_EDUCATION_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioEducations = action.payload;
+    });
+    builder.addCase(PORTFOLIO_ALL_EDUCATION_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_ALL_EXPERIENCE_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_ALL_EXPERIENCE_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioExperiences = action.payload;
+    });
+    builder.addCase(PORTFOLIO_ALL_EXPERIENCE_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_SKILLS_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_SKILLS_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioSkills = action.payload;
+    });
+    builder.addCase(PORTFOLIO_SKILLS_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_PROJECTS_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_PROJECTS_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioProjects = action.payload;
+    });
+    builder.addCase(PORTFOLIO_PROJECTS_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_SERVICES_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_SERVICES_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioServices = action.payload;
+    });
+    builder.addCase(PORTFOLIO_SERVICES_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
+    });
+    builder.addCase(PORTFOLIO_TESTIMONIALS_REQUEST, (state) => {
+      state.portfolioLoading = true;
+    });
+    builder.addCase(PORTFOLIO_TESTIMONIALS_SUCCESS, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioTestimonials = action.payload;
+    });
+    builder.addCase(PORTFOLIO_TESTIMONIALS_FAILURE, (state, action) => {
+      state.portfolioLoading = false;
+      state.portfolioError = action.payload;
     });
 });
 

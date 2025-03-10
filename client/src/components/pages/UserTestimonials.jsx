@@ -35,6 +35,7 @@ import StarIcon from "@mui/icons-material/Star";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { getPortfolioTestimonialDetails } from "../../redux/actions/portfolioActions";
 
 const TestimonialsSection = () => {
   const theme = useTheme();
@@ -42,12 +43,8 @@ const TestimonialsSection = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio } = useSelector(
+  const { currentPortfolio, portfolioTestimonials } = useSelector(
     (state) => state.userPortfolio
-  );
-
-  const userTestimonials = useSelector(
-    (state) => state.userPortfolio.portfolioTestimonials
   );
 
   const [testimonials, setTestimonials] = useState([]);
@@ -170,22 +167,21 @@ const TestimonialsSection = () => {
   };
 
   useEffect(() => {
-    console.log(portfolio);
-    if (userTestimonials && userTestimonials.testimonials?.length > 0) {
-      const formattedTestimonials = userTestimonials.testimonials.map(
-        (review) => ({
-          id: review.testimonialId,
-          employerName: review.employerName,
-          employerRole: review.employerRole,
-          companyName: review.companyName,
-          imageUrl: review.image ? review.image.url : null,
-          comment: review.comment,
-          rating: review.rating,
-        })
-      );
+    if (portfolioTestimonials && portfolioTestimonials.length > 0) {
+      const formattedTestimonials = portfolioTestimonials.map((review) => ({
+        id: review.testimonialId,
+        employerName: review.employerName,
+        employerRole: review.employerRole,
+        companyName: review.companyName,
+        imageUrl: review.image ? review.image.url : null,
+        comment: review.comment,
+        rating: review.rating,
+      }));
       setTestimonials(formattedTestimonials);
+    } else {
+      dispatch(getPortfolioTestimonialDetails(currentPortfolio._id));
     }
-  }, [portfolio, userTestimonials]);
+  }, [portfolioTestimonials]);
 
   // Testimonial Modal Component
   const TestimonialModal = () => {

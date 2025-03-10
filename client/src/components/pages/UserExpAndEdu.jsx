@@ -37,7 +37,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EditIcon from "@mui/icons-material/Edit";
 import { ADD_NEW_EDUCATION, EDIT_EDUCATION, INCREMENT_PAGE_COUNT } from "../../redux/constants";
-import { saveEducationDetails } from "../../redux/actions/portfolioActions";
+import { getPortfolioEducationDetails, getPortfolioExperienceDetails, saveEducationDetails } from "../../redux/actions/portfolioActions";
 
 // Education Modal Component
 const EducationModal = memo(({
@@ -618,8 +618,9 @@ const EducationExperienceSection = () => {
   const dispatch = useDispatch();
   
   // Get user experience and education data from redux
-  const userExpEdu = useSelector((state) => state.userPortfolio.portfolioExpAndEdu);
-
+  const { portfolioEducations, portfolioExperiences, currentPortfolio } =
+    useSelector((state) => state.userPortfolio);
+  
   // Education state
   const [educations, setEducations] = useState([]);
   const [educationModalOpen, setEducationModalOpen] = useState(false);
@@ -639,10 +640,15 @@ const EducationExperienceSection = () => {
     return date.toISOString().split("T")[0];
   }, []);
 
-  // Load data from reducer when component mounts or when userExpEdu changes
   useEffect(() => {
-    if (userExpEdu?.education?.length > 0) {
-      const formattedEducations = userExpEdu.education.map((edu) => ({
+    dispatch(getPortfolioEducationDetails(currentPortfolio._id));
+    dispatch(getPortfolioExperienceDetails(currentPortfolio._id));
+  }, []);
+
+  // Load data from reducer when component mounts or when portfolioEducations changes
+  useEffect(() => {
+    if (portfolioEducations?.length > 0) {
+      const formattedEducations = portfolioEducations.map((edu) => ({
         isEdited: true,
         id: edu.educationId || Date.now() + Math.random(),
         degree: edu.degree || "",
@@ -655,8 +661,8 @@ const EducationExperienceSection = () => {
       setEducations(formattedEducations);
     }
 
-    if (userExpEdu?.experience?.length > 0) {
-      const formattedExperiences = userExpEdu.experience.map((exp) => ({
+    if (portfolioExperiences?.length > 0) {
+      const formattedExperiences = portfolioExperiences.map((exp) => ({
         isEdited: true,
         id: exp.experienceId || Date.now() + Math.random(),
         title: exp.title || "",
@@ -671,7 +677,7 @@ const EducationExperienceSection = () => {
       }));
       setExperiences(formattedExperiences);
     }
-  }, [userExpEdu, formatDateForInput]);
+  }, [portfolioExperiences, formatDateForInput]);
 
   // Education handlers
   const addEducation = useCallback(() => {

@@ -141,9 +141,12 @@ exports.editUserMetaData = asyncErrorHandler(async (req, res, next) => {
 
 // API to get meta data by user id
 exports.getMetaDataByUserId = asyncErrorHandler(async (req, res, next) => {
+    console.log("Get meta data by user id");
     const userId = req.user.id;
     const portfolioId = req.params.id;
+    console.log(userId, portfolioId);
     const userMetaData = await UserMetaData.findOne({ user: userId, portfolio: portfolioId });
+    console.log(userMetaData);
     res.status(200).json({
         success: true,
         userMetaData,

@@ -3,125 +3,247 @@ const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
 const { v4: uuidv4 } = require('uuid');
 
-exports.addNewEducation = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { portfolioId, degree, school, startDate, endDate, result, comments } = req.body;
+exports.addNewEducations = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { portfolioId, educations } = req.body;
 
+  if (
+    !portfolioId ||
+    !educations ||
+    !Array.isArray(educations) ||
+    educations.length === 0
+  ) {
+    return next(
+      new HandleError(
+        "Please provide portfolioId and at least one education entry",
+        400
+      )
+    );
+  }
+
+  // Validate each education entry
+  for (const education of educations) {
+    const { degree, school, startDate, endDate, result } = education;
     if (!degree || !school || !startDate || !endDate || !result) {
-        return next(new HandleError("Please fill the mandatory fields", 400));
+      return next(
+        new HandleError(
+          "Each education entry must include degree, school, startDate, endDate, and result",
+          400
+        )
+      );
     }
+  }
 
-    // Find the user's education and experience document
-    let expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
+  // Find the user's education and experience document
+  let expEduDetails = await UserExpEdu.findOne({
+    user: userId,
+    portfolio: portfolioId,
+  });
 
-    if (!expEduDetails) {
-        expEduDetails = new UserExpEdu({ user: userId, portfolio: portfolioId, education: [], experience: [] });
-    }
-
-    // Create a new education entry
-    const newEducation = {
-        educationId: uuidv4(),
-        degree,
-        school,
-        startDate,
-        endDate,
-        result,
-        comments
-    };
-
-    // Push the new education into the education array
-    expEduDetails.education.push(newEducation);
-
-    // Save the updated document
-    await expEduDetails.save();
-
-    return res.status(201).json({
-        success: true,
-        message: 'Education added successfully!',
-        education: expEduDetails.education
+  if (!expEduDetails) {
+    expEduDetails = new UserExpEdu({
+      user: userId,
+      portfolio: portfolioId,
+      education: [],
+      experience: [],
     });
+  }
+
+  // Create and add new education entries
+  const newEducations = educations.map((education) => ({
+    educationId: uuidv4(),
+    degree: education.degree,
+    school: education.school,
+    startDate: education.startDate,
+    endDate: education.endDate,
+    result: education.result,
+    comments: education.comments || "",
+  }));
+
+  // Add all new education entries to the existing array
+  expEduDetails.education = [...expEduDetails.education, ...newEducations];
+
+  // Save the updated document
+  await expEduDetails.save();
+
+  return res.status(201).json({
+    success: true,
+    message: `${newEducations.length} education entries added successfully!`,
+    education: expEduDetails.education,
+  });
 });
 
+exports.editEducationsByIds = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { portfolioId, educations } = req.body;
 
-exports.editEducationById = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { portfolioId, educationId, degree, school, startDate, endDate, result, comments } = req.body;
+  if (
+    !portfolioId ||
+    !educations ||
+    !Array.isArray(educations) ||
+    educations.length === 0
+  ) {
+    return next(
+      new HandleError(
+        "Please provide portfolioId and at least one education entry to update",
+        400
+      )
+    );
+  }
 
-    if (!educationId || !degree || !school || !startDate || !endDate || !result || !portfolioId) {
-        return next(new HandleError("Please fill the mandatory fields", 400));
+  // Validate each education entry
+  for (const education of educations) {
+    const { educationId, degree, school, startDate, endDate, result } =
+      education;
+    if (
+      !educationId ||
+      !degree ||
+      !school ||
+      !startDate ||
+      !endDate ||
+      !result
+    ) {
+      return next(
+        new HandleError(
+          "Each education entry must include educationId, degree, school, startDate, endDate, and result",
+          400
+        )
+      );
     }
+  }
 
-    // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
+  // Find the user's education and experience document
+  const expEduDetails = await UserExpEdu.findOne({
+    user: userId,
+    portfolio: portfolioId,
+  });
 
-    if (!expEduDetails) {
-        return next(new HandleError("User education details not found", 404));
-    }
+  if (!expEduDetails) {
+    return next(new HandleError("User education details not found", 404));
+  }
 
-    // Find the education entry by educationId and update it
-    const educationIndex = expEduDetails.education.findIndex(e => e.educationId === educationId);
+  // Update each education entry
+  const updatedIds = [];
+  const notFoundIds = [];
+
+  for (const education of educations) {
+    const { educationId } = education;
+    const educationIndex = expEduDetails.education.findIndex(
+      (e) => e.educationId === educationId
+    );
 
     if (educationIndex === -1) {
-        return next(new HandleError("Education not found", 404));
+      notFoundIds.push(educationId);
+      continue;
     }
 
     expEduDetails.education[educationIndex] = {
-        ...expEduDetails.education[educationIndex],
-        educationId,
-        degree,
-        school,
-        startDate,
-        endDate,
-        result,
-        comments
+      ...expEduDetails.education[educationIndex],
+      ...education,
     };
+    updatedIds.push(educationId);
+  }
 
-    // Save the updated document
-    await expEduDetails.save();
+  // If no valid education entries were found, return an error
+  if (updatedIds.length === 0) {
+    return next(
+      new HandleError("None of the specified education entries were found", 404)
+    );
+  }
 
-    res.status(200).json({
-        success: true,
-        message: 'Education updated successfully!',
-        education: expEduDetails.education
-    });
+  // Save the updated document
+  await expEduDetails.save();
+
+  const response = {
+    success: true,
+    message: `${updatedIds.length} education entries updated successfully!`,
+    education: expEduDetails.education,
+  };
+
+  // Include information about any not found education entries
+  if (notFoundIds.length > 0) {
+    response.warning = `${
+      notFoundIds.length
+    } education entries not found: ${notFoundIds.join(", ")}`;
+  }
+
+  res.status(200).json(response);
 });
 
+exports.deleteEducationsByIds = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { portfolioId, educationIds } = req.body;
 
-exports.deleteEducationById = asyncErrorHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const { portfolioId, educationId } = req.body;
+  if (
+    !portfolioId ||
+    !educationIds ||
+    !Array.isArray(educationIds) ||
+    educationIds.length === 0
+  ) {
+    return next(
+      new HandleError(
+        "Please provide portfolioId and at least one educationId",
+        400
+      )
+    );
+  }
 
-    if (!educationId) {
-        return next(new HandleError("Education ID is required", 400));
+  // Find the user's education and experience document
+  const expEduDetails = await UserExpEdu.findOne({
+    user: userId,
+    portfolio: portfolioId,
+  });
+
+  if (!expEduDetails) {
+    return next(new HandleError("User education details not found", 404));
+  }
+
+  // Track successful deletions and not found IDs
+  const deletedIds = [];
+  const notFoundIds = [];
+
+  // Filter out the educations to delete
+  const originalLength = expEduDetails.education.length;
+  expEduDetails.education = expEduDetails.education.filter((education) => {
+    if (educationIds.includes(education.educationId)) {
+      deletedIds.push(education.educationId);
+      return false; // Remove this education
     }
+    return true; // Keep this education
+  });
 
-    // Find the user's education and experience document
-    const expEduDetails = await UserExpEdu.findOne({ user: userId, portfolio: portfolioId });
-
-    if (!expEduDetails) {
-        return next(new HandleError("User education details not found", 404));
+  // Check if any education entries were not found
+  educationIds.forEach((id) => {
+    if (!deletedIds.includes(id)) {
+      notFoundIds.push(id);
     }
+  });
 
-    // Find the index of the education to delete
-    const educationIndex = expEduDetails.education.findIndex(e => e.educationId === educationId);
+  // If no valid education entries were found, return an error
+  if (deletedIds.length === 0) {
+    return next(
+      new HandleError("None of the specified education entries were found", 404)
+    );
+  }
 
-    if (educationIndex === -1) {
-        return next(new HandleError("Education not found", 404));
-    }
+  // Save the updated document
+  await expEduDetails.save();
 
-    // Remove the education from the array
-    expEduDetails.education.splice(educationIndex, 1);
+  const response = {
+    success: true,
+    message: `${deletedIds.length} education entries deleted successfully!`,
+    education: expEduDetails.education,
+  };
 
-    // Save the updated document
-    await expEduDetails.save();
+  // Include information about any not found education entries
+  if (notFoundIds.length > 0) {
+    response.warning = `${
+      notFoundIds.length
+    } education entries not found: ${notFoundIds.join(", ")}`;
+  }
 
-    res.status(200).json({
-        success: true,
-        message: 'Education deleted successfully!',
-        education: expEduDetails.education
-    });
+  res.status(200).json(response);
 });
-
 
 exports.getAllEducationByUserId = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;

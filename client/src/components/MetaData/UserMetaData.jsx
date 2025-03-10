@@ -23,16 +23,15 @@ import WorkIcon from "@mui/icons-material/Work";
 import LinkIcon from "@mui/icons-material/Link";
 import { updateUserMetaData } from "../../redux/actions/userActions";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { getPortfolioMetaData } from "../../redux/actions/portfolioActions";
 
 const UserMetaData = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
-  const { portfolioLoading, portfolioMetaData, portfolio } = useSelector(
-    (state) => state.userPortfolio
-  );
-
+  const { portfolioLoading, portfolioMetaData, portfolio, currentPortfolio } =
+    useSelector((state) => state.userPortfolio);
+    
   const dispatch = useDispatch();
 
   const [roles, setRoles] = useState([]);
@@ -101,11 +100,15 @@ const UserMetaData = () => {
 
   // Initialize data when portfolioMetaData changes
   useEffect(() => {
-    if (portfolioLoading === false && portfolioMetaData) {
-      setTitle(portfolioMetaData.title);
-      setDescription(portfolioMetaData.description);
-      setResume(portfolioMetaData.resume);
-      if (portfolioMetaData.roles && !roles.length) {
+    if (
+      portfolioLoading === false &&
+      (portfolioMetaData !== undefined || portfolioMetaData !== null) &&
+      portfolioMetaData?.length !== 0
+    ) {
+      setTitle(portfolioMetaData?.title);
+      setDescription(portfolioMetaData?.description);
+      setResume(portfolioMetaData?.resume);
+      if (portfolioMetaData?.roles && !roles.length) {
         setRoles(
           portfolioMetaData.roles.map((role) => ({
             id: Date.now() + Math.random(),
@@ -113,7 +116,7 @@ const UserMetaData = () => {
           }))
         );
       }
-      if (portfolioMetaData.socials && !socials.length) {
+      if (portfolioMetaData?.socials && !socials.length) {
         setSocials(
           portfolioMetaData.socials.map((social) => ({
             id: Date.now() + Math.random(),
@@ -122,8 +125,12 @@ const UserMetaData = () => {
           }))
         );
       }
+    } else {
+      if (currentPortfolio) {
+        dispatch(getPortfolioMetaData(currentPortfolio._id));
+      }
     }
-  }, [portfolioMetaData, portfolioLoading]);
+  }, [portfolioLoading]);
 
   // Save metadata function
   const saveMetaData = async () => {

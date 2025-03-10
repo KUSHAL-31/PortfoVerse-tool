@@ -24,6 +24,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import EditIcon from "@mui/icons-material/Edit";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
+import { getPortfolioServicesDetails } from "../../redux/actions/portfolioActions";
 
 const ServiceSection = () => {
   const theme = useTheme();
@@ -31,12 +32,8 @@ const ServiceSection = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio } = useSelector(
+  const { currentPortfolio, portfolioServices } = useSelector(
     (state) => state.userPortfolio
-  );
-
-  const userServices = useSelector(
-    (state) => state.userPortfolio.portfolioServices
   );
 
   const [services, setServices] = useState([]);
@@ -113,20 +110,17 @@ const ServiceSection = () => {
   };
 
   useEffect(() => {
-    if (
-      userServices &&
-      userServices.services &&
-      userServices.services.length > 0
-    ) {
-      console.log("User services:", userServices.services);
-      const formattedServices = userServices.services.map((service) => ({
+    if (portfolioServices && portfolioServices.length > 0) {
+      const formattedServices = portfolioServices.map((service) => ({
         id: service.serviceId,
         title: service.title,
         description: service.description,
       }));
       setServices(formattedServices);
+    } else {
+      dispatch(getPortfolioServicesDetails(currentPortfolio._id));
     }
-  }, [portfolio, userServices]);
+  }, [portfolioServices]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

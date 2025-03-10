@@ -5,7 +5,7 @@ import {
   getAllUserPortfolios,
   getPortfolioDetailById,
 } from "../../redux/actions/portfolioActions";
-import { SET_CURRENT_PORTFOLIO } from "../../redux/constants";
+import { RESET_ALL_PORTFOLIO_DETAILS, RESET_PAGE_COUNT, SET_CURRENT_PORTFOLIO } from "../../redux/constants";
 import { useNavigate } from "react-router-dom";
 import { Modal1, Modal2 } from "../../design/modals/Modals";
 import "./UserPortfolios.scss";
@@ -289,7 +289,9 @@ const UserPortfolio = () => {
   };
 
   const handlePortfolioClick = (portfolio) => {
+    dispatch({ type: RESET_ALL_PORTFOLIO_DETAILS });
     dispatch({ type: SET_CURRENT_PORTFOLIO, payload: portfolio });
+    dispatch({ type: RESET_PAGE_COUNT });
     dispatch(getPortfolioDetailById(portfolio._id));
     navigate("/portfolio/details");
   };

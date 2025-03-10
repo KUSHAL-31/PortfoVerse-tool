@@ -1,14 +1,20 @@
 const express = require("express");
-const { addNewEducation, editEducationById, getAllEducationByUserId, getEducationById, deleteEducationById } = require("../controllers/expEduController");
+const {
+  getAllEducationByUserId,
+  getEducationById,
+  deleteEducationsByIds,
+  addNewEducations,
+  editEducationsByIds,
+} = require("../controllers/expEduController");
 const { authUser } = require("../middlewares/auth");
 const router = express.Router();
 
 // SKills API
-router.route("/create").post(authUser, addNewEducation);
-router.route("/edit").patch(authUser, editEducationById);
+router.route("/create").post(authUser, addNewEducations);
+router.route("/edit").patch(authUser, editEducationsByIds);
 router.route("/getAll/:id").get(authUser, getAllEducationByUserId);
 router.route("/get").get(authUser, getEducationById);
-router.route("/remove").post(authUser, deleteEducationById);
+router.route("/remove").post(authUser, deleteEducationsByIds);
 
 
 

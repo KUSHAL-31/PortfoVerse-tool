@@ -18,6 +18,20 @@ export const updateNewPortfolioUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_UR
 
 export const getPortfolioDetailByIdUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/details`;
 
+export const portfolioMetaDataUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/metadata/details`;
+
+export const portfolioEducationDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/education/getAll`;
+
+export const portfolioExperienceDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/experience/getAll`;
+
+export const portfolioSkillsDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/skills/getAll`;
+
+export const portfolioProjectsDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/projects/getAll`;
+
+export const portfolioTestimonialsDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/testimonials/getAll`;
+
+export const portfolioServicesDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/getAll`;
+
 
 // User meta data related URLs
 
