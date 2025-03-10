@@ -139,7 +139,7 @@ const UserMetaData = () => {
       })),
     };
     const doesExist = portfolioMetaData !== null ? true : false;
-    dispatch(updateUserMetaData(doesExist, portfolioData));
+    // dispatch(updateUserMetaData(doesExist, portfolioData));
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 

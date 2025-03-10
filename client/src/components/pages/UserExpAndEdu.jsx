@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -31,15 +31,371 @@ import LinkIcon from "@mui/icons-material/Link";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
+// Memoized Education Card Component
+const EducationCard = memo(({ 
+  education, 
+  index, 
+  isMobile, 
+  removeEducation, 
+  handleEducationChange 
+}) => {
+  const handleFieldChange = useCallback((field, value) => {
+    handleEducationChange(education.id, field, value);
+  }, [education.id, handleEducationChange]);
+
+  return (
+    <Card
+      elevation={3}
+      sx={{
+        borderRadius: 2,
+        mb: 3,
+        overflow: "visible",
+        transition: "all 0.3s",
+        "&:hover": {
+          boxShadow: 6,
+        },
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 2,
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6" component="div" fontWeight="bold">
+            Education #{index + 1}
+          </Typography>
+          <IconButton
+            color="error"
+            onClick={() => removeEducation(education.id)}
+            size="large"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {!isMobile && (
+            <SchoolIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="Degree / Education"
+            placeholder="Bachelor of Science in Computer Science"
+            variant="outlined"
+            value={education.degree}
+            onChange={(e) => handleFieldChange("degree", e.target.value)}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {!isMobile && (
+            <BusinessIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="School / University"
+            placeholder="University of California"
+            variant="outlined"
+            value={education.school}
+            onChange={(e) => handleFieldChange("school", e.target.value)}
+          />
+        </Box>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              {!isMobile && (
+                <CalendarTodayIcon
+                  sx={{ mr: 0.5, fontSize: "small" }}
+                />
+              )}{" "}
+              Start Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={education.startDate}
+              onChange={(e) => handleFieldChange("startDate", e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              {!isMobile && (
+                <CalendarTodayIcon
+                  sx={{ mr: 0.5, fontSize: "small" }}
+                />
+              )}{" "}
+              End Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={education.endDate}
+              onChange={(e) => handleFieldChange("endDate", e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {!isMobile && (
+            <GradeIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="Result (CGPA/Percentage)"
+            placeholder="3.8 GPA / 85%"
+            variant="outlined"
+            value={education.result}
+            onChange={(e) => handleFieldChange("result", e.target.value)}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "flex-start" }}>
+          {!isMobile && (
+            <EmojiEventsIcon
+              sx={{ mr: 1, mt: 2, color: "text.secondary" }}
+            />
+          )}
+          <TextField
+            fullWidth
+            label="Achievements / Additional Information"
+            placeholder="Dean's List, Scholarships, Academic achievements..."
+            variant="outlined"
+            multiline
+            rows={3}
+            value={education.comments}
+            onChange={(e) => handleFieldChange("comments", e.target.value)}
+          />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+});
+
+// Memoized Experience Card Component
+const ExperienceCard = memo(({ 
+  experience, 
+  index, 
+  isMobile, 
+  removeExperience, 
+  handleExperienceChange,
+  handlePresentChange 
+}) => {
+  const handleFieldChange = useCallback((field, value) => {
+    handleExperienceChange(experience.id, field, value);
+  }, [experience.id, handleExperienceChange]);
+
+  const onPresentChange = useCallback((e) => {
+    handlePresentChange(experience.id, e);
+  }, [experience.id, handlePresentChange]);
+
+  return (
+    <Card
+      elevation={3}
+      sx={{
+        borderRadius: 2,
+        mb: 3,
+        overflow: "visible",
+        transition: "all 0.3s",
+        "&:hover": {
+          boxShadow: 6,
+        },
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 2,
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6" component="div" fontWeight="bold">
+            Experience #{index + 1}
+          </Typography>
+          <IconButton
+            color="error"
+            onClick={() => removeExperience(experience.id)}
+            size="large"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {!isMobile && (
+            <WorkIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="Job Title"
+            placeholder="Software Engineer"
+            variant="outlined"
+            value={experience.title}
+            onChange={(e) => handleFieldChange("title", e.target.value)}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {!isMobile && (
+            <BusinessIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="Company Name"
+            placeholder="Google Inc."
+            variant="outlined"
+            value={experience.company}
+            onChange={(e) => handleFieldChange("company", e.target.value)}
+          />
+        </Box>
+
+        <FormControl component="fieldset" sx={{ mb: 2 }}>
+          <FormLabel component="legend">
+            Currently Working Here?
+          </FormLabel>
+          <RadioGroup
+            row
+            value={experience.isPresent ? "yes" : "no"}
+            onChange={onPresentChange}
+          >
+            <FormControlLabel
+              value="yes"
+              control={<Radio />}
+              label="Yes"
+            />
+            <FormControlLabel
+              value="no"
+              control={<Radio />}
+              label="No"
+            />
+          </RadioGroup>
+        </FormControl>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              {!isMobile && (
+                <CalendarTodayIcon
+                  sx={{ mr: 0.5, fontSize: "small" }}
+                />
+              )}{" "}
+              Start Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={experience.startDate}
+              onChange={(e) => handleFieldChange("startDate", e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              {!isMobile && (
+                <CalendarTodayIcon
+                  sx={{ mr: 0.5, fontSize: "small" }}
+                />
+              )}{" "}
+              End Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={experience.endDate}
+              onChange={(e) => handleFieldChange("endDate", e.target.value)}
+              disabled={experience.isPresent}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              helperText={
+                experience.isPresent
+                  ? "Not applicable for current job"
+                  : ""
+              }
+            />
+          </Grid>
+        </Grid>
+
+        <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
+          {!isMobile && (
+            <DescriptionIcon
+              sx={{ mr: 1, mt: 2, color: "text.secondary" }}
+            />
+          )}
+          <TextField
+            fullWidth
+            label="Job Description"
+            placeholder="Describe your roles, responsibilities, and achievements..."
+            variant="outlined"
+            multiline
+            rows={3}
+            value={experience.description}
+            onChange={(e) => handleFieldChange("description", e.target.value)}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {!isMobile && (
+            <LinkIcon sx={{ mr: 1, color: "text.secondary" }} />
+          )}
+          <TextField
+            fullWidth
+            label="Certificate Link / Supporting Document"
+            placeholder="https://example.com/certificate"
+            variant="outlined"
+            value={experience.certificate}
+            onChange={(e) => handleFieldChange("certificate", e.target.value)}
+          />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+});
+
 const EducationExperienceSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolio } = useSelector(
-    (state) => state.userPortfolio
-  );
-
-  // Get user experience and education data from redux
+  
+  // Get user experience and education data from redux - use memoization
   const userExpEdu = useSelector((state) => state.userPortfolio.portfolioExpAndEdu);
 
   // Education state
@@ -48,10 +404,18 @@ const EducationExperienceSection = () => {
   // Experience state
   const [experiences, setExperiences] = useState([]);
 
+  // Format ISO date string to YYYY-MM-DD for input fields
+  const formatDateForInput = useCallback((isoString) => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    return date.toISOString().split("T")[0];
+  }, []);
+
   // Load data from reducer when component mounts or when userExpEdu changes
   useEffect(() => {
-    if (userExpEdu && userExpEdu.education && userExpEdu.education.length > 0) {
+    if (userExpEdu?.education?.length > 0) {
       const formattedEducations = userExpEdu.education.map((edu) => ({
+        isEdited: true,
         id: edu.educationId || Date.now() + Math.random(),
         degree: edu.degree || "",
         school: edu.school || "",
@@ -60,16 +424,12 @@ const EducationExperienceSection = () => {
         result: edu.result || "",
         comments: edu.comments || "",
       }));
-      console.log(formattedEducations);
       setEducations(formattedEducations);
     }
 
-    if (
-      userExpEdu &&
-      userExpEdu.experience &&
-      userExpEdu.experience.length > 0
-    ) {
+    if (userExpEdu?.experience?.length > 0) {
       const formattedExperiences = userExpEdu.experience.map((exp) => ({
+        isEdited: true,
         id: exp.experienceId || Date.now() + Math.random(),
         title: exp.title || "",
         company: exp.company || "",
@@ -83,19 +443,13 @@ const EducationExperienceSection = () => {
       }));
       setExperiences(formattedExperiences);
     }
-  }, [userExpEdu]);
+  }, [userExpEdu, formatDateForInput]);
 
-  // Format ISO date string to YYYY-MM-DD for input fields
-  const formatDateForInput = (isoString) => {
-    if (!isoString) return "";
-    const date = new Date(isoString);
-    return date.toISOString().split("T")[0];
-  };
-
-  // Add a new education entry
-  const addEducation = () => {
+  // Add a new education entry - memoized
+  const addEducation = useCallback(() => {
     if (educations.length < 4) {
       const newEducation = {
+        isEdited: false,
         id: Date.now() + Math.random(),
         degree: "",
         school: "",
@@ -104,16 +458,17 @@ const EducationExperienceSection = () => {
         result: "",
         comments: "",
       };
-      setEducations([...educations, newEducation]);
+      setEducations(prev => [...prev, newEducation]);
     } else {
       alert("Maximum of 4 education entries allowed.");
     }
-  };
+  }, [educations.length]);
 
-  // Add a new experience entry
-  const addExperience = () => {
+  // Add a new experience entry - memoized
+  const addExperience = useCallback(() => {
     if (experiences.length < 4) {
       const newExperience = {
+        isEdited: false,
         id: Date.now() + Math.random(),
         title: "",
         company: "",
@@ -123,46 +478,46 @@ const EducationExperienceSection = () => {
         isPresent: false,
         certificate: "",
       };
-      setExperiences([...experiences, newExperience]);
+      setExperiences(prev => [...prev, newExperience]);
     } else {
       alert("Maximum of 4 experience entries allowed.");
     }
-  };
+  }, [experiences.length]);
 
-  // Remove an education entry
-  const removeEducation = (id) => {
-    setEducations(educations.filter((education) => education.id !== id));
-  };
+  // Remove an education entry - memoized
+  const removeEducation = useCallback((id) => {
+    setEducations(prev => prev.filter(education => education.id !== id));
+  }, []);
 
-  // Remove an experience entry
-  const removeExperience = (id) => {
-    setExperiences(experiences.filter((experience) => experience.id !== id));
-  };
+  // Remove an experience entry - memoized
+  const removeExperience = useCallback((id) => {
+    setExperiences(prev => prev.filter(experience => experience.id !== id));
+  }, []);
 
-  // Handle education field changes
-  const handleEducationChange = (id, field, value) => {
-    setEducations(
-      educations.map((education) =>
+  // Handle education field changes - memoized with functional updates
+  const handleEducationChange = useCallback((id, field, value) => {
+    setEducations(prev => 
+      prev.map(education =>
         education.id === id ? { ...education, [field]: value } : education
       )
     );
-  };
+  }, []);
 
-  // Handle experience field changes
-  const handleExperienceChange = (id, field, value) => {
-    setExperiences(
-      experiences.map((experience) =>
+  // Handle experience field changes - memoized with functional updates
+  const handleExperienceChange = useCallback((id, field, value) => {
+    setExperiences(prev => 
+      prev.map(experience =>
         experience.id === id ? { ...experience, [field]: value } : experience
       )
     );
-  };
+  }, []);
 
-  // Handle radio button change for isPresent
-  const handlePresentChange = (id, event) => {
+  // Handle radio button change for isPresent - memoized
+  const handlePresentChange = useCallback((id, event) => {
     const isPresentValue = event.target.value === "yes";
 
-    setExperiences(
-      experiences.map((experience) => {
+    setExperiences(prev => 
+      prev.map(experience => {
         if (experience.id === id) {
           return {
             ...experience,
@@ -174,40 +529,25 @@ const EducationExperienceSection = () => {
         return experience;
       })
     );
-  };
+  }, []);
 
-  // Save all data
-  const saveData = () => {
-    // // Format the data to match the backend structure
-    // const formattedEducation = educations.map((edu) => ({
-    //   educationId: edu.id,
-    //   degree: edu.degree,
-    //   school: edu.school,
-    //   startDate: edu.startDate,
-    //   endDate: edu.endDate,
-    //   result: edu.result,
-    //   comments: edu.comments,
-    // }));
+  // Save all data - memoized
+  const saveData = useCallback(() => {
+    // Format the data to match the backend structure
+    const formattedEducation = educations.map((edu) => ({
+      isEdited: edu.isEdited,
+      educationId: edu.id,
+      degree: edu.degree,
+      school: edu.school,
+      startDate: edu.startDate,
+      endDate: edu.endDate,
+      result: edu.result,
+      comments: edu.comments,
+    }));
 
-    // const formattedExperience = experiences.map((exp) => ({
-    //   experienceId: exp.id,
-    //   title: exp.title,
-    //   company: exp.company,
-    //   startDate: exp.startDate,
-    //   endDate: exp.isPresent ? null : exp.endDate,
-    //   isPresent: exp.isPresent,
-    //   description: exp.description.split("\n"), // Convert to array of lines
-    //   certificate: exp.certificate,
-    // }));
-
-    // console.log("Saving education data:", formattedEducation);
-    // console.log("Saving experience data:", formattedExperience);
-    // alert("Education and Experience details saved successfully!");
+    // For implementation
     dispatch({ type: INCREMENT_PAGE_COUNT });
-
-    // Here you would dispatch an action to save data to Redux
-    // dispatch({ type: "SAVE_EDUCATION_EXPERIENCE", payload: { education: formattedEducation, experience: formattedExperience } });
-  };
+  }, [educations]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -269,190 +609,14 @@ const EducationExperienceSection = () => {
           )}
 
           {educations.map((education, index) => (
-            <Card
+            <EducationCard
               key={education.id}
-              elevation={3}
-              sx={{
-                borderRadius: 2,
-                mb: 3,
-                overflow: "visible",
-                transition: "all 0.3s",
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
-              <CardContent sx={{ p: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 2,
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography variant="h6" component="div" fontWeight="bold">
-                    Education #{index + 1}
-                  </Typography>
-                  <IconButton
-                    color="error"
-                    onClick={() => removeEducation(education.id)}
-                    size="large"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  {!isMobile && (
-                    <SchoolIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Degree / Education"
-                    placeholder="Bachelor of Science in Computer Science"
-                    variant="outlined"
-                    value={education.degree}
-                    onChange={(e) =>
-                      handleEducationChange(
-                        education.id,
-                        "degree",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  {!isMobile && (
-                    <BusinessIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="School / University"
-                    placeholder="University of California"
-                    variant="outlined"
-                    value={education.school}
-                    onChange={(e) =>
-                      handleEducationChange(
-                        education.id,
-                        "school",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.secondary"
-                      gutterBottom
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      {!isMobile && (
-                        <CalendarTodayIcon
-                          sx={{ mr: 0.5, fontSize: "small" }}
-                        />
-                      )}{" "}
-                      Start Date
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      type="date"
-                      variant="outlined"
-                      value={education.startDate}
-                      onChange={(e) =>
-                        handleEducationChange(
-                          education.id,
-                          "startDate",
-                          e.target.value
-                        )
-                      }
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.secondary"
-                      gutterBottom
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      {!isMobile && (
-                        <CalendarTodayIcon
-                          sx={{ mr: 0.5, fontSize: "small" }}
-                        />
-                      )}{" "}
-                      End Date
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      type="date"
-                      variant="outlined"
-                      value={education.endDate}
-                      onChange={(e) =>
-                        handleEducationChange(
-                          education.id,
-                          "endDate",
-                          e.target.value
-                        )
-                      }
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  {!isMobile && (
-                    <GradeIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Result (CGPA/Percentage)"
-                    placeholder="3.8 GPA / 85%"
-                    variant="outlined"
-                    value={education.result}
-                    onChange={(e) =>
-                      handleEducationChange(
-                        education.id,
-                        "result",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                  {!isMobile && (
-                    <EmojiEventsIcon
-                      sx={{ mr: 1, mt: 2, color: "text.secondary" }}
-                    />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Achievements / Additional Information"
-                    placeholder="Dean's List, Scholarships, Academic achievements..."
-                    variant="outlined"
-                    multiline
-                    rows={3}
-                    value={education.comments}
-                    onChange={(e) =>
-                      handleEducationChange(
-                        education.id,
-                        "comments",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-              </CardContent>
-            </Card>
+              education={education}
+              index={index}
+              isMobile={isMobile}
+              removeEducation={removeEducation}
+              handleEducationChange={handleEducationChange}
+            />
           ))}
         </Grid>
 
@@ -513,218 +677,15 @@ const EducationExperienceSection = () => {
           )}
 
           {experiences.map((experience, index) => (
-            <Card
+            <ExperienceCard
               key={experience.id}
-              elevation={3}
-              sx={{
-                borderRadius: 2,
-                mb: 3,
-                overflow: "visible",
-                transition: "all 0.3s",
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
-              <CardContent sx={{ p: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 2,
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography variant="h6" component="div" fontWeight="bold">
-                    Experience #{index + 1}
-                  </Typography>
-                  <IconButton
-                    color="error"
-                    onClick={() => removeExperience(experience.id)}
-                    size="large"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  {!isMobile && (
-                    <WorkIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Job Title"
-                    placeholder="Software Engineer"
-                    variant="outlined"
-                    value={experience.title}
-                    onChange={(e) =>
-                      handleExperienceChange(
-                        experience.id,
-                        "title",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  {!isMobile && (
-                    <BusinessIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Company Name"
-                    placeholder="Google Inc."
-                    variant="outlined"
-                    value={experience.company}
-                    onChange={(e) =>
-                      handleExperienceChange(
-                        experience.id,
-                        "company",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <FormControl component="fieldset" sx={{ mb: 2 }}>
-                  <FormLabel component="legend">
-                    Currently Working Here?
-                  </FormLabel>
-                  <RadioGroup
-                    row
-                    value={experience.isPresent ? "yes" : "no"}
-                    onChange={(e) => handlePresentChange(experience.id, e)}
-                  >
-                    <FormControlLabel
-                      value="yes"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="no"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
-                </FormControl>
-
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.secondary"
-                      gutterBottom
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      {!isMobile && (
-                        <CalendarTodayIcon
-                          sx={{ mr: 0.5, fontSize: "small" }}
-                        />
-                      )}{" "}
-                      Start Date
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      type="date"
-                      variant="outlined"
-                      value={experience.startDate}
-                      onChange={(e) =>
-                        handleExperienceChange(
-                          experience.id,
-                          "startDate",
-                          e.target.value
-                        )
-                      }
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.secondary"
-                      gutterBottom
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      {!isMobile && (
-                        <CalendarTodayIcon
-                          sx={{ mr: 0.5, fontSize: "small" }}
-                        />
-                      )}{" "}
-                      End Date
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      type="date"
-                      variant="outlined"
-                      value={experience.endDate}
-                      onChange={(e) =>
-                        handleExperienceChange(
-                          experience.id,
-                          "endDate",
-                          e.target.value
-                        )
-                      }
-                      disabled={experience.isPresent}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      helperText={
-                        experience.isPresent
-                          ? "Not applicable for current job"
-                          : ""
-                      }
-                    />
-                  </Grid>
-                </Grid>
-
-                <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
-                  {!isMobile && (
-                    <DescriptionIcon
-                      sx={{ mr: 1, mt: 2, color: "text.secondary" }}
-                    />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Job Description"
-                    placeholder="Describe your roles, responsibilities, and achievements..."
-                    variant="outlined"
-                    multiline
-                    rows={3}
-                    value={experience.description}
-                    onChange={(e) =>
-                      handleExperienceChange(
-                        experience.id,
-                        "description",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {!isMobile && (
-                    <LinkIcon sx={{ mr: 1, color: "text.secondary" }} />
-                  )}
-                  <TextField
-                    fullWidth
-                    label="Certificate Link / Supporting Document"
-                    placeholder="https://example.com/certificate"
-                    variant="outlined"
-                    value={experience.certificate}
-                    onChange={(e) =>
-                      handleExperienceChange(
-                        experience.id,
-                        "certificate",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Box>
-              </CardContent>
-            </Card>
+              experience={experience}
+              index={index}
+              isMobile={isMobile}
+              removeExperience={removeExperience}
+              handleExperienceChange={handleExperienceChange}
+              handlePresentChange={handlePresentChange}
+            />
           ))}
         </Grid>
       </Grid>

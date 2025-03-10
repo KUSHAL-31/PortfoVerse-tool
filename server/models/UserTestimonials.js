@@ -2,56 +2,64 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
 const userTestimonialsSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioUsers",
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: "K31PortfolioUsers",
+    required: true,
+  },
+  portfolio: {
+    type: mongoose.Schema.ObjectId,
+    ref: "K31PortfolioWebsite",
+    required: true,
+  },
+  testimonials: [
+    {
+      testimonialId: {
+        type: String,
+        default: uuidv4,
+      },
+      employerName: {
+        type: String,
         required: true,
-    },
-    portfolio: {
-        type: mongoose.Schema.ObjectId,
-        ref: "K31PortfolioWebsite",
+      },
+      employerRole: {
+        type: String,
+      },
+      companyName: {
+        type: String,
         required: true,
+      },
+      image: {
+        public_id: {
+          type: String,
+        },
+        url: {
+          type: String,
+        },
+      },
+      comment: {
+        type: String,
+        required: true,
+      },
+      rating: {
+        type: Number,
+        required: true,
+        max: 5,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    testimonials: [
-        {
-            testimonialId: {
-                type: String,
-                default: uuidv4,
-            },
-            employerName: {
-                type: String,
-                required: true,
-            },
-            employerRole: {
-                type: String,
-            },
-            companyName: {
-                type: String,
-                required: true,
-            },
-            image: {
-                public_id: {
-                    type: String,
-                },
-                url: {
-                    type: String,
-                }
-            },
-            comment: {
-                type: String,
-                required: true,
-            },
-            rating: {
-                type: Number,
-                required: true,
-                max: 5,
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now,
-            },
-        }
-    ],
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 
