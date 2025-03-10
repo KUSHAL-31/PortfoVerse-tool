@@ -276,8 +276,6 @@ const UserPortfolio = () => {
   useEffect(() => {
     if (userPortfolios === undefined || userPortfolios.length === 0) {
       dispatch(getAllUserPortfolios());
-    } else {
-      console.log(userPortfolios);
     }
   }, [dispatch, userPortfolios]);
 

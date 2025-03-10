@@ -6,6 +6,10 @@ import {
   Card,
   CardContent,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -19,6 +23,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CategoryIcon from "@mui/icons-material/Category";
 import SaveIcon from "@mui/icons-material/Save";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 const UserSkills = () => {
@@ -31,8 +37,9 @@ const UserSkills = () => {
     (state) => state.userPortfolio
   );
 
-  const userSkills = useSelector((state) => state.userPortfolio.portfolioSkills);
-
+  const userSkills = useSelector(
+    (state) => state.userPortfolio.portfolioSkills
+  );
 
   const [skillSections, setSkillSections] = useState([
     {
@@ -42,121 +49,10 @@ const UserSkills = () => {
     },
   ]);
 
-  // Add a new skill section
-  const addSkillSection = () => {
-    if (skillSections.length < 4) {
-      setSkillSections([
-        ...skillSections,
-        {
-          id: Date.now() + Math.random(),
-          title: "New Skill Section",
-          skills: [],
-        },
-      ]);
-    } else {
-      alert("You can add a maximum of 4 skill sections");
-    }
-  };
-
-  // Remove a skill section
-  const removeSkillSection = (sectionId) => {
-    setSkillSections(
-      skillSections.filter((section) => section.id !== sectionId)
-    );
-  };
-
-  // Update section title
-  const updateSectionTitle = (sectionId, newTitle) => {
-    setSkillSections(
-      skillSections.map((section) =>
-        section.id === sectionId ? { ...section, title: newTitle } : section
-      )
-    );
-  };
-
-  // Add a new skill to a section
-  const addSkill = (sectionId) => {
-    setSkillSections(
-      skillSections.map((section) => {
-        if (section.id === sectionId) {
-          if (section.skills.length < 12) {
-            return {
-              ...section,
-              skills: [
-                ...section.skills,
-                {
-                  id: Date.now() + Math.random(),
-                  name: "",
-                  rating: 75,
-                },
-              ],
-            };
-          } else {
-            alert("You can add a maximum of 12 skills per section");
-            return section;
-          }
-        }
-        return section;
-      })
-    );
-  };
-
-  // Remove a skill from a section
-  const removeSkill = (sectionId, skillId) => {
-    setSkillSections(
-      skillSections.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              skills: section.skills.filter((skill) => skill.id !== skillId),
-            }
-          : section
-      )
-    );
-  };
-
-  // Handle skill name change
-  const handleNameChange = (sectionId, skillId, value) => {
-    setSkillSections(
-      skillSections.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              skills: section.skills.map((skill) =>
-                skill.id === skillId ? { ...skill, name: value } : skill
-              ),
-            }
-          : section
-      )
-    );
-  };
-
-  // Handle skill rating change
-  const handleRatingChange = (sectionId, skillId, value) => {
-    setSkillSections(
-      skillSections.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              skills: section.skills.map((skill) =>
-                skill.id === skillId ? { ...skill, rating: value } : skill
-              ),
-            }
-          : section
-      )
-    );
-  };
-
-  // Save all skills data
-  const saveSkills = () => {
-    // Here you would typically dispatch an action to save to Redux or API
-    // console.log("Saving skills data:", skillSections);
-    // // Example dispatch (uncomment and modify as needed):
-    // // dispatch(saveUserSkills(skillSections));
-    // alert("Skills saved successfully!");
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  };
-
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isNewSection, setIsNewSection] = useState(false);
+  const [currentSection, setCurrentSection] = useState(null);
 
   // Custom mark labels for the slider
   const marks = [
@@ -173,32 +69,157 @@ const UserSkills = () => {
     { value: 50, label: "Int" },
     { value: 100, label: "Exp" },
   ];
-   
-   useEffect(() => {
-     if (userSkills && userSkills.skillSection.length > 0) {
-       // Transform backend data to component state format
-       const formattedSections = userSkills.skillSection.map((section) => ({
-         id: section.skillId,
-         title: section.heading,
-         skills: section.list.map((skill) => ({
-           id: skill._id,
-           name: skill.name,
-           rating: skill.rating,
-         })),
-       }));
 
-       setSkillSections(formattedSections);
-     } else if (skillSections.length === 0) {
-       // If no data and no sections, initialize with one empty section
-       setSkillSections([
-         {
-           id: Date.now(),
-           title: "Professional Skills",
-           skills: [],
-         },
-       ]);
-     }
-   }, [portfolio]);
+  // Open modal to add a new skill section
+  const openAddSectionModal = () => {
+    if (skillSections.length < 4) {
+      setIsNewSection(true);
+      setCurrentSection({
+        id: Date.now() + Math.random(),
+        title: "New Skill Section",
+        skills: [],
+      });
+      setModalOpen(true);
+    } else {
+      alert("You can add a maximum of 4 skill sections");
+    }
+  };
+
+  // Open modal to edit an existing skill section
+  const openEditSectionModal = (sectionId) => {
+    const sectionToEdit = skillSections.find(
+      (section) => section.id === sectionId
+    );
+    if (sectionToEdit) {
+      setIsNewSection(false);
+      setCurrentSection({ ...sectionToEdit });
+      setModalOpen(true);
+    }
+  };
+
+  // Close the modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setCurrentSection(null);
+  };
+
+  // Save section changes from modal
+  const saveSection = () => {
+    if (isNewSection) {
+      // Add new section
+      setSkillSections([...skillSections, currentSection]);
+    } else {
+      // Update existing section
+      setSkillSections(
+        skillSections.map((section) =>
+          section.id === currentSection.id ? currentSection : section
+        )
+      );
+    }
+    closeModal();
+  };
+
+  // Remove a skill section
+  const removeSkillSection = (sectionId) => {
+    setSkillSections(
+      skillSections.filter((section) => section.id !== sectionId)
+    );
+  };
+
+  // Update section title in modal
+  const updateModalSectionTitle = (newTitle) => {
+    setCurrentSection({
+      ...currentSection,
+      title: newTitle,
+    });
+  };
+
+  // Add a new skill in modal
+  const addSkillInModal = () => {
+    if (currentSection.skills.length < 12) {
+      setCurrentSection({
+        ...currentSection,
+        skills: [
+          ...currentSection.skills,
+          {
+            id: Date.now() + Math.random(),
+            name: "",
+            rating: 75,
+          },
+        ],
+      });
+    } else {
+      alert("You can add a maximum of 12 skills per section");
+    }
+  };
+
+  // Remove a skill in modal
+  const removeSkillInModal = (skillId) => {
+    setCurrentSection({
+      ...currentSection,
+      skills: currentSection.skills.filter((skill) => skill.id !== skillId),
+    });
+  };
+
+  // Handle skill name change in modal
+  const handleNameChangeInModal = (skillId, value) => {
+    setCurrentSection({
+      ...currentSection,
+      skills: currentSection.skills.map((skill) =>
+        skill.id === skillId ? { ...skill, name: value } : skill
+      ),
+    });
+  };
+
+  // Handle skill rating change in modal
+  const handleRatingChangeInModal = (skillId, value) => {
+    setCurrentSection({
+      ...currentSection,
+      skills: currentSection.skills.map((skill) =>
+        skill.id === skillId ? { ...skill, rating: value } : skill
+      ),
+    });
+  };
+
+  // Save all skills data
+  const saveSkills = () => {
+    // Here you would typically dispatch an action to save to Redux or API
+    // console.log("Saving skills data:", skillSections);
+    // // Example dispatch (uncomment and modify as needed):
+    // // dispatch(saveUserSkills(skillSections));
+    // alert("Skills saved successfully!");
+    dispatch({ type: INCREMENT_PAGE_COUNT });
+  };
+
+  useEffect(() => {
+    if (
+      userSkills &&
+      userSkills.skillSection &&
+      userSkills.skillSection.length > 0
+    ) {
+      // Transform backend data to component state format
+      const formattedSections = userSkills.skillSection.map((section) => ({
+        id: section.skillId,
+        title: section.heading,
+        skills: section.list.map((skill) => ({
+          id: skill._id,
+          name: skill.name,
+          rating: skill.rating,
+        })),
+      }));
+
+      setSkillSections(formattedSections);
+    } else if (skillSections.length === 0) {
+      // If no data and no sections, initialize with one empty section
+      setSkillSections([
+        {
+          id: Date.now(),
+          title: "Professional Skills",
+          skills: [],
+        },
+      ]);
+    }
+  }, [portfolio, userSkills]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -219,7 +240,7 @@ const UserSkills = () => {
         <Button
           variant="contained"
           startIcon={<CategoryIcon />}
-          onClick={addSkillSection}
+          onClick={openAddSectionModal}
           disabled={skillSections.length >= 4}
           fullWidth={isMobile}
           size={isMobile ? "medium" : "large"}
@@ -235,163 +256,81 @@ const UserSkills = () => {
         </Button>
       </Box>
 
-      {skillSections.map((section, sectionIndex) => (
-        <Card
-          key={section.id}
-          elevation={3}
-          sx={{
-            mb: 4,
-            borderRadius: 2,
-            overflow: "visible",
-            border: `1px solid ${theme.palette.divider}`,
-            position: "relative",
-          }}
-        >
-          <CardContent>
-            <Box
+      <Grid container spacing={3}>
+        {skillSections.map((section, index) => (
+          <Grid item xs={12} sm={6} md={4} key={section.id}>
+            <Card
+              elevation={3}
               sx={{
+                borderRadius: 2,
                 mb: 3,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                overflow: "visible",
+                transition: "all 0.3s",
+                "&:hover": {
+                  boxShadow: 6,
+                },
               }}
             >
-              <TextField
-                label="Section Title"
-                variant="outlined"
-                value={section.title}
-                onChange={(e) => updateSectionTitle(section.id, e.target.value)}
-                sx={{
-                  mb: 2,
-                  flexGrow: 1,
-                  mr: 2,
-                }}
-              />
+              <CardContent sx={{ p: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 2,
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="h6" component="div" fontWeight="bold">
+                    Skill Category #{index + 1}
+                  </Typography>
+                  <Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => openEditSectionModal(section.id)}
+                      size="medium"
+                      sx={{ mr: 1 }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => removeSkillSection(section.id)}
+                      size="medium"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
 
-              {skillSections.length > 1 && (
-                <IconButton
-                  color="error"
-                  onClick={() => removeSkillSection(section.id)}
+                <Typography variant="h6" component="div" gutterBottom>
+                  {section.title || "Untitled Section"}
+                </Typography>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
                   sx={{ mb: 2 }}
                 >
-                  <DeleteIcon />
-                </IconButton>
-              )}
-            </Box>
-
-            <Button
-              variant="outlined"
-              startIcon={<AddCircleIcon />}
-              onClick={() => addSkill(section.id)}
-              fullWidth={isMobile}
-              sx={{
-                mb: 3,
-                py: 1,
-                borderRadius: 2,
-              }}
-            >
-              Add Skill to {section.title}
-            </Button>
-
-            {section.skills.length === 0 && (
-              <Box
-                sx={{
-                  p: 3,
-                  textAlign: "center",
-                  border: "1px dashed grey",
-                  borderRadius: 2,
-                  mb: 2,
-                }}
-              >
-                <Typography variant="body1" color="textSecondary">
-                  No skills added to this section yet. Click the button above to
-                  add skills.
+                  {section.skills.length} skills in this category
                 </Typography>
-              </Box>
-            )}
 
-            <Grid container spacing={3}>
-              {section.skills.map((skill) => (
-                <Grid item xs={12} sm={6} md={4} key={skill.id}>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      height: "100%",
-                      borderRadius: 2,
-                      transition: "all 0.3s",
-                      "&:hover": {
-                        boxShadow: 4,
-                        transform: "translateY(-3px)",
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <TextField
-                        fullWidth
-                        label="Skill Name"
-                        variant="outlined"
-                        value={skill.name}
-                        onChange={(e) =>
-                          handleNameChange(section.id, skill.id, e.target.value)
-                        }
-                        sx={{ mr: 1 }}
-                      />
-                      <IconButton
-                        color="error"
-                        onClick={() => removeSkill(section.id, skill.id)}
-                        size="large"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-
-                    <Box sx={{ px: 1 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          mb: 0.5,
-                        }}
-                      >
-                        <Typography variant="body2" color="textSecondary">
-                          Proficiency
-                        </Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {skill.rating}%
-                        </Typography>
-                      </Box>
-
-                      <Slider
-                        value={skill.rating}
-                        onChange={(e, value) =>
-                          handleRatingChange(section.id, skill.id, value)
-                        }
-                        step={5}
-                        min={0}
-                        max={100}
-                        marks={isMobile ? mobileMarks : marks}
-                        valueLabelDisplay="auto"
-                        valueLabelFormat={(value) => `${value}%`}
-                        sx={{
-                          color: theme.palette.secondary.main,
-                          "& .MuiSlider-thumb": {
-                            height: 20,
-                            width: 20,
-                          },
-                          "& .MuiSlider-markLabel": {
-                            fontSize: isMobile ? "0.65rem" : "0.75rem",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      ))}
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<EditIcon />}
+                  onClick={() => openEditSectionModal(section.id)}
+                  size="small"
+                  sx={{ mt: 1 }}
+                >
+                  Edit Skills
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
@@ -411,6 +350,264 @@ const UserSkills = () => {
           Save Skills Profile
         </Button>
       </Box>
+
+      {/* Edit/Add Modal */}
+      {/* Edit/Add Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={closeModal}
+        maxWidth="md"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: { xs: 0, sm: 2 },
+            width: { xs: "100%", sm: "90%", md: "80%" },
+            maxHeight: { xs: "100%", sm: "90vh" },
+            margin: { xs: 0, sm: 2 },
+          },
+        }}
+      >
+        <DialogTitle>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              px: { xs: 1, sm: 2 },
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                fontWeight: 600,
+              }}
+            >
+              {isNewSection
+                ? "Add New Skill Category"
+                : `Edit: ${currentSection?.title}`}
+            </Typography>
+            <IconButton
+              onClick={closeModal}
+              edge="end"
+              sx={{
+                color: "grey.500",
+                "&:hover": { color: "error.main" },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent
+          dividers
+          sx={{
+            p: { xs: 2, sm: 3 },
+            overflowY: "auto",
+          }}
+        >
+          {currentSection && (
+            <>
+              <TextField
+                label="Section Title"
+                variant="outlined"
+                fullWidth
+                value={currentSection.title}
+                onChange={(e) => updateModalSectionTitle(e.target.value)}
+                sx={{
+                  mb: 3,
+                  "& .MuiInputLabel-root": {
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                  },
+                }}
+              />
+
+              <Button
+                variant="outlined"
+                startIcon={<AddCircleIcon />}
+                onClick={addSkillInModal}
+                fullWidth
+                sx={{
+                  mb: 3,
+                  py: { xs: 0.8, sm: 1 },
+                  borderRadius: 2,
+                  fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                }}
+              >
+                Add Skill to this Category
+              </Button>
+
+              {currentSection.skills.length === 0 && (
+                <Box
+                  sx={{
+                    p: { xs: 2, sm: 3 },
+                    textAlign: "center",
+                    border: "1px dashed grey",
+                    borderRadius: 2,
+                    mb: 2,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    color="textSecondary"
+                    sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                  >
+                    No skills added to this section yet. Click the button above
+                    to add skills.
+                  </Typography>
+                </Box>
+              )}
+
+              <Box sx={{ mt: 2 }}>
+                {currentSection.skills.map((skill, index) => (
+                  <Card
+                    key={skill.id}
+                    variant="outlined"
+                    sx={{
+                      p: { xs: 1.5, sm: 2 },
+                      borderRadius: 2,
+                      mb: 2,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "stretch", sm: "center" },
+                        mb: { xs: 1.5, sm: 2 },
+                      }}
+                    >
+                      <TextField
+                        fullWidth
+                        label="Skill Name"
+                        variant="outlined"
+                        size={isMobile ? "small" : "medium"}
+                        value={skill.name}
+                        onChange={(e) =>
+                          handleNameChangeInModal(skill.id, e.target.value)
+                        }
+                        sx={{
+                          flexGrow: 1,
+                          mb: { xs: 1, sm: 0 },
+                          mr: { xs: 0, sm: 1 },
+                        }}
+                      />
+                      <IconButton
+                        color="error"
+                        onClick={() => removeSkillInModal(skill.id)}
+                        sx={{
+                          alignSelf: { xs: "flex-end", sm: "center" },
+                          ml: { xs: 0, sm: 1 },
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+
+                    <Box sx={{ px: { xs: 0.5, sm: 1 } }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 0.5,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          Proficiency
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontWeight="bold"
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          {skill.rating}%
+                        </Typography>
+                      </Box>
+
+                      <Slider
+                        value={skill.rating}
+                        onChange={(e, value) =>
+                          handleRatingChangeInModal(skill.id, value)
+                        }
+                        step={5}
+                        min={0}
+                        max={100}
+                        marks={isMobile ? mobileMarks : marks}
+                        valueLabelDisplay="auto"
+                        valueLabelFormat={(value) => `${value}%`}
+                        sx={{
+                          color: theme.palette.secondary.main,
+                          height: { xs: 4, sm: 8 },
+                          "& .MuiSlider-thumb": {
+                            height: { xs: 16, sm: 20 },
+                            width: { xs: 16, sm: 20 },
+                          },
+                          "& .MuiSlider-markLabel": {
+                            fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                            transform: "translateX(-50%)",
+                            whiteSpace: "nowrap",
+                          },
+                          "& .MuiSlider-rail": {
+                            height: { xs: 4, sm: 8 },
+                          },
+                          "& .MuiSlider-track": {
+                            height: { xs: 4, sm: 8 },
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Card>
+                ))}
+              </Box>
+            </>
+          )}
+        </DialogContent>
+
+        <DialogActions
+          sx={{
+            p: { xs: 1.5, sm: 2, md: 3 },
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "stretch",
+          }}
+        >
+          <Button
+            onClick={closeModal}
+            variant="outlined"
+            fullWidth={isMobile}
+            sx={{
+              mb: { xs: 1, sm: 0 },
+              mr: { xs: 0, sm: 2 },
+              py: { xs: 0.8, sm: 1 },
+              order: { xs: 2, sm: 1 },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={saveSection}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            startIcon={<SaveIcon />}
+            sx={{
+              order: { xs: 1, sm: 2 },
+              mb: { xs: 1, sm: 0 },
+              py: { xs: 0.8, sm: 1 },
+              fontWeight: "bold",
+            }}
+          >
+            {isNewSection ? "Add Section" : "Update Section"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

@@ -12,11 +12,17 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SaveIcon from "@mui/icons-material/Save";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import EditIcon from "@mui/icons-material/Edit";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 const ServiceSection = () => {
@@ -29,27 +35,45 @@ const ServiceSection = () => {
     (state) => state.userPortfolio
   );
 
-   const userServices = useSelector(
-     (state) => state.userPortfolio.portfolioServices
-   );
-    
+  const userServices = useSelector(
+    (state) => state.userPortfolio.portfolioServices
+  );
 
   const [services, setServices] = useState([]);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentService, setCurrentService] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Add a new service
   const addService = () => {
     if (services.length < 4) {
-      setServices([
-        ...services,
-        {
-          id: Date.now() + Math.random(),
-          title: "",
-          description: "",
-        },
-      ]);
+      const newService = {
+        id: Date.now() + Math.random(),
+        title: "",
+        description: "",
+      };
+      setCurrentService(newService);
+      setIsEditing(false);
+      setModalOpen(true);
     } else {
       alert("You can add a maximum of 4 services");
     }
+  };
+
+  // Handle editing a service
+  const handleEditClick = (id) => {
+    const serviceToEdit = services.find((service) => service.id === id);
+    setCurrentService(serviceToEdit);
+    setIsEditing(true);
+    setModalOpen(true);
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setCurrentService(null);
   };
 
   // Remove a service
@@ -58,35 +82,51 @@ const ServiceSection = () => {
   };
 
   // Handle service field changes
-  const handleServiceChange = (id, field, value) => {
-    setServices(
-      services.map((service) =>
-        service.id === id ? { ...service, [field]: value } : service
-      )
-    );
+  const handleServiceChange = (field, value) => {
+    setCurrentService({
+      ...currentService,
+      [field]: value,
+    });
   };
 
-  // Save services
+  // Save current service (from modal)
+  const saveCurrentService = () => {
+    if (isEditing) {
+      // Update existing service
+      setServices(
+        services.map((service) =>
+          service.id === currentService.id ? currentService : service
+        )
+      );
+    } else {
+      // Add new service
+      setServices([...services, currentService]);
+    }
+    setModalOpen(false);
+    setCurrentService(null);
+  };
+
+  // Save all services
   const saveServices = () => {
-    // Here you would typically dispatch an action to save to Redux or API
-    // console.log("Saving services data:", services);
-    // // Example dispatch (uncomment and modify as needed):
-    // // dispatch(saveUserServices(services));
-    // alert("Services saved successfully!");
+    console.log("Saving services data:", services);
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
   useEffect(() => {
-      if (userServices && userServices.services.length > 0) {
-        console.log("User projects:", userServices.services);
-        const formattedServices = userServices.services.map((service) => ({
-          id: service.serviceId,
-          title: service.title,
-          description: service.description,
-        }));
-        setServices(formattedServices);
-      }
-    }, [portfolio]);
+    if (
+      userServices &&
+      userServices.services &&
+      userServices.services.length > 0
+    ) {
+      console.log("User services:", userServices.services);
+      const formattedServices = userServices.services.map((service) => ({
+        id: service.serviceId,
+        title: service.title,
+        description: service.description,
+      }));
+      setServices(formattedServices);
+    }
+  }, [portfolio, userServices]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -140,24 +180,27 @@ const ServiceSection = () => {
       )}
 
       <Grid container spacing={3}>
-        {services.map((service) => (
-          <Grid item xs={12} md={6} key={service.id}>
+        {services.map((service, index) => (
+          <Grid item xs={12} sm={6} key={service.id}>
             <Card
               elevation={3}
               sx={{
-                height: "100%",
                 borderRadius: 2,
+                mb: 3,
+                overflow: "visible",
                 transition: "all 0.3s",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
                 "&:hover": {
                   boxShadow: 6,
-                  transform: "translateY(-5px)",
                 },
               }}
             >
               <CardContent
                 sx={{
                   p: 3,
-                  height: "100%",
+                  flexGrow: 1,
                   display: "flex",
                   flexDirection: "column",
                 }}
@@ -166,8 +209,8 @@ const ServiceSection = () => {
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "flex-start",
                     mb: 2,
+                    alignItems: "center",
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -179,47 +222,58 @@ const ServiceSection = () => {
                       }}
                     />
                     <Typography variant="h6" component="div" fontWeight="bold">
-                      Service {services.indexOf(service) + 1}
+                      Service #{index + 1}
                     </Typography>
                   </Box>
-                  <IconButton
-                    color="error"
-                    onClick={() => removeService(service.id)}
-                    size="medium"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditClick(service.id)}
+                      size="medium"
+                      sx={{ mr: 1 }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => removeService(service.id)}
+                      size="medium"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="Service Title"
-                  variant="outlined"
-                  value={service.title}
-                  onChange={(e) =>
-                    handleServiceChange(service.id, "title", e.target.value)
-                  }
-                  sx={{ mb: 2 }}
-                  placeholder="e.g., Web Development, UI/UX Design, SEO Optimization"
-                />
+                <Typography variant="h6" component="div" gutterBottom>
+                  {service.title || "Untitled Service"}
+                </Typography>
 
-                <TextField
-                  fullWidth
-                  label="Service Description"
-                  variant="outlined"
-                  multiline
-                  rows={4}
-                  value={service.description}
-                  onChange={(e) =>
-                    handleServiceChange(
-                      service.id,
-                      "description",
-                      e.target.value
-                    )
-                  }
+                <Divider sx={{ my: 1 }} />
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ mb: 2, flexGrow: 1 }}
-                  placeholder="Describe what this service entails, your approach, and what value it delivers to clients."
-                />
+                >
+                  {service.description
+                    ? service.description.length > 100
+                      ? `${service.description.substring(0, 100)}...`
+                      : service.description
+                    : "No description provided"}
+                </Typography>
+
+                <Box sx={{ mt: "auto" }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<EditIcon />}
+                    onClick={() => handleEditClick(service.id)}
+                    size="small"
+                    sx={{ mt: 1 }}
+                  >
+                    Edit Details
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -246,6 +300,69 @@ const ServiceSection = () => {
           </Button>
         </Box>
       )}
+
+      {/* Service Edit/Create Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={handleModalClose}
+        maxWidth="md"
+        fullWidth
+        fullScreen={isMobile}
+        aria-labelledby="service-dialog-title"
+      >
+        <DialogTitle id="service-dialog-title">
+          {isEditing ? "Edit Service" : "Add New Service"}
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {currentService && (
+            <Grid container spacing={3}>
+              {/* Service Title */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Service Title"
+                  variant="outlined"
+                  value={currentService.title}
+                  onChange={(e) => handleServiceChange("title", e.target.value)}
+                  sx={{ mb: 2 }}
+                  placeholder="e.g., Web Development, UI/UX Design, SEO Optimization"
+                />
+              </Grid>
+
+              {/* Service Description */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Service Description"
+                  variant="outlined"
+                  multiline
+                  rows={6}
+                  value={currentService.description}
+                  onChange={(e) =>
+                    handleServiceChange("description", e.target.value)
+                  }
+                  placeholder="Describe what this service entails, your approach, and what value it delivers to clients."
+                />
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={handleModalClose} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={saveCurrentService}
+            variant="contained"
+            color="primary"
+            startIcon={<SaveIcon />}
+          >
+            {isEditing ? "Update Service" : "Save Service"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

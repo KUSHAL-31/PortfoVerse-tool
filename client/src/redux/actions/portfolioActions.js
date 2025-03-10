@@ -43,14 +43,7 @@ export const createNewPortfolio = () => async (dispatch) => {
         const randomDigits = Math.floor(100000 + Math.random() * 900000);
         const websiteNameWithDigits = `${websiteName}-${randomDigits}`;
         const websiteUrl = `${import.meta.env.VITE_REACT_APP_PORTFOLIO_URL}/${websiteNameWithDigits}`;
-        const { data } = await axios.post(createNewPortfolioUrl, {
-            headerTitle,
-            websiteName: websiteNameWithDigits,
-            websiteUrl,
-            isPublished: false,
-        }, {
-            withCredentials: true,
-        });
+        
 
         // console.log(data);
 
@@ -83,4 +76,13 @@ export const getPortfolioDetailById = (portfolioId) => async (dispatch) => {
             payload: error.response?.data?.message || "An error occurred",
         });
     }
+}
+
+
+export const saveEducationDetails = () => async (dispatch) => { 
+    const { user } = store.getState().user;
+    const { newlyAddedEducations, editedEducations } =
+        store.getState().userPortfolio;
+    newlyAddedEducations.map((edu) => console.log(edu));
+    editedEducations.map((edu) => console.log(edu));
 }
