@@ -9,7 +9,6 @@ const UserTestimonials = require("../models/UserTestimonials");
 const UserMetaData = require("../models/UserMetaData");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
-const cloudinary = require("cloudinary");
 
 
 exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
@@ -168,7 +167,7 @@ exports.doesPortfolioExists = asyncErrorHandler(async (req, res, next) => {
 });
 
 
-// Get All Portfolio details ( for template website )
+// Get All Portfolio details
 
 exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
     const { portfolioId } = req.body;
@@ -187,6 +186,70 @@ exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
         message: 'Portfolio details fetched successfully',
     });
 });
+
+// Get All Portfolio details ( for template website )
+
+exports.getAllPortfolioDetails = asyncErrorHandler(async (req, res, next) => {
+  const { portfolioId } = req.body;
+
+  // Get the portfolio details based on portfolioId
+  const portfolio = await UserPortfolio.findById(portfolioId);
+
+  // Get user details based on userId
+
+  const user = await Users.findById(portfolio.user);
+
+  // Get the user experience and education details based on userId
+  const userExpEdu = await UserExpEdu.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  // Get the user projects details based on userId
+  const userProjects = await UserProjects.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  // Get the user skills details based on userId
+  const userSkills = await UserSkills.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  // Get the user services details based on userId
+  const userServices = await UserServices.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  // Get the user testimonials details based on userId
+  const userTestimonials = await UserTestimonials.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  // Get the user meta data details based on userId
+  const userMetaData = await UserMetaData.findOne({
+    user: portfolio.user,
+    portfolio: portfolioId,
+  });
+
+  res.status(200).json({
+    success: true,
+    portfolio,
+    user,
+    userExpEdu,
+    userProjects,
+    userSkills,
+    userServices,
+    userTestimonials,
+    userMetaData,
+    message: "Portfolio details fetched successfully",
+  });
+});
+
+
 
 // Check if portfolio name is available for not
 

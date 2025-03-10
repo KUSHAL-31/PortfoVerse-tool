@@ -8,6 +8,7 @@ router.route("/create").post(authUser, createNewPortfolio);
 router.route("/update").post(authUser, changePortfolioDetails);
 router.route("/check").post(doesPortfolioExists);
 router.route("/details").post(getAllPortfolioDetails);
+router.route("/details/template").post(getAllPortfolioDetails);
 router.route("/name/available").get(authUser, checkPortfolioName);
 router.route("/getAll").get(authUser, getAllUserPortfolios);
 
