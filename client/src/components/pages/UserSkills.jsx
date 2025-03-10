@@ -26,7 +26,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
-import { getPortfolioSkillsDetails } from "../../redux/actions/portfolioActions";
+import { addNewSkillSection, deleteSkillSection, editSkillSection, getPortfolioSkillsDetails } from "../../redux/actions/portfolioActions";
 
 const UserSkills = () => {
   const theme = useTheme();
@@ -34,7 +34,7 @@ const UserSkills = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { portfolioLoading, portfolioSkills, currentPortfolio } = useSelector(
+  const { portfolioSkills, currentPortfolio, isPageLoading } = useSelector(
     (state) => state.userPortfolio
   );
 
@@ -67,7 +67,7 @@ const UserSkills = () => {
       setIsNewSection(true);
       setCurrentSection({
         id: Date.now() + Math.random(),
-        title: "New Skill Section",
+        heading: "New Skill Section",
         skills: [],
       });
       setModalOpen(true);
@@ -97,31 +97,23 @@ const UserSkills = () => {
   // Save section changes from modal
   const saveSection = () => {
     if (isNewSection) {
-      // Add new section
-      setSkillSections([...skillSections, currentSection]);
+      dispatch(addNewSkillSection(currentSection));
     } else {
-      // Update existing section
-      setSkillSections(
-        skillSections.map((section) =>
-          section.id === currentSection.id ? currentSection : section
-        )
-      );
+     dispatch(editSkillSection(currentSection));
     }
     closeModal();
   };
 
   // Remove a skill section
   const removeSkillSection = (sectionId) => {
-    setSkillSections(
-      skillSections.filter((section) => section.id !== sectionId)
-    );
+    dispatch(deleteSkillSection(sectionId));
   };
 
   // Update section title in modal
-  const updateModalSectionTitle = (newTitle) => {
+  const updateModalSectionHeading = (heading) => {
     setCurrentSection({
       ...currentSection,
-      title: newTitle,
+      heading: heading,
     });
   };
 
@@ -191,7 +183,7 @@ const UserSkills = () => {
       // Transform backend data to component state format
       const formattedSections = portfolioSkills.skillSection.map((section) => ({
         id: section.skillId,
-        title: section.heading,
+        heading: section.heading,
         skills: section.list.map((skill) => ({
           id: skill._id,
           name: skill.name,
@@ -203,7 +195,7 @@ const UserSkills = () => {
     } else {
       dispatch(getPortfolioSkillsDetails(currentPortfolio._id));
     }
-  }, [dispatch, portfolioSkills]);
+  }, [dispatch, isPageLoading, portfolioSkills]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -287,7 +279,7 @@ const UserSkills = () => {
                 </Box>
 
                 <Typography variant="h6" component="div" gutterBottom>
-                  {section.title || "Untitled Section"}
+                  {section.heading || "Untitled Section"}
                 </Typography>
 
                 <Divider sx={{ my: 1 }} />
@@ -370,7 +362,7 @@ const UserSkills = () => {
             >
               {isNewSection
                 ? "Add New Skill Category"
-                : `Edit: ${currentSection?.title}`}
+                : `Edit: ${currentSection?.heading}`}
             </Typography>
             <IconButton
               onClick={closeModal}
@@ -395,11 +387,11 @@ const UserSkills = () => {
           {currentSection && (
             <>
               <TextField
-                label="Section Title"
+                label="Section heading"
                 variant="outlined"
                 fullWidth
-                value={currentSection.title}
-                onChange={(e) => updateModalSectionTitle(e.target.value)}
+                value={currentSection.heading}
+                onChange={(e) => updateModalSectionHeading(e.target.value)}
                 sx={{
                   mb: 3,
                   "& .MuiInputLabel-root": {

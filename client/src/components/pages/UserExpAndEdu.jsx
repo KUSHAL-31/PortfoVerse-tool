@@ -21,7 +21,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Modal,
   Divider,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -36,15 +35,24 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import LinkIcon from "@mui/icons-material/Link";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EditIcon from "@mui/icons-material/Edit";
-import { ADD_NEW_EDUCATION, EDIT_EDUCATION, INCREMENT_PAGE_COUNT } from "../../redux/constants";
-import { getPortfolioEducationDetails, getPortfolioExperienceDetails, saveEducationDetails } from "../../redux/actions/portfolioActions";
+
+import {
+  getPortfolioEducationDetails,
+  getPortfolioExperienceDetails,
+  addNewEducation,
+  editEducation,
+  deleteEducation,
+  addNewExperience,
+  editExperience,
+  deleteExperience,
+} from "../../redux/actions/portfolioActions";
+import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 
 // Education Modal Component
 const EducationModal = memo(({
   open,
   handleClose,
   education,
-  handleEducationChange,
   saveEducation,
   isEdit,
 }) => {
@@ -52,6 +60,8 @@ const EducationModal = memo(({
   const [formData, setFormData] = useState({ ...education });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const dispatch = useDispatch();
 
   // Update form data when education prop changes
   useEffect(() => {
@@ -62,13 +72,12 @@ const EducationModal = memo(({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    handleEducationChange(formData.id, "degree", formData.degree);
-    handleEducationChange(formData.id, "school", formData.school);
-    handleEducationChange(formData.id, "startDate", formData.startDate);
-    handleEducationChange(formData.id, "endDate", formData.endDate);
-    handleEducationChange(formData.id, "result", formData.result);
-    handleEducationChange(formData.id, "comments", formData.comments);
+  const handleSubmit = (isEdit) => {
+    if (isEdit) {
+      dispatch(editEducation(formData));
+    } else {
+      dispatch(addNewEducation(formData));
+    }
     saveEducation();
     handleClose();
   };
@@ -132,9 +141,7 @@ const EducationModal = memo(({
                 sx={{ display: "flex", alignItems: "center" }}
               >
                 {!isMobile && (
-                  <CalendarTodayIcon
-                    sx={{ mr: 0.5, fontSize: "small" }}
-                  />
+                  <CalendarTodayIcon sx={{ mr: 0.5, fontSize: "small" }} />
                 )}{" "}
                 Start Date
               </Typography>
@@ -158,9 +165,7 @@ const EducationModal = memo(({
                 sx={{ display: "flex", alignItems: "center" }}
               >
                 {!isMobile && (
-                  <CalendarTodayIcon
-                    sx={{ mr: 0.5, fontSize: "small" }}
-                  />
+                  <CalendarTodayIcon sx={{ mr: 0.5, fontSize: "small" }} />
                 )}{" "}
                 End Date
               </Typography>
@@ -179,9 +184,7 @@ const EducationModal = memo(({
           </Grid>
 
           <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-            {!isMobile && (
-              <GradeIcon sx={{ mr: 1, color: "text.secondary" }} />
-            )}
+            {!isMobile && <GradeIcon sx={{ mr: 1, color: "text.secondary" }} />}
             <TextField
               fullWidth
               label="Result (CGPA/Percentage)"
@@ -195,9 +198,7 @@ const EducationModal = memo(({
 
           <Box sx={{ display: "flex", alignItems: "flex-start" }}>
             {!isMobile && (
-              <EmojiEventsIcon
-                sx={{ mr: 1, mt: 2, color: "text.secondary" }}
-              />
+              <EmojiEventsIcon sx={{ mr: 1, mt: 2, color: "text.secondary" }} />
             )}
             <TextField
               fullWidth
@@ -216,11 +217,17 @@ const EducationModal = memo(({
         <Button onClick={handleClose} variant="outlined" color="primary">
           Cancel
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          variant="contained" 
+        <Button
+          onClick={() => handleSubmit(isEdit)}
+          variant="contained"
           color="primary"
-          disabled={!formData.degree || !formData.school || !formData.startDate || !formData.endDate || !formData.result}
+          disabled={
+            !formData.degree ||
+            !formData.school ||
+            !formData.startDate ||
+            !formData.endDate ||
+            !formData.result
+          }
         >
           {isEdit ? "Update" : "Add"}
         </Button>
@@ -234,8 +241,6 @@ const ExperienceModal = memo(({
   open,
   handleClose,
   experience,
-  handleExperienceChange,
-  handlePresentChange,
   saveExperience,
   isEdit,
 }) => {
@@ -243,6 +248,8 @@ const ExperienceModal = memo(({
   const [formData, setFormData] = useState({ ...experience });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const dispatch = useDispatch();
 
   // Update form data when experience prop changes
   useEffect(() => {
@@ -262,19 +269,13 @@ const ExperienceModal = memo(({
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (isEdit) => {
+    if (isEdit) {
+      dispatch(editExperience(formData));
+    } else {
+      dispatch(addNewExperience(formData));
+    }
     // Update all fields at once
-    handleExperienceChange(formData.id, "title", formData.title);
-    handleExperienceChange(formData.id, "company", formData.company);
-    handleExperienceChange(formData.id, "startDate", formData.startDate);
-    handleExperienceChange(formData.id, "endDate", formData.endDate);
-    handleExperienceChange(formData.id, "description", formData.description);
-    handleExperienceChange(formData.id, "certificate", formData.certificate);
-    
-    // Handle isPresent separately
-    const event = { target: { value: formData.isPresent ? "yes" : "no" } };
-    handlePresentChange(formData.id, event);
-    
     saveExperience();
     handleClose();
   };
@@ -450,7 +451,7 @@ const ExperienceModal = memo(({
           Cancel
         </Button>
         <Button 
-          onClick={handleSubmit} 
+          onClick={()=>handleSubmit(isEdit)} 
           variant="contained" 
           color="primary"
           disabled={!formData.title || !formData.company || !formData.startDate || (!formData.endDate && !formData.isPresent)}
@@ -466,7 +467,6 @@ const ExperienceModal = memo(({
 const EducationSummaryCard = memo(({ 
   education, 
   index, 
-  isMobile, 
   removeEducation,
   handleEditClick
 }) => {
@@ -618,8 +618,12 @@ const EducationExperienceSection = () => {
   const dispatch = useDispatch();
   
   // Get user experience and education data from redux
-  const { portfolioEducations, portfolioExperiences, currentPortfolio } =
-    useSelector((state) => state.userPortfolio);
+  const {
+    portfolioEducations,
+    portfolioExperiences,
+    currentPortfolio,
+    isPageLoading,
+  } = useSelector((state) => state.userPortfolio);
   
   // Education state
   const [educations, setEducations] = useState([]);
@@ -643,7 +647,7 @@ const EducationExperienceSection = () => {
   useEffect(() => {
     dispatch(getPortfolioEducationDetails(currentPortfolio._id));
     dispatch(getPortfolioExperienceDetails(currentPortfolio._id));
-  }, []);
+  }, [dispatch, isPageLoading]);
 
   // Load data from reducer when component mounts or when portfolioEducations changes
   useEffect(() => {
@@ -700,17 +704,9 @@ const EducationExperienceSection = () => {
     }
   }, [educations.length]);
 
-  const removeEducation = useCallback((id) => {
-    setEducations(prev => prev.filter(education => education.id !== id));
-  }, []);
-
-  const handleEducationChange = useCallback((id, field, value) => {
-    setEducations(prev => 
-      prev.map(education =>
-        education.id === id ? { ...education, [field]: value } : education
-      )
-    );
-  }, []);
+  const removeEducation = (id) => {
+    dispatch(deleteEducation(id));
+  }
 
   const handleEducationEdit = useCallback((id) => {
     const educationToEdit = educations.find(edu => edu.id === id);
@@ -750,33 +746,9 @@ const EducationExperienceSection = () => {
     }
   }, [experiences.length]);
 
-  const removeExperience = useCallback((id) => {
-    setExperiences(prev => prev.filter(experience => experience.id !== id));
-  }, []);
-
-  const handleExperienceChange = useCallback((id, field, value) => {
-    setExperiences(prev => 
-      prev.map(experience =>
-        experience.id === id ? { ...experience, [field]: value } : experience
-      )
-    );
-  }, []);
-
-  const handlePresentChange = useCallback((id, event) => {
-    const isPresentValue = event.target.value === "yes";
-    setExperiences(prev => 
-      prev.map(experience => {
-        if (experience.id === id) {
-          return {
-            ...experience,
-            isPresent: isPresentValue,
-            endDate: isPresentValue ? "" : experience.endDate,
-          };
-        }
-        return experience;
-      })
-    );
-  }, []);
+  const removeExperience = (id) => {
+    dispatch(deleteExperience(id));
+  }
 
   const handleExperienceEdit = useCallback((id) => {
     const experienceToEdit = experiences.find(exp => exp.id === id);
@@ -794,23 +766,6 @@ const EducationExperienceSection = () => {
     // No need to update for edit case as it's handled by handleExperienceChange
   }, [currentExperience, isEditExperience]);
 
-  // Save all data
-  const saveData = useCallback(() => {
-    // Format the data to match the backend structure
-    educations.forEach((edu) => {
-      if(edu.isEdited) {
-        dispatch({type: EDIT_EDUCATION, payload: edu});
-      } else {
-        dispatch({ type: ADD_NEW_EDUCATION, payload: edu });
-      }
-    });
-
-    dispatch(saveEducationDetails());
-
-    // For implementation
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  }, [educations, dispatch]);
-
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Education Modal */}
@@ -819,7 +774,6 @@ const EducationExperienceSection = () => {
           open={educationModalOpen}
           handleClose={() => setEducationModalOpen(false)}
           education={currentEducation}
-          handleEducationChange={handleEducationChange}
           saveEducation={saveEducation}
           isEdit={isEditEducation}
         />
@@ -831,8 +785,6 @@ const EducationExperienceSection = () => {
           open={experienceModalOpen}
           handleClose={() => setExperienceModalOpen(false)}
           experience={currentExperience}
-          handleExperienceChange={handleExperienceChange}
-          handlePresentChange={handlePresentChange}
           saveExperience={saveExperience}
           isEdit={isEditExperience}
         />
@@ -982,7 +934,7 @@ const EducationExperienceSection = () => {
           size="large"
           color="success"
           startIcon={<SaveIcon />}
-          onClick={saveData}
+          onClick={()=>{dispatch({ type: INCREMENT_PAGE_COUNT });}}
           sx={{
             py: 1.5,
             px: 6,

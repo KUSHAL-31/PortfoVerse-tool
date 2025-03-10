@@ -15,6 +15,7 @@ exports.listNewProjectByUserId = asyncErrorHandler(async (req, res, next) => {
     result = await cloudinary.v2.uploader.upload(image, {
       folder: "k31portfolios",
     });
+    console.log(result);
   }
 
   // Find the user's website document

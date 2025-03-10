@@ -8,6 +8,7 @@ const cors = require("cors");
 const Helmet = require("helmet");
 const morganMiddleware = require("./middlewares/loggers/morgan");
 const limiter = require("./middlewares/rateLimiter");
+const cloudinary = require("cloudinary");
 
 require("dotenv").config();
 // Defining express middlewares
@@ -55,6 +56,11 @@ process.on("uncaughtException", (err) => {
 })
 
 // Cloudinary initialization
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 dbConnection();
 

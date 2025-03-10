@@ -32,6 +32,44 @@ export const portfolioTestimonialsDetailsUrl = `${import.meta.env.VITE_REACT_APP
 
 export const portfolioServicesDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/getAll`;
 
+// User modules APIs
+
+export const addNewEducationUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/education/create`;
+
+export const editEducationUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/education/edit`;
+
+export const deleteEducationUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/education/remove`;
+
+export const addNewExperienceUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/experience/create`;
+
+export const editExperienceUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/experience/edit`;
+
+export const deleteExperienceUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/experience/remove`;
+
+export const addNewSkillsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/skills/create`;
+
+export const editSkillsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/skills/edit`;
+
+export const deleteSkillsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/skills/remove`;
+
+export const addNewProjectsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/projects/create`;
+
+export const editProjectsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/projects/edit`;
+
+export const deleteProjectsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/projects/remove`;
+
+export const addNewTestimonialsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/testimonials/create`;
+
+export const editTestimonialsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/testimonials/edit`;
+
+export const deleteTestimonialsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/testimonials/remove`;
+
+export const addNewServicesUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/create`;
+
+export const editServicesUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/edit`;
+
+export const deleteServicesUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/remove`;
+
 
 // User meta data related URLs
 

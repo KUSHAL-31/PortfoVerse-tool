@@ -29,7 +29,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import EditIcon from "@mui/icons-material/Edit";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
-import { getPortfolioProjectsDetails } from "../../redux/actions/portfolioActions";
+import { addNewProjectSection, deleteProjectSection, editProjectSection, getPortfolioProjectsDetails } from "../../redux/actions/portfolioActions";
 
 const ProjectSection = () => {
   const theme = useTheme();
@@ -55,9 +55,9 @@ const ProjectSection = () => {
         id: Date.now() + Math.random(),
         title: "",
         description: "",
-        imageUrl: null,
-        demoUrl: "",
-        sourceCodeUrl: "",
+        image: null,
+        url: "",
+        sourceCode: "",
       };
       setCurrentProject(newProject);
       setIsEditing(false);
@@ -83,15 +83,16 @@ const ProjectSection = () => {
 
   // Remove a project
   const removeProject = (id) => {
-    setProjects(projects.filter((project) => project.id !== id));
+    dispatch(deleteProjectSection(id));
   };
 
   // Handle project field changes
   const handleProjectChange = (field, value) => {
-    setCurrentProject({
-      ...currentProject,
+    setCurrentProject((prev) => ({
+      ...prev,
       [field]: value,
-    });
+      ...(field === "image" ? { isImageEdited: true } : {}), // Add isImageEdited if field is image
+    }));
   };
 
   // Handle image upload
@@ -100,7 +101,7 @@ const ProjectSection = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        handleProjectChange("imageUrl", e.target.result);
+        handleProjectChange("image", e.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -114,15 +115,9 @@ const ProjectSection = () => {
   // Save current project (from modal)
   const saveCurrentProject = () => {
     if (isEditing) {
-      // Update existing project
-      setProjects(
-        projects.map((project) =>
-          project.id === currentProject.id ? currentProject : project
-        )
-      );
+     dispatch(editProjectSection(currentProject));
     } else {
-      // Add new project
-      setProjects([...projects, currentProject]);
+     dispatch(addNewProjectSection(currentProject));
     }
     setModalOpen(false);
     setCurrentProject(null);
@@ -143,9 +138,9 @@ const ProjectSection = () => {
         id: project.projectId,
         title: project.title,
         description: project.description,
-        imageUrl: project.image ? project.image.url : null,
-        demoUrl: project.url,
-        sourceCodeUrl: project.sourceCode,
+        image: project.image ? project.image.url : null,
+        url: project.url,
+        sourceCode: project.sourceCode,
       }));
       setProjects(formattedSections);
     } else {
@@ -229,10 +224,10 @@ const ProjectSection = () => {
                   overflow: "hidden",
                 }}
               >
-                {project.imageUrl ? (
+                {project.image ? (
                   <CardMedia
                     component="img"
-                    image={project.imageUrl}
+                    image={project.image}
                     alt={project.title || "Project image"}
                     sx={{
                       position: "absolute",
@@ -383,17 +378,17 @@ const ProjectSection = () => {
                     minHeight: 240,
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: currentProject.imageUrl
+                    justifyContent: currentProject.image
                       ? "flex-start"
                       : "center",
                     alignItems: "center",
                   }}
                 >
-                  {currentProject.imageUrl ? (
+                  {currentProject.image ? (
                     <>
                       <CardMedia
                         component="img"
-                        image={currentProject.imageUrl}
+                        image={currentProject.image}
                         alt={currentProject.title || "Project image"}
                         sx={{
                           borderRadius: 1,
@@ -468,10 +463,8 @@ const ProjectSection = () => {
                     label="Demo URL"
                     placeholder="https://example.com"
                     variant="outlined"
-                    value={currentProject.demoUrl}
-                    onChange={(e) =>
-                      handleProjectChange("demoUrl", e.target.value)
-                    }
+                    value={currentProject.url}
+                    onChange={(e) => handleProjectChange("url", e.target.value)}
                   />
                 </Box>
 
@@ -482,9 +475,9 @@ const ProjectSection = () => {
                     label="Source Code URL"
                     placeholder="https://github.com/username/repo"
                     variant="outlined"
-                    value={currentProject.sourceCodeUrl}
+                    value={currentProject.sourceCode}
                     onChange={(e) =>
-                      handleProjectChange("sourceCodeUrl", e.target.value)
+                      handleProjectChange("sourceCode", e.target.value)
                     }
                   />
                 </Box>

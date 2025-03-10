@@ -6,7 +6,8 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.listNewSkillSection = asyncErrorHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const { portfolioId, heading, skills } = req.body;
+    const { portfolioId, heading , skills } = req.body;
+    console.log(req.body);
     if (!heading || (!skills && skills.length !== 0)) {
         return next(new HandleError("Please fill the mandatory fields", 400));
     }

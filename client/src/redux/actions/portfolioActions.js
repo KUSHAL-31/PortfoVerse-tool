@@ -8,6 +8,8 @@ import {
   GET_PORTFOLIO_DETAILS_FAILURE,
   GET_PORTFOLIO_DETAILS_REQUEST,
   GET_PORTFOLIO_DETAILS_SUCCESS,
+  PAGE_LOADED,
+  PAGE_LOADING,
   PORTFOLIO_ALL_EDUCATION_FAILURE,
   PORTFOLIO_ALL_EDUCATION_REQUEST,
   PORTFOLIO_ALL_EDUCATION_SUCCESS,
@@ -33,7 +35,25 @@ import {
 
 import axios from "axios";
 import {
+  addNewEducationUrl,
+  addNewExperienceUrl,
+  addNewProjectsUrl,
+  addNewServicesUrl,
+  addNewSkillsUrl,
+  addNewTestimonialsUrl,
   createNewPortfolioUrl,
+  deleteEducationUrl,
+  deleteExperienceUrl,
+  deleteProjectsUrl,
+  deleteServicesUrl,
+  deleteSkillsUrl,
+  deleteTestimonialsUrl,
+  editEducationUrl,
+  editExperienceUrl,
+  editProjectsUrl,
+  editServicesUrl,
+  editSkillsUrl,
+  editTestimonialsUrl,
   getAllUserPortfolioUrl,
   getPortfolioDetailByIdUrl,
   portfolioEducationDetailsUrl,
@@ -196,6 +216,7 @@ export const getPortfolioSkillsDetails = (portfolioId) => async (dispatch) => {
         withCredentials: true, // This ensures cookies are saved from the response
       }
     );
+    console.log("Skills", data);
     dispatch({
       type: PORTFOLIO_SKILLS_SUCCESS,
       payload: data.skills,
@@ -208,69 +229,457 @@ export const getPortfolioSkillsDetails = (portfolioId) => async (dispatch) => {
   }
 };
 
-export const getPortfolioProjectsDetails = (portfolioId) => async (dispatch) => {
-  console.log(portfolioId);
+export const getPortfolioProjectsDetails =
+  (portfolioId) => async (dispatch) => {
+    console.log(portfolioId);
+    try {
+      dispatch({ type: PORTFOLIO_PROJECTS_REQUEST });
+      // Set `withCredentials` to allow cross-origin cookies
+      const { data } = await axios.get(
+        `${portfolioProjectsDetailsUrl}/${portfolioId}`,
+        {
+          withCredentials: true, // This ensures cookies are saved from the response
+        }
+      );
+      dispatch({
+        type: PORTFOLIO_PROJECTS_SUCCESS,
+        payload: data.projects,
+      });
+    } catch (error) {
+      dispatch({
+        type: PORTFOLIO_PROJECTS_FAILURE,
+        payload: error.response?.data?.message || "An error occurred",
+      });
+    }
+  };
+
+export const getPortfolioServicesDetails =
+  (portfolioId) => async (dispatch) => {
+    try {
+      dispatch({ type: PORTFOLIO_SERVICES_REQUEST });
+      // Set `withCredentials` to allow cross-origin cookies
+      const { data } = await axios.get(
+        `${portfolioServicesDetailsUrl}/${portfolioId}`,
+        {
+          withCredentials: true, // This ensures cookies are saved from the response
+        }
+      );
+      dispatch({
+        type: PORTFOLIO_SERVICES_SUCCESS,
+        payload: data.services,
+      });
+    } catch (error) {
+      dispatch({
+        type: PORTFOLIO_SERVICES_FAILURE,
+        payload: error.response?.data?.message || "An error occurred",
+      });
+    }
+  };
+
+export const getPortfolioTestimonialDetails =
+  (portfolioId) => async (dispatch) => {
+    try {
+      dispatch({ type: PORTFOLIO_TESTIMONIALS_REQUEST });
+      // Set `withCredentials` to allow cross-origin cookies
+      const { data } = await axios.get(
+        `${portfolioTestimonialsDetailsUrl}/${portfolioId}`,
+        {
+          withCredentials: true, // This ensures cookies are saved from the response
+        }
+      );
+      dispatch({
+        type: PORTFOLIO_TESTIMONIALS_SUCCESS,
+        payload: data.testimonials,
+      });
+    } catch (error) {
+      dispatch({
+        type: PORTFOLIO_TESTIMONIALS_FAILURE,
+        payload: error.response?.data?.message || "An error occurred",
+      });
+    }
+  };
+
+export const addNewEducation = (education) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  console.log("Education", education);
   try {
-    dispatch({ type: PORTFOLIO_PROJECTS_REQUEST});
-    // Set `withCredentials` to allow cross-origin cookies
-    const { data } = await axios.get(
-      `${portfolioProjectsDetailsUrl}/${portfolioId}`,
+    const { data } = await axios.post(
+      `${addNewEducationUrl}`,
+      { ...education, portfolioId: currentPortfolio._id },
       {
         withCredentials: true, // This ensures cookies are saved from the response
       }
     );
-    dispatch({
-      type: PORTFOLIO_PROJECTS_SUCCESS,
-      payload: data.projects,
-    });
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioEducationDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
   } catch (error) {
-    dispatch({
-      type: PORTFOLIO_PROJECTS_FAILURE,
-      payload: error.response?.data?.message || "An error occurred",
-    });
+    console.log("Error", error);
   }
 };
 
-export const getPortfolioServicesDetails = (portfolioId) => async (dispatch) => {
+export const editEducation = (education) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
   try {
-    dispatch({ type: PORTFOLIO_SERVICES_REQUEST });
-    // Set `withCredentials` to allow cross-origin cookies
-    const { data } = await axios.get(
-      `${portfolioServicesDetailsUrl}/${portfolioId}`,
+    const { data } = await axios.patch(
+      `${editEducationUrl}`,
+      { ...education, portfolioId: currentPortfolio._id },
       {
         withCredentials: true, // This ensures cookies are saved from the response
       }
     );
-    dispatch({
-      type: PORTFOLIO_SERVICES_SUCCESS,
-      payload: data.services,
-    });
+    if (data.success) {
+      dispatch(getPortfolioEducationDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
   } catch (error) {
-    dispatch({
-      type: PORTFOLIO_SERVICES_FAILURE,
-      payload: error.response?.data?.message || "An error occurred",
-    });
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
   }
 };
 
-export const getPortfolioTestimonialDetails = (portfolioId) => async (dispatch) => {
+export const deleteEducation = (educationId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
   try {
-    dispatch({ type: PORTFOLIO_TESTIMONIALS_REQUEST });
-    // Set `withCredentials` to allow cross-origin cookies
-    const { data } = await axios.get(
-      `${portfolioTestimonialsDetailsUrl}/${portfolioId}`,
+    const { data } = await axios.post(
+      `${deleteEducationUrl}`,
+      { educationIds: [educationId], portfolioId: currentPortfolio._id },
       {
         withCredentials: true, // This ensures cookies are saved from the response
       }
     );
-    dispatch({
-      type: PORTFOLIO_TESTIMONIALS_SUCCESS,
-      payload: data.testimonials,
-    });
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioEducationDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
   } catch (error) {
-    dispatch({
-      type: PORTFOLIO_TESTIMONIALS_FAILURE,
-      payload: error.response?.data?.message || "An error occurred",
-    });
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
   }
 };
+
+
+export const addNewExperience = (experience) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  console.log("Experience", experience);
+  try {
+    const { data } = await axios.post(
+      `${addNewExperienceUrl}`,
+      { ...experience, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioExperienceDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+export const editExperience = (experience) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.patch(
+      `${editExperienceUrl}`,
+      { ...experience, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioExperienceDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const deleteExperience = (experienceId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
+  try {
+    const { data } = await axios.post(
+      `${deleteExperienceUrl}`,
+      { experienceId, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioExperienceDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+
+export const addNewSkillSection = (skillSection) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.post(
+      `${addNewSkillsUrl}`,
+      { ...skillSection, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioSkillsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+export const editSkillSection = (skillSection) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.patch(
+      `${editSkillsUrl}`,
+      { ...skillSection, portfolioId: currentPortfolio._id, skillId : skillSection.id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioSkillsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const deleteSkillSection = (skillId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
+  try {
+    const { data } = await axios.post(
+      `${deleteSkillsUrl}`,
+      { skillId, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioSkillsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const addNewProjectSection = (project) => async (dispatch) => { 
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.post(
+      `${addNewProjectsUrl}`,
+      { ...project, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioProjectsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+export const editProjectSection = (project) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.patch(
+      `${editProjectsUrl}`,
+      { ...project, portfolioId: currentPortfolio._id, projectId : project.id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioProjectsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const deleteProjectSection = (projectId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
+  try {
+    const { data } = await axios.post(
+      `${deleteProjectsUrl}`,
+      { projectId, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioProjectsDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+
+export const addNewServiceSection = (service) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.post(
+      `${addNewServicesUrl}`,
+      { ...service, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioServicesDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+export const editServiceSection = (service) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.patch(
+      `${editServicesUrl}`,
+      { ...service, portfolioId: currentPortfolio._id, serviceId : service.id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioServicesDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const deleteServiceSection = (serviceId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
+  try {
+    const { data } = await axios.post(
+      `${deleteServicesUrl}`,
+      { serviceId, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioServicesDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const addNewTestimonialSection = (testimonial) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.post(
+      `${addNewTestimonialsUrl}`,
+      { ...testimonial, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioTestimonialDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+export const editTestimonialSection = (testimonial) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.patch(
+      `${editTestimonialsUrl}`,
+      { ...testimonial, portfolioId: currentPortfolio._id, testimonialId : testimonial.id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioTestimonialDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const deleteTestimonialSection = (testimonialId) => async (dispatch) => {
+  const { currentPortfolio } = store.getState().userPortfolio;
+  dispatch({ type: PAGE_LOADING });
+  try {
+    const { data } = await axios.post(
+      `${deleteTestimonialsUrl}`,
+      { testimonialId, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    console.log("Data", data);
+    if (data.success) {
+      dispatch(getPortfolioTestimonialDetails(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}

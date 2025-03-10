@@ -24,15 +24,14 @@ import SaveIcon from "@mui/icons-material/Save";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import EditIcon from "@mui/icons-material/Edit";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
-import { getPortfolioServicesDetails } from "../../redux/actions/portfolioActions";
+import { addNewServiceSection, deleteServiceSection, editServiceSection, getPortfolioServicesDetails } from "../../redux/actions/portfolioActions";
 
 const ServiceSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const dispatch = useDispatch();
-  const { currentPortfolio, portfolioServices } = useSelector(
+  const { currentPortfolio, portfolioServices, isPageLoading } = useSelector(
     (state) => state.userPortfolio
   );
 
@@ -75,7 +74,7 @@ const ServiceSection = () => {
 
   // Remove a service
   const removeService = (id) => {
-    setServices(services.filter((service) => service.id !== id));
+    dispatch(deleteServiceSection(id));
   };
 
   // Handle service field changes
@@ -89,23 +88,15 @@ const ServiceSection = () => {
   // Save current service (from modal)
   const saveCurrentService = () => {
     if (isEditing) {
-      // Update existing service
-      setServices(
-        services.map((service) =>
-          service.id === currentService.id ? currentService : service
-        )
-      );
+      dispatch(editServiceSection(currentService));
     } else {
-      // Add new service
-      setServices([...services, currentService]);
-    }
-    setModalOpen(false);
-    setCurrentService(null);
-  };
+      dispatch(addNewServiceSection(currentService));
+    };
+    handleModalClose();
+  }
 
   // Save all services
   const saveServices = () => {
-    console.log("Saving services data:", services);
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
@@ -120,7 +111,7 @@ const ServiceSection = () => {
     } else {
       dispatch(getPortfolioServicesDetails(currentPortfolio._id));
     }
-  }, [portfolioServices]);
+  }, [portfolioServices, isPageLoading]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

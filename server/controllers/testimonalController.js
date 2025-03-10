@@ -45,7 +45,6 @@ exports.listNewTestimonialByUserId = asyncErrorHandler(async (req, res, next) =>
     return res.status(201).json({
         success: true,
         message: 'testimonial added successfully!',
-        testimonials: testimonialDetails.testimonials
     });
 });
 
