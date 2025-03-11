@@ -5,12 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const userWebsiteSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioUsers",
+    ref: "Users",
     required: true,
   },
   portfolio: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioWebsite",
+    ref: "WebsiteDetails",
     required: true,
   },
   projects: [
@@ -56,4 +56,4 @@ const userWebsiteSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model("UserPortfolioProjects", userWebsiteSchema);
+module.exports = mongoose.model("Projects", userWebsiteSchema);

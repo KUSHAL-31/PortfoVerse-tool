@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const websiteSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioUsers",
+    ref: "Users",
     required: true,
   },
   logo: {
@@ -41,4 +41,4 @@ const websiteSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("K31PortfolioWebsite", websiteSchema);
+module.exports = mongoose.model("WebsiteDetails", websiteSchema);

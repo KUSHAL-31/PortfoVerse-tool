@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const userMetaDataSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioUsers",
+    ref: "Users",
     required: true,
   },
   portfolio: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioWebsite",
+    ref: "WebsiteDetails",
     required: true,
   },
   resume: {
@@ -70,4 +70,4 @@ const userMetaDataSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("UserPortfolioMetaData", userMetaDataSchema);
+module.exports = mongoose.model("UserMetaData", userMetaDataSchema);

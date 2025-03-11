@@ -9,6 +9,7 @@ const UserTestimonials = require("../models/UserTestimonials");
 const UserMetaData = require("../models/UserMetaData");
 const asyncErrorHandler = require("../utility/asyncErrorHandler");
 const HandleError = require("../utility/handleError");
+const cloudinary = require("cloudinary");
 
 
 exports.createNewPortfolio = asyncErrorHandler(async (req, res, next) => {
@@ -274,5 +275,71 @@ exports.getAllUserPortfolios = asyncErrorHandler(async (req, res, next) => {
         success: true,
         portfolios,
         message: "User Portfolios fetched successfully",
+    });
+});
+
+
+// Delete portfolio image by ID
+exports.deletePortfolioImage = asyncErrorHandler(async (req, res, next) => {
+    const { imageId } = req.params;
+    const userId = req.user.id;
+
+    let userMetaData = await UserPortfolioMetaData.findOne({ user: userId });
+
+    if (!userMetaData) {
+        return next(new HandleError("Portfolio metadata not found", 404));
+    }
+
+    const imageIndex = userMetaData.images.findIndex(img => img.public_id === imageId);
+
+    if (imageIndex === -1) {
+        return next(new HandleError("Image not found", 404));
+    }
+
+    // Remove from Cloudinary
+    await cloudinary.v2.uploader.destroy(imageId);
+
+    // Remove from the array
+    userMetaData.images.splice(imageIndex, 1);
+    await userMetaData.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Image deleted successfully",
+    });
+});
+
+
+// Add a new portfolio image
+exports.addPortfolioImage = asyncErrorHandler(async (req, res, next) => {
+    const { image } = req.body;
+    const userId = req.user.id;
+
+    if (!image ) {
+        return next(new HandleError("Image is required", 400));
+    }
+
+    let userMetaData = await UserPortfolioMetaData.findOne({ user: userId });
+
+    if (!userMetaData) {
+        return next(new HandleError("Portfolio metadata not found", 404));
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.v2.uploader.upload(image, {
+        folder: "k31portfolios",
+    });
+
+    // Add new image to the array
+    userMetaData.images.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+    });
+
+    await userMetaData.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Image added successfully",
     });
 });

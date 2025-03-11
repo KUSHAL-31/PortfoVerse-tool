@@ -4,12 +4,12 @@ const { v4: uuidv4 } = require('uuid');
 const userExperienceEducationSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioUsers",
+    ref: "Users",
     required: true,
   },
   portfolio: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioWebsite",
+    ref: "WebsiteDetails",
     required: true,
   },
   education: [
@@ -91,4 +91,4 @@ const userExperienceEducationSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("UserPortfolioExperienceEducation", userExperienceEducationSchema);
+module.exports = mongoose.model("ExperienceAndEducation", userExperienceEducationSchema);

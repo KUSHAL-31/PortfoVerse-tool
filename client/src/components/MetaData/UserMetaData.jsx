@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -24,6 +24,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import { updateUserMetaData } from "../../redux/actions/userActions";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 import { getPortfolioMetaData } from "../../redux/actions/portfolioActions";
+import ImageUploadSection from "./ImageUploadSection";
 
 const UserMetaData = () => {
   const theme = useTheme();
@@ -31,7 +32,7 @@ const UserMetaData = () => {
 
   const { portfolioLoading, portfolioMetaData, portfolio, currentPortfolio } =
     useSelector((state) => state.userPortfolio);
-    
+
   const dispatch = useDispatch();
 
   const [roles, setRoles] = useState([]);
@@ -39,6 +40,9 @@ const UserMetaData = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [resume, setResume] = useState("");
+  // Inside your UserMetaData component, add these state variables:
+  const [portfolioImages, setPortfolioImages] = useState([]);
+  const [portfolioImageUrls, setPortfolioImageUrls] = useState([]);
 
   const socialMediaOptions = [
     "LinkedIn",
@@ -98,6 +102,17 @@ const UserMetaData = () => {
     );
   };
 
+  // Add this function inside your component
+// Use useCallback to memoize the function to prevent unnecessary re-renders
+const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
+  console.log("Image update called with:", { 
+    fileCount: imageFiles.length, 
+    urlCount: imageUrls.length 
+  });
+  
+  setPortfolioImages(imageFiles);
+  setPortfolioImageUrls(imageUrls);
+}, []);
   // Initialize data when portfolioMetaData changes
   useEffect(() => {
     if (
@@ -133,6 +148,24 @@ const UserMetaData = () => {
   }, [portfolioLoading]);
 
   // Save metadata function
+  // const saveMetaData = async () => {
+  //   const portfolioData = {
+  //     portfolioId: portfolio._id,
+  //     title,
+  //     description,
+  //     resume,
+  //     roles: roles.map((role) => role.text),
+  //     socials: socials.map((social) => ({
+  //       name: social.selected,
+  //       url: social.url,
+  //     })),
+  //   };
+  //   const doesExist = portfolioMetaData !== null ? true : false;
+  //   // dispatch(updateUserMetaData(doesExist, portfolioData));
+  //   dispatch({ type: INCREMENT_PAGE_COUNT });
+  // };
+
+  // Modify your saveMetaData function to include images
   const saveMetaData = async () => {
     const portfolioData = {
       portfolioId: portfolio._id,
@@ -144,9 +177,30 @@ const UserMetaData = () => {
         name: social.selected,
         url: social.url,
       })),
+      // Add this line to include existing image URLs
+      existingImages: portfolioImageUrls,
     };
+
     const doesExist = portfolioMetaData !== null ? true : false;
-    // dispatch(updateUserMetaData(doesExist, portfolioData));
+
+    // Create a FormData object if there are new images to upload
+    if (portfolioImages.length > 0) {
+      const formData = new FormData();
+
+      // Append all the portfolio data
+      formData.append("portfolioData", JSON.stringify(portfolioData));
+
+      // Append each image file
+      portfolioImages.forEach((file, index) => {
+        formData.append(`image${index}`, file);
+      });
+
+      // dispatch(updateUserMetaDataWithImages(doesExist, formData));
+    } else {
+      // Use the existing action if there are no new images
+      // dispatch(updateUserMetaData(doesExist, portfolioData));
+    }
+
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
@@ -184,6 +238,10 @@ const UserMetaData = () => {
       </Box>
 
       <Grid container spacing={4}>
+      <ImageUploadSection 
+  portfolioMetaData={portfolioMetaData} 
+  updateImages={handleImagesUpdate} 
+/>
         {/* Basic Information Section */}
         <Grid item xs={12}>
           <Card

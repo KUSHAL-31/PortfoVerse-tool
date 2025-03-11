@@ -5,12 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const userSkillsSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioUsers",
+    ref: "Users",
     required: true,
   },
   portfolio: {
     type: mongoose.Schema.ObjectId,
-    ref: "K31PortfolioWebsite",
+    ref: "WebsiteDetails",
     required: true,
   },
   skillSection: [
@@ -49,4 +49,4 @@ const userSkillsSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model("UserPortfolioSkills", userSkillsSchema);
+module.exports = mongoose.model("Skills", userSkillsSchema);
