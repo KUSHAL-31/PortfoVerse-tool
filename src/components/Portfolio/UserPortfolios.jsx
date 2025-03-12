@@ -274,10 +274,8 @@ const UserPortfolio = () => {
   );
 
   useEffect(() => {
-    if (userPortfolios === undefined || userPortfolios.length === 0) {
       dispatch(getAllUserPortfolios());
-    }
-  }, [dispatch, userPortfolios]);
+  }, []);
 
   const handleModalClick = () => {
     setShowModal(true);

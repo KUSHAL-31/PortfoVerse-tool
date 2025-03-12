@@ -70,6 +70,10 @@ export const editServicesUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api
 
 export const deleteServicesUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/services/remove`;
 
+export const editWebsiteDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/update`;
+
+export const isWebsiteNameAvailableUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/portfolio/name/available`;
+
 
 // User meta data related URLs
 

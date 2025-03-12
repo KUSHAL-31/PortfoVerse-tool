@@ -54,8 +54,10 @@ import {
   editServicesUrl,
   editSkillsUrl,
   editTestimonialsUrl,
+  editWebsiteDetailsUrl,
   getAllUserPortfolioUrl,
   getPortfolioDetailByIdUrl,
+  isWebsiteNameAvailableUrl,
   portfolioEducationDetailsUrl,
   portfolioExperienceDetailsUrl,
   portfolioMetaDataUrl,
@@ -88,6 +90,7 @@ export const getAllUserPortfolios = () => async (dispatch) => {
 };
 
 export const createNewPortfolio = () => async (dispatch) => {
+  console.log("Creating new portfolio");
   dispatch({ type: CREATE_NEW_PORTFOLIO_REQUEST });
   try {
     const { user } = store.getState().user;
@@ -96,13 +99,19 @@ export const createNewPortfolio = () => async (dispatch) => {
     const websiteName = username.split(" ").join("-");
     const randomDigits = Math.floor(100000 + Math.random() * 900000);
     const websiteNameWithDigits = `${websiteName}-${randomDigits}`;
-    const websiteUrl = `${
-      import.meta.env.VITE_REACT_APP_PORTFOLIO_URL
-    }/${websiteNameWithDigits}`;
 
     // console.log(data);
 
-    dispatch({ type: CREATE_NEW_PORTFOLIO_SUCCESS, payload: data });
+    const data = {
+      headerTitle,
+      websiteName: websiteNameWithDigits,
+    };
+
+    await axios.post(createNewPortfolioUrl, data, {
+      withCredentials: true, // This ensures cookies are saved from the response
+    });
+    
+    dispatch({ type: CREATE_NEW_PORTFOLIO_SUCCESS });
 
     dispatch(getAllUserPortfolios());
   } catch (error) {
@@ -683,3 +692,39 @@ export const deleteTestimonialSection = (testimonialId) => async (dispatch) => {
     console.log("Error", error);
   }
 }
+
+export const editWebsiteDetails = (websiteDetails) => async (dispatch) => {
+  dispatch({ type: PAGE_LOADING });
+  const { currentPortfolio } = store.getState().userPortfolio;
+  try {
+    const { data } = await axios.post(
+      `${editWebsiteDetailsUrl}`,
+      { ...websiteDetails, portfolioId: currentPortfolio._id },
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    if (data.success) {
+      dispatch(getPortfolioMetaData(currentPortfolio._id));
+    }
+    dispatch({ type: PAGE_LOADED });
+  } catch (error) {
+    dispatch({ type: PAGE_LOADED });
+    console.log("Error", error);
+  }
+}
+
+export const checkWebsiteNameAvailability = (websiteName) => async (dispatch) => {
+  try {
+    const { data } = await axios.get(
+      `${isWebsiteNameAvailableUrl}?websiteName=${websiteName}`,
+      {
+        withCredentials: true, // This ensures cookies are saved from the response
+      }
+    );
+    return data.isAvailable;
+  } catch (error) {
+    console.log("Error", error);
+    return false;
+  }
+};

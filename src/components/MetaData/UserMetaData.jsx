@@ -167,7 +167,7 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
 
   // Modify your saveMetaData function to include images
   const saveMetaData = async () => {
-    const portfolioData = {
+    var portfolioData = {
       portfolioId: portfolio._id,
       title,
       description,
@@ -178,29 +178,16 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
         url: social.url,
       })),
       // Add this line to include existing image URLs
-      existingImages: portfolioImageUrls,
+      // existingImages: portfolioImageUrls,
     };
 
     const doesExist = portfolioMetaData !== null ? true : false;
 
-    // Create a FormData object if there are new images to upload
-    if (portfolioImages.length > 0) {
-      const formData = new FormData();
-
-      // Append all the portfolio data
-      formData.append("portfolioData", JSON.stringify(portfolioData));
-
-      // Append each image file
-      portfolioImages.forEach((file, index) => {
-        formData.append(`image${index}`, file);
-      });
-
-      // dispatch(updateUserMetaDataWithImages(doesExist, formData));
-    } else {
-      // Use the existing action if there are no new images
-      // dispatch(updateUserMetaData(doesExist, portfolioData));
-    }
-
+    // // Create a FormData object if there are new images to upload
+    // if (portfolioImages.length > 0) {
+    //   portfolioData = {...portfolioData, images: portfolioImages};
+    // }
+    // dispatch(updateUserMetaData(doesExist, portfolioData));
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
@@ -238,10 +225,6 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
       </Box>
 
       <Grid container spacing={4}>
-      <ImageUploadSection 
-  portfolioMetaData={portfolioMetaData} 
-  updateImages={handleImagesUpdate} 
-/>
         {/* Basic Information Section */}
         <Grid item xs={12}>
           <Card

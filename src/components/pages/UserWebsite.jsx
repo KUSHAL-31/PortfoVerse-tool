@@ -18,6 +18,7 @@ import {
   Avatar,
   IconButton,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -26,13 +27,13 @@ import LanguageIcon from "@mui/icons-material/Language";
 import TitleIcon from "@mui/icons-material/Title";
 import PublicIcon from "@mui/icons-material/Public";
 import PublicOffIcon from "@mui/icons-material/PublicOff";
-// import { updatePortfolioWebsiteDetails } from "../../redux/actions/userActions"; // Adjust the import based on your actual action
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { editWebsiteDetails } from "../../redux/actions/portfolioActions";
+import { checkWebsiteNameAvailability } from "../../redux/actions/portfolioActions";
 
 const PortfolioWebsiteDetails = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
   const dispatch = useDispatch();
   const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
@@ -42,18 +43,57 @@ const PortfolioWebsiteDetails = () => {
   const [headerTitle, setHeaderTitle] = useState("");
   const [websiteName, setWebsiteName] = useState("");
   const [isPublished, setIsPublished] = useState(false);
+  const [isLogoEdited, setIsLogoEdited] = useState(false);
+
+  // New states for website name availability
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [isWebsiteNameAvailable, setIsWebsiteNameAvailable] = useState(null);
+  const [originalWebsiteName, setOriginalWebsiteName] = useState("");
+
+  // Debounce timer for name checking
+  const availabilityTimerRef = useRef(null);
 
   const fileInputRef = useRef(null);
 
   // Load existing data from backend if available
   useEffect(() => {
     if (portfolio) {
-      setLogoImage(portfolio.logo.url ? portfolio.logo.url : null);
+      setLogoImage(
+        portfolio.logo && portfolio.logo.url ? portfolio.logo.url : null
+      );
       setHeaderTitle(portfolio.headerTitle);
       setWebsiteName(portfolio.details.websiteName);
+      setOriginalWebsiteName(portfolio.details.websiteName);
       setIsPublished(portfolio.isPublished);
     }
   }, [portfolio]);
+
+  // Check website name availability when it changes
+  const handleWebsiteNameChange = (e) => {
+    const newName = e.target.value;
+    setWebsiteName(newName);
+
+    // Clear previous timer
+    if (availabilityTimerRef.current) {
+      clearTimeout(availabilityTimerRef.current);
+    }
+
+    // Skip check if empty or if it's the original name
+    if (!newName || newName === originalWebsiteName) {
+      setIsWebsiteNameAvailable(null);
+      return;
+    }
+
+    // Set checking state
+    setIsCheckingAvailability(true);
+
+    // Debounce the API call (only check after 500ms of no typing)
+    availabilityTimerRef.current = setTimeout(async () => {
+      const isAvailable = await dispatch(checkWebsiteNameAvailability(newName));
+      setIsWebsiteNameAvailable(isAvailable);
+      setIsCheckingAvailability(false);
+    }, 500);
+  };
 
   // Handle logo image upload
   const handleImageUpload = (event) => {
@@ -62,6 +102,7 @@ const PortfolioWebsiteDetails = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setLogoImage(e.target.result);
+        setIsLogoEdited(true);
       };
       reader.readAsDataURL(file);
     }
@@ -74,18 +115,49 @@ const PortfolioWebsiteDetails = () => {
 
   // Save website details
   const saveWebsiteDetails = () => {
-    // const websiteData = {
-    //   portfolioId: portfolio._id,
-    //   logoImage,
-    //   headerTitle,
-    //   websiteName,
-    //   isPublished,
-    // };
+    const websiteData = {
+      portfolioId: portfolio._id,
+      isLogoEdited,
+      logo: isLogoEdited ? logoImage : null,
+      headerTitle,
+      websiteName,
+      isPublished,
+    };
 
-    // const doesExist = websiteDetails !== null;
-    // dispatch(updatePortfolioWebsiteDetails(doesExist, websiteData));
+    dispatch(editWebsiteDetails(websiteData));
     // You might want to show a success message or redirect after saving
-    alert("Website details saved successfully!");
+    // alert("Website details saved successfully!");
+
+    // Update original website name after saving
+    setOriginalWebsiteName(websiteName);
+  };
+
+  // Get the appropriate helper text for website name field
+  const getWebsiteNameHelperText = () => {
+    if (isCheckingAvailability) {
+      return "Checking availability...";
+    }
+
+    if (websiteName === originalWebsiteName) {
+      return "This will be used in browser tab titles and SEO";
+    }
+
+    if (websiteName && isWebsiteNameAvailable === true) {
+      return "✓ This website name is available!";
+    }
+
+    if (websiteName && isWebsiteNameAvailable === false) {
+      return "✗ This website name is already taken";
+    }
+
+    return "This will be used in browser tab titles and SEO";
+  };
+
+  // Get color for helper text
+  const getHelperTextColor = () => {
+    if (isWebsiteNameAvailable === true) return "success.main";
+    if (isWebsiteNameAvailable === false) return "error.main";
+    return "text.secondary";
   };
 
   if (portfolioLoading === undefined || portfolioLoading) {
@@ -251,8 +323,25 @@ const PortfolioWebsiteDetails = () => {
                     variant="outlined"
                     placeholder="Your Portfolio Website Name"
                     value={websiteName}
-                    onChange={(e) => setWebsiteName(e.target.value)}
-                    helperText="This will be used in browser tab titles and SEO"
+                    onChange={handleWebsiteNameChange}
+                    helperText={getWebsiteNameHelperText()}
+                    FormHelperTextProps={{
+                      sx: { color: getHelperTextColor() },
+                    }}
+                    InputProps={{
+                      endAdornment: websiteName &&
+                        websiteName !== originalWebsiteName && (
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {isCheckingAvailability ? (
+                              <CircularProgress size={20} />
+                            ) : isWebsiteNameAvailable ? (
+                              <CheckCircleIcon color="success" />
+                            ) : isWebsiteNameAvailable === false ? (
+                              <CancelIcon color="error" />
+                            ) : null}
+                          </Box>
+                        ),
+                    }}
                   />
                 </Box>
               </Box>
@@ -375,6 +464,8 @@ const PortfolioWebsiteDetails = () => {
             fontSize: "1.1rem",
             boxShadow: 3,
           }}
+          // Disable save button if the website name is taken
+          disabled={isWebsiteNameAvailable === false || isCheckingAvailability}
         >
           Save Website Details
         </Button>
