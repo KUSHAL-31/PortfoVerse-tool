@@ -27,6 +27,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "portfoverse-client"
+          app-name: "portfoverse-maker"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ./dist
