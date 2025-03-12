@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
 import { logoutUser } from "../../redux/actions/userActions";
 import { Link, useNavigate } from "react-router-dom";
-import { Dialog } from "@mui/material";
 import { Modal1 } from "../../design/modals/Modals";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -16,6 +15,7 @@ const Header = () => {
   const [showModal, setShowModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -44,8 +44,16 @@ const Header = () => {
       }
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
@@ -77,28 +85,6 @@ const Header = () => {
         </div>
 
         <nav className={`navigation ${menuOpen ? "active" : ""}`}>
-          <ul className="nav_links">
-            <li>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/projects" onClick={() => setMenuOpen(false)}>
-                Projects
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" onClick={() => setMenuOpen(false)}>
-                About
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" onClick={() => setMenuOpen(false)}>
-                Contact
-              </Link>
-            </li>
-          </ul>
 
           <div className="header_right">
             {authUser === undefined || authUser === false ? (
