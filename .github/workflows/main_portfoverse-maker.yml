@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Set Environment Variables
+        run: echo "VITE_REACT_APP_HOSTED_URL=${{ secrets.VITE_REACT_APP_HOSTED_URL }}" >> $GITHUB_ENV
+
       - name: Install Dependencies
         run: npm install
 
