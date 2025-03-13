@@ -14,6 +14,7 @@ import UserServices from "./components/pages/UserServices";
 import UserTestimonials from "./components/pages/UserTestimonials";
 import UserMetaData from "./components/MetaData/UserMetaData";
 import PortfolioWebsiteDetails from "./components/PortfolioWebsiteDetails";
+import { CircularProgress } from "@mui/material";
 
 function App() {
   const { loading, authUser } = useSelector((state) => state.user);
@@ -29,7 +30,7 @@ function App() {
   }, [authUser]);
 
   if (loading === undefined || loading) {
-    return <div>Loading...</div>;
+    return <CircularProgress />;
   }
 
   return (

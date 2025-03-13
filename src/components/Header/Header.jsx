@@ -4,7 +4,7 @@ import "../../design/Buttons.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
 import { logoutUser } from "../../redux/actions/userActions";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Modal1 } from "../../design/modals/Modals";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
