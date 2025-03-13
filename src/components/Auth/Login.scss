@@ -1,228 +1,425 @@
 @use "../../design/_CustomColors.scss" as *;
-.login_signup_container {
-    // margin-top: 80px;
-    width: 100%;
-    // height: calc(100vh - 80px);
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(255, 255, 255);
 
-    .login_signup_close {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        background-color: $colorOne;
-        height: 30px;
-        width: 30px;
-
-        button {
-            background-color: transparent;
-            border: none;
-            height: 30px;
-            width: 30px;
-            cursor: pointer;
-            outline: none;
-            color: white;
-            font-weight: bold;
-        }
-    }
+.auth-container {
+  position: relative;
+  background: white;
+  width: 100%;
+  // min-height: 450px;
+  overflow: hidden;
 }
 
-.login_signup_box {
-    background-color: rgb(243, 243, 243);
-    width: 400px;
-    height: 470px;
-    overflow: hidden;
-}
+.auth-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
 
-.login_signup_toggle {
-    display: flex;
-    height: 50px;
-}
-
-.login_signup_toggle > p {
-    // color: rgb(19, 16, 65);
-    font: 400 1.1rem "Roboto";
-    transition: all 0.5s;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    padding-top: 5px;
-}
-
-.login_signup_toggle > p:hover {
-    color: $colorOne;
-}
-
-.login_signup_tab_text {
-    color: $colorThree;
-}
-
-.login_signup_box > div > button {
-    background-color: $colorOne;
-    height: 3px;
-    width: 50%;
+  button {
+    background-color: rgba(0, 0, 0, 0.05);
     border: none;
-    transition: all 0.5s;
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    color: $colorThree;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: rotate(90deg);
+    }
+  }
 }
 
-.login_form,
-.signup_form {
+.auth-content {
+  padding: 30px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: $colorThree;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: rgba($colorThree, 0.7);
+    font-size: 16px;
+  }
+}
+
+.auth-forms-container {
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $colorThree;
+    margin-left: 4px;
+  }
+  
+  input {
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    color: $colorThree;
+    
+    &:focus {
+      outline: none;
+      border-color: $colorOne;
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba($colorOne, 0.1);
+    }
+    
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.3);
+    }
+    
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      background-color: #f1f1f1;
+    }
+  }
+}
+
+.send-otp-btn {
+  background-color: $colorOne;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba($colorOne, 0.4);
+  
+  &:hover {
+    background-color: $colorOneDark;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba($colorOne, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba($colorOne, 0.3);
+  }
+  
+  &:disabled {
+    background-color: rgba($colorOne, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.otp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 5px 0;
+  
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $colorThree;
+    margin-left: 4px;
+  }
+}
+
+.otp-input-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.otp-input {
+  width: 40px !important;
+  height: 50px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  color: $colorThree;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $colorOne;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba($colorOne, 0.1);
+  }
+  
+  // Remove spinner arrows for number inputs
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.otp-actions {
+  display: flex;
+  justify-content: flex-end;
+  
+  .resend-otp-btn {
+    background: none;
+    border: none;
+    color: $colorOne;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    
+    &:hover {
+      text-decoration: underline;
+      color: $colorOneDark;
+    }
+  }
+  
+  .resend-timer {
+    font-size: 14px;
+    color: rgba($colorThree, 0.7);
+    
+    span {
+      font-weight: 600;
+      color: $colorThree;
+    }
+  }
+}
+
+.submit-btn {
+  background-color: $colorOne;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  box-shadow: 0 2px 6px rgba($colorOne, 0.4);
+  
+  &:hover {
+    background-color: $colorOneDark;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba($colorOne, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba($colorOne, 0.3);
+  }
+  
+  &:disabled {
+    background-color: rgba($colorOne, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  span {
+    padding: 0 16px;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f8f8;
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+  
+  svg {
+    font-size: 20px;
+  }
+}
+
+// Responsive styles
+@media screen and (max-width: 600px) {
+  .auth-content {
+    padding: 20px;
+  }
+  
+  .auth-header {
+    margin-bottom: 20px;
+    
+    h1 {
+      font-size: 24px;
+    }
+    
+    p {
+      font-size: 14px;
+    }
+  }
+  
+  .form-group {
+    input {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+  }
+  
+  .otp-input-container {
+    gap: 6px;
+  }
+  
+  .otp-input {
+    width: 36px !important;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  .submit-btn,
+  .google-btn,
+  .send-otp-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+  
+  .google-btn svg {
+    font-size: 18px;
+  }
+  
+  .otp-actions .resend-timer {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .auth-header {
+    h1 {
+      font-size: 22px;
+    }
+  }
+  
+  .otp-input-container {
+    gap: 4px;
+  }
+  
+  .otp-input {
+    width: 32px !important;
+    height: 40px;
+    font-size: 15px;
+  }
+}
+
+
+
+
+// Registration form scss
+
+.register-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    margin: auto;
-    height: 83%;
-    padding: 30px;
-    transition: all 0.5s;
+    text-align: left;
+    margin-bottom: 15px;
 
-    .login_phoneNumber {
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* Hide arrows in Firefox */
-        input[type="number"] {
-            appearance: textfield;
-            -moz-appearance: textfield;
-        }
+    label {
+      font-size: 14px;
+      margin-bottom: 5px;
     }
-}
 
-.signup_form {
-    transform: translateY(-100%) translateX(-100vmax);
-}
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  }
 
-.login_form > div,
-.signup_form > div {
-    display: flex;
+  .continue-btn {
     width: 100%;
-    align-items: center;
-}
-
-.login_form > div > input,
-.signup_form > div > input {
-    margin: 12px 0;
-    padding: 10px 60px;
-    padding-right: 1vmax;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.274);
-    border-radius: 5px;
-    outline: none;
-    font: 300 1.1rem "Roboto";
-    color: $colorThree;
-}
-
-.login_form > div > input::placeholder,
-.signup_form > div > input::placeholder {
-    color: rgb(151, 151, 151);
-}
-
-.login_form > div > svg,
-.signup_form > div > svg {
-    position: absolute;
-    transform: translateX(1vmax);
-    font-size: 1.8rem;
-    color: rgb(151, 151, 151);
-}
-
-.other__methods__text {
-    // color: $colorOne;
-    font-size: 1.1rem;
-    font-weight: 500;
-    // align-self: flex-start;
-    // margin-left: 5px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.other__methods__text:hover {
-    color: $colorOneDark;
-}
-
-.login_button,
-.signup_button {
-    cursor: pointer;
-    color: white;
-    background-color: $colorOne;
-    font: 400 1.2rem "Roboto";
-    width: 100%;
-    transition: all 0.3s;
-    outline: none;
+    padding: 12px;
+    background: #007bff;
+    color: #fff;
+    font-size: 16px;
     border: none;
-    border-radius: 5px;
-    padding: 9px 17px;
-}
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
 
-.login_button:hover,
-.signup_button:hover {
-    background-color: $colorOneDark;
-}
-
-.leftShift {
-    transform: translateX(-100%);
-}
-
-.rightShift {
-    transform: translateX(100%);
-}
-
-.neutralShift {
-    transform: translateX(0%);
-}
-
-.neutralFormShift {
-    transform: translateX(0%) translateY(-100%);
-}
-
-@media screen and (max-width: 600px) {
-    .login_signup_container {
-        // margin-top: 90px;
-        background-color: white;
+    &:hover {
+      background: #0056b3;
     }
-    .login_signup_box {
-        width: 100vw;
-        // height: calc(100vh - 90px);
-    }
-    .login_signup_toggle {
-        height: 5vmax;
-    }
-    .login_signup_toggle > p {
-        font: 500 0.8rem "Roboto";
-    }
-
-    .login_form > div > input,
-    .signup_form > div > input {
-        padding: 1vmax 5vmax;
-        font: 300 0.8rem "Roboto";
-        padding-left: 45px;
-    }
-
-    .login_form > div > svg,
-    .signup_form > div > svg {
-        margin-left: 5px;
-        font-size: 1.5rem;
-    }
-
-    .login_form > a {
-        font: 500 1.8rem "Gill Sans";
-    }
-
-    .login_button,
-    .signup_button {
-        font: 300 0.8rem "Roboto";
-        // padding: 1.8vmax;
-    }
-    .other__methods__text {
-        font-size: 0.8rem !important;
-    }
+  }
 }

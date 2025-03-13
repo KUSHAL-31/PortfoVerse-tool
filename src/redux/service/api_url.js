@@ -1,12 +1,17 @@
 // API URLs for login, register and user related actions
 
-export const loginUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/login`;
+export const googleLoginUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/google/login`;
 
 export const registerUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/register`;
 
 export const getUserDetailsUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/details`;
 
 export const userLogoutUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/logout`;
+
+export const sendOtpUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/generate/otp`;
+
+export const verifyOtpUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/v1/user/verify/otp`;
+
 
 // User portfolio and website related URLs
 

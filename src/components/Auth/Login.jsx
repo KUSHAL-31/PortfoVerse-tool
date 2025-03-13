@@ -1,215 +1,247 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Login.scss";
-import {
-  MailOutlineOutlined,
-  LockOpen,
-  Face,
-  Phone,
-} from "@mui/icons-material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Dialog } from "@mui/material";
+import { Google } from "@mui/icons-material";
 import { TOGGLE_LOGIN_BOX } from "../../redux/constants";
-import { registerUser, loginUser } from "../../redux/actions/userActions";
+import { googleLoginUser, sendOtp, verifyOtp } from "../../redux/actions/userActions";
 import { useNavigate } from "react-router-dom";
-// import { login, register, clearErrors } from "../../actions/userActions";
-// import { useAlert } from "react-alert";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import OTPInput from "react-otp-input";
 
-const Login = ({ history, location }) => {
+const Login = () => {
   const dispatch = useDispatch();
-  //   const alert = useAlert();
-
-  // const { error, loading, authUser } = useSelector((state) => state.user);
-  const loading = false;
-
-  const loginTab = useRef(null);
-  const registerTab = useRef(null);
-  const tabSwitcher = useRef(null);
-
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  const [user, setUser] = useState({
-    username: "",
-    email: "",
-    password: "",
-    phoneNumber: "",
-  });
-
   const navigate = useNavigate();
 
-  const { username, email, password } = user;
+  const [loginEmail, setLoginEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOTP, setShowOTP] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [emailDisabled, setEmailDisabled] = useState(false);
+  const timerRef = useRef(null);
+
+  const [googleUser, setGoogleUser] = useState(null);
+
+  const { isOtpInvalid } = useSelector((state) => state.user);
+
+  const startResendTimer = () => {
+    setResendTimer(120); // 120 seconds = 2 minutes
+    setEmailDisabled(true);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setResendTimer((prevTimer) => {
+        if (prevTimer <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prevTimer - 1;
+      });
+    }, 1000);
+  };
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // Format seconds into mm:ss
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   const LoginSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email: loginEmail, password: loginPassword }));
-    navigate("/view-portfolio");
+    dispatch(verifyOtp(loginEmail, otp));
   };
 
-  const SignupSubmit = (e) => {
+  const handleSendOTP = (e) => {
     e.preventDefault();
-    // const myForm = new FormData();
-    // myForm.set("username", username);
-    // myForm.set("email", email);
-    // myForm.set("password", password);
-    dispatch(registerUser({ username, email, password, phoneNumber }));
-    navigate("/view-portfolio");
-  };
-
-  const signupDataChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
-
-  // const redirect = location.search ? location.search.split("=")[1] : "/account";
-
-  // useEffect(() => {
-  //   // if (error) {
-  //   //   //   alert.error(error);
-  //   //   //   dispatch(clearErrors());
-  //   // }
-  //   // if (authUser) {
-  //   //   history.push(redirect);
-  //   // }
-  // }, [dispatch, error, authUser, history, redirect]);
-
-  const switchTab = (e, tab) => {
-    if (tab === "login") {
-      tabSwitcher.current.classList.add("neutralShift");
-      tabSwitcher.current.classList.remove("rightShift");
-      registerTab.current.classList.remove("neutralFormShift");
-      loginTab.current.classList.remove("leftShift");
+    if (loginEmail && !resendTimer) {
+      // Here you would dispatch an action to send OTP to the email
+      // dispatch(sendOTP(loginEmail));
+      setShowOTP(true);
+      startResendTimer();
     }
-    if (tab === "register") {
-      tabSwitcher.current.classList.add("rightShift");
-      tabSwitcher.current.classList.remove("neutralShift");
-      registerTab.current.classList.add("neutralFormShift");
-      loginTab.current.classList.add("leftShift");
-    }
+    dispatch(sendOtp(loginEmail));
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setGoogleUser(codeResponse);
+    },
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  useEffect(() => {
+    if (googleUser) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${googleUser.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${googleUser.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          // // Handle successful Google login
+          dispatch(googleLoginUser(res.data.email));
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [googleUser, navigate]);
+
+  useEffect(() => {
+    if (resendTimer === 0 && emailDisabled) {
+      setEmailDisabled(false);
+    }
+  }, [resendTimer, emailDisabled]);
 
   return (
     <>
-      {loading ? (
-        <div className="loading">
-          <div></div>
-        </div>
-      ) : (
-        <Dialog open={true} className="">
-          <div className="login_signup_container">
-            <div className="login_signup_close">
-              <button onClick={() => dispatch({ type: TOGGLE_LOGIN_BOX })}>
-                X
-              </button>
-            </div>
-            <div className="login_signup_box">
-              {/* Login/Register tab */}
-              <div>
-                <div className="login_signup_toggle">
-                  <p
-                    className="login_signup_tab_text"
-                    onClick={(e) => switchTab(e, "login")}
-                  >
-                    LOGIN
-                  </p>
-                  <p
-                    className="login_signup_tab_text"
-                    onClick={(e) => switchTab(e, "register")}
-                  >
-                    REGISTER
-                  </p>
-                </div>
-                <button ref={tabSwitcher}></button>
-              </div>
+      <Dialog
+        open={true}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.12)",
+            maxWidth: "500px",
+            margin: "20px",
+          },
+        }}
+      >
+        <div className="auth-container">
+          <div className="auth-close-btn">
+            <button onClick={() => dispatch({ type: TOGGLE_LOGIN_BOX })}>
+              ×
+            </button>
+          </div>
 
-              {/* Login Form */}
-              <form
-                className="login_form"
-                onSubmit={LoginSubmit}
-                ref={loginTab}
-              >
-                <div className="login_email">
-                  <MailOutlineOutlined />
+          <div className="auth-content">
+            <div className="auth-header">
+              <h1>Welcome Back</h1>
+              <p>Please login to continue</p>
+            </div>
+
+            <div className="auth-forms-container">
+              <form className="auth-form" onSubmit={LoginSubmit}>
+                <div className="form-group">
+                  <label htmlFor="login-email">Email</label>
                   <input
+                    id="login-email"
                     type="email"
-                    placeholder="Email"
+                    placeholder="Enter your email"
                     required
                     value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
+                    disabled={emailDisabled}
+                    onChange={(e) => {
+                      setLoginEmail(e.target.value);
+                      if (showOTP) {
+                        setShowOTP(false);
+                        setOtp("");
+                        if (timerRef.current) {
+                          clearInterval(timerRef.current);
+                          setResendTimer(0);
+                        }
+                      }
+                    }}
                   />
                 </div>
-                <div className="login_password">
-                  <LockOpen />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                  />
-                </div>
-                <input type="submit" value="Login" className="login_button" />
-                <p className="other__methods__text">OR</p>
-              </form>
 
-              {/* Signup Form */}
-              <form
-                className="signup_form"
-                onSubmit={SignupSubmit}
-                ref={registerTab}
-                encType="multipart/form-data"
-              >
-                <div className="signup_username">
-                  <Face />
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    required
-                    value={username}
-                    name="username"
-                    onChange={signupDataChange}
-                  />
+                {!showOTP && (
+                  <button
+                    type="button"
+                    className="send-otp-btn"
+                    onClick={handleSendOTP}
+                    disabled={!loginEmail || resendTimer > 0}
+                  >
+                    Send OTP
+                  </button>
+                )}
+
+                {showOTP && (
+                  <div className="otp-container">
+                    {isOtpInvalid ? <p>
+                      The OTP you entered is invalid. Please try again.
+                    </p> : <p>
+                      Enter the OTP sent to your email
+                    </p>}
+                    <OTPInput
+                      value={otp}
+                      onChange={setOtp}
+                      numInputs={6}
+                      inputType="number"
+                      renderSeparator={<span className="otp-separator"></span>}
+                      renderInput={(props) => (
+                        <input
+                          {...props}
+                          className="otp-input"
+                          style={
+                            isOtpInvalid
+                              ? {
+                                  borderColor: "#ff5b58",
+                                }
+                              : {}
+                          }
+                        />
+                      )}
+                      containerStyle="otp-input-container"
+                    />
+                    <div className="otp-actions">
+                      {resendTimer > 0 ? (
+                        <div className="resend-timer">
+                          Resend in <span>{formatTime(resendTimer)}</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="resend-otp-btn"
+                          onClick={handleSendOTP}
+                        >
+                          Resend OTP
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {showOTP && (
+                  <button
+                    type="submit"
+                    className="submit-btn"
+                    disabled={otp.length !== 6}
+                  >
+                    Login
+                  </button>
+                )}
+
+                <div className="divider">
+                  <span>OR</span>
                 </div>
-                <div className="signup_email">
-                  <MailOutlineOutlined />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    required
-                    value={email}
-                    onChange={signupDataChange}
-                  />
-                </div>
-                <div className="signup_password">
-                  <LockOpen />
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    required
-                    value={password}
-                    onChange={signupDataChange}
-                  />
-                </div>
-                <div className="login_phoneNumber">
-                  <Phone />
-                  <input
-                    type="number"
-                    placeholder="Phone Number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                  />
-                </div>
-                <input
-                  type="submit"
-                  value="Register"
-                  className="signup_button"
-                />
+
+                <button
+                  type="button"
+                  className="google-btn"
+                  onClick={handleGoogleLogin}
+                >
+                  <Google /> Continue with Google
+                </button>
               </form>
             </div>
           </div>
-        </Dialog>
-      )}
+        </div>
+      </Dialog>
     </>
   );
 };
