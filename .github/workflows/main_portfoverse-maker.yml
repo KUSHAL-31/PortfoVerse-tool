@@ -23,6 +23,7 @@ jobs:
           echo "VITE_REACT_APP_HOSTED_URL=${{ secrets.VITE_REACT_APP_HOSTED_URL }}" >> $GITHUB_ENV
           echo "VITE_REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.VITE_REACT_APP_GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
           echo "VITE_REACT_APP_GOOGLE_CLIENT_SECRET=${{ secrets.VITE_REACT_APP_GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "VITE_REACT_APP_TEMPLATE_URL=${{ secrets.VITE_REACT_APP_TEMPLATE_URL }}" >> $GITHUB_ENV
 
 
       - name: Install Dependencies
