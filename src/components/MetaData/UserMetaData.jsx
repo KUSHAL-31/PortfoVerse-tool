@@ -18,7 +18,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SaveIcon from "@mui/icons-material/Save";
-import WorkIcon from "@mui/icons-material/Work";
 import LinkIcon from "@mui/icons-material/Link";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
@@ -188,7 +187,7 @@ const UserMetaData = () => {
 
     dispatch(updateUserMetaData(doesExist, portfolioData));
 // 
-    // dispatch({ type: INCREMENT_PAGE_COUNT });
+    dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
   if (portfolioLoading === undefined || portfolioLoading) {
@@ -446,6 +445,7 @@ const UserMetaData = () => {
                   onClick={addRole}
                   disabled={roles.length >= 4}
                   size={isMobile ? "small" : "medium"}
+                  color="primary"
                 >
                   Add Role
                 </Button>
@@ -478,7 +478,6 @@ const UserMetaData = () => {
                         mb: 2,
                       }}
                     >
-                      <WorkIcon sx={{ mr: 1, color: "text.secondary" }} />
                       <TextField
                         fullWidth
                         label="Role"
@@ -628,8 +627,6 @@ const UserMetaData = () => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
           variant="contained"
-          size="large"
-          color="success"
           startIcon={<SaveIcon />}
           onClick={saveMetaData}
           sx={{
@@ -638,6 +635,7 @@ const UserMetaData = () => {
             borderRadius: 2,
             fontSize: "1.1rem",
             boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
           }}
         >
           Save and Proceed

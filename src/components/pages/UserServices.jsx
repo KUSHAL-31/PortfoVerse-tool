@@ -95,11 +95,6 @@ const ServiceSection = () => {
     handleModalClose();
   }
 
-  // Save all services
-  const saveServices = () => {
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  };
-
   useEffect(() => {
     if (portfolioServices && portfolioServices.length > 0) {
       const formattedServices = portfolioServices.map((service) => ({
@@ -265,26 +260,23 @@ const ServiceSection = () => {
         ))}
       </Grid>
 
-      {services.length > 0 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
-          <Button
-            variant="contained"
-            size="large"
-            color="success"
-            startIcon={<SaveIcon />}
-            onClick={saveServices}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 2,
-              fontSize: "1.1rem",
-              boxShadow: 3,
-            }}
-          >
-            Save Services
-          </Button>
-        </Box>
-      )}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 2,
+            fontSize: "1.1rem",
+            boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
+          }}
+        >
+          Save and Proceed
+        </Button>
+      </Box>
 
       {/* Service Edit/Create Modal */}
       <Dialog

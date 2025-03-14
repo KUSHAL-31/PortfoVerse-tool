@@ -75,8 +75,8 @@ const Header = () => {
       <div className="header_container">
         <div className="header_left">
           <h3 className="website_logo" onClick={() => handleNavigate("/")}>
-            <span className="logo_text1">K31</span>
-            <span className="logo_text2">Portfolio</span>
+            <span className="logo_text1">Portfo</span>
+            <span className="logo_text2">Verse</span>
           </h3>
         </div>
 

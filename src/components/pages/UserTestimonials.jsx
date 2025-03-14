@@ -490,11 +490,6 @@ const handleTestimonialChange = useCallback((field, value) => {
     }
   }
 
-  // Save all testimonials - memoize
-  const saveTestimonials = useCallback(() => {
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  }, [dispatch]);
-
   // Handle modal close - memoize
   const handleModalClose = useCallback(() => {
     setModalOpen(false);
@@ -589,26 +584,23 @@ const handleTestimonialChange = useCallback((field, value) => {
         ))}
       </Grid>
 
-      {testimonials.length > 0 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
-          <Button
-            variant="contained"
-            size="large"
-            color="success"
-            startIcon={<SaveIcon />}
-            onClick={saveTestimonials}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 2,
-              fontSize: "1.1rem",
-              boxShadow: 3,
-            }}
-          >
-            Save Testimonials
-          </Button>
-        </Box>
-      )}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 2,
+            fontSize: "1.1rem",
+            boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
+          }}
+        >
+          Save and Proceed
+        </Button>
+      </Box>
 
       {/* Modal for Adding/Editing Testimonial */}
       <TestimonialModal
@@ -624,7 +616,7 @@ const handleTestimonialChange = useCallback((field, value) => {
       <DeleteConfirmationDialog
         open={deleteConfirmOpen}
         onClose={handleDeleteDialogClose}
-        onDelete={()=>removeTestimonial(testimonialToDelete)}
+        onDelete={() => removeTestimonial(testimonialToDelete)}
       />
     </Container>
   );

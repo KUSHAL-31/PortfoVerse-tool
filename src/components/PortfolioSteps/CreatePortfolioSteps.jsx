@@ -1,8 +1,5 @@
 import React from "react";
 import {
-  Step,
-  StepLabel,
-  Stepper,
   Typography,
   Box,
   useTheme,
@@ -250,6 +247,7 @@ const CreatePortfolioSteps = ({ activeStep }) => {
                   active={activeStep === step.index}
                   completed={activeStep > step.index}
                   sx={{ zIndex: 2 }}
+                  onClick={() => console.log(step.index)}
                 >
                   {step.icon}
                 </StyledIconBox>

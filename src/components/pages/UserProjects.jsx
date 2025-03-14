@@ -123,12 +123,6 @@ const ProjectSection = () => {
     setCurrentProject(null);
   };
 
-  // Save all projects
-  const saveProjects = () => {
-    console.log("Saving projects data:", projects);
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  };
-
   useEffect(() => {
     if (
       portfolioProjects &&
@@ -319,26 +313,23 @@ const ProjectSection = () => {
         ))}
       </Grid>
 
-      {projects.length > 0 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
-          <Button
-            variant="contained"
-            size="large"
-            color="success"
-            startIcon={<SaveIcon />}
-            onClick={saveProjects}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 2,
-              fontSize: "1.1rem",
-              boxShadow: 3,
-            }}
-          >
-            Save Projects
-          </Button>
-        </Box>
-      )}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 2,
+            fontSize: "1.1rem",
+            boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
+          }}
+        >
+          Save and Proceed
+        </Button>
+      </Box>
 
       {/* Project Edit/Create Modal */}
       <Dialog

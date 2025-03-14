@@ -5,10 +5,15 @@ import {
   getAllUserPortfolios,
   getPortfolioDetailById,
 } from "../../redux/actions/portfolioActions";
-import { RESET_ALL_PORTFOLIO_DETAILS, RESET_PAGE_COUNT, SET_CURRENT_PORTFOLIO } from "../../redux/constants";
+import {
+  RESET_ALL_PORTFOLIO_DETAILS,
+  RESET_PAGE_COUNT,
+  SET_CURRENT_PORTFOLIO,
+} from "../../redux/constants";
 import { useNavigate } from "react-router-dom";
 import { Modal1, Modal2 } from "../../design/modals/Modals";
 import "./UserPortfolios.scss";
+import DefaultPortfolioImage from "../../assets/images/default_portfolio.jpg";
 
 // MUI Imports
 import {
@@ -42,7 +47,7 @@ const PortfolioCard = ({ portfolio, onClick }) => {
 
   const handleCopyLink = (e) => {
     e.stopPropagation(); // Prevent the card click event
-    navigator.clipboard.writeText(portfolio.details.websiteUrl);
+    navigator.clipboard.writeText(import.meta.env.VITE_REACT_APP_TEMPLATE_URL + portfolio.details.websiteName);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -81,11 +86,7 @@ const PortfolioCard = ({ portfolio, onClick }) => {
           <CardMedia
             component="img"
             height="180"
-            image={
-              (portfolio.logo
-                ? portfolio.logo.url
-                : `https://source.unsplash.com/random/300x200?creative`) || ""
-            }
+            image={portfolio.logo ? portfolio.logo.url : DefaultPortfolioImage}
             alt={portfolio.name || "Project thumbnail"}
             sx={{
               objectFit: "cover",
@@ -149,51 +150,52 @@ const PortfolioCard = ({ portfolio, onClick }) => {
             </Box>
 
             {/* Website URL with hyperlink if online */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                mb: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              <Typography
-                variant="body2"
-                color={isOnline ? "primary.main" : "text.secondary"}
+            {isOnline && (
+              <Box
                 sx={{
-                  cursor: isOnline ? "pointer" : "default",
                   display: "flex",
                   alignItems: "center",
-                  mr: 1,
-                  maxWidth: "calc(100% - 40px)",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  mb: 2,
+                  flexWrap: "wrap",
                 }}
-                onClick={isOnline ? handleLinkClick : undefined}
               >
-                {import.meta.env.VITE_REACT_APP_TEMPLATE_URL +
-                  portfolio.details.websiteName}
-                {isOnline && (
-                  <LinkIcon
-                    fontSize="small"
-                    sx={{ ml: 0.5, fontSize: "1rem", flexShrink: 0 }}
-                  />
-                )}
-              </Typography>
-
-              {/* Copy button */}
-              <Tooltip title={copied ? "Copied!" : "Copy URL"}>
-                <IconButton
-                  size="small"
-                  onClick={handleCopyLink}
-                  sx={{ p: 0.5, flexShrink: 0 }}
+                <Typography
+                  variant="body2"
+                  color={isOnline ? "primary.main" : "text.secondary"}
+                  sx={{
+                    cursor: isOnline ? "pointer" : "default",
+                    display: "flex",
+                    alignItems: "center",
+                    mr: 1,
+                    maxWidth: "calc(100% - 40px)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  onClick={isOnline ? handleLinkClick : undefined}
                 >
-                  <ContentCopyIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                  {import.meta.env.VITE_REACT_APP_TEMPLATE_URL +
+                    portfolio.details.websiteName}
+                  {isOnline && (
+                    <LinkIcon
+                      fontSize="small"
+                      sx={{ ml: 0.5, fontSize: "1rem", flexShrink: 0 }}
+                    />
+                  )}
+                </Typography>
 
+                {/* Copy button */}
+                <Tooltip title={copied ? "Copied!" : "Copy URL"}>
+                  <IconButton
+                    size="small"
+                    onClick={handleCopyLink}
+                    sx={{ p: 0.5, flexShrink: 0 }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
             <Box
               sx={{
                 display: "flex",
@@ -358,7 +360,7 @@ const UserPortfolio = () => {
   );
 
   useEffect(() => {
-      dispatch(getAllUserPortfolios());
+    dispatch(getAllUserPortfolios());
   }, []);
 
   const handleModalClick = () => {
@@ -457,6 +459,7 @@ const UserPortfolio = () => {
             WebkitTextFillColor: "transparent",
             fontSize: isMobile ? "2rem" : "2.5rem",
           }}
+          className="text-color-1"
         >
           Your Portfolio Collection
         </Typography>
@@ -500,7 +503,7 @@ const UserPortfolio = () => {
         <Modal2
           showModal={showModal}
           setShowModal={setShowModal}
-          title={"Only one free portfolio available"}
+          title={"Only one free portfolio available. Premium plans coming soon!"}
         />
       )}
     </Container>

@@ -31,10 +31,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { editWebsiteDetails } from "../../redux/actions/portfolioActions";
 import { checkWebsiteNameAvailability } from "../../redux/actions/portfolioActions";
+import { useNavigate } from "react-router-dom";
 
 const PortfolioWebsiteDetails = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { portfolioLoading, portfolio } = useSelector(
     (state) => state.userPortfolio
   );
@@ -130,6 +132,7 @@ const PortfolioWebsiteDetails = () => {
 
     // Update original website name after saving
     setOriginalWebsiteName(websiteName);
+    navigate("/view-portfolio");
   };
 
   // Get the appropriate helper text for website name field
@@ -453,8 +456,6 @@ const PortfolioWebsiteDetails = () => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
           variant="contained"
-          size="large"
-          color="success"
           startIcon={<SaveIcon />}
           onClick={saveWebsiteDetails}
           sx={{
@@ -463,11 +464,11 @@ const PortfolioWebsiteDetails = () => {
             borderRadius: 2,
             fontSize: "1.1rem",
             boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
           }}
-          // Disable save button if the website name is taken
-          disabled={isWebsiteNameAvailable === false || isCheckingAvailability}
+          disabled={isCheckingAvailability || isWebsiteNameAvailable === false}
         >
-          Save Website Details
+          Save and Proceed
         </Button>
       </Box>
     </Container>
