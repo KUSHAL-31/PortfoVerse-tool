@@ -931,19 +931,18 @@ const EducationExperienceSection = () => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
           variant="contained"
-          size="large"
-          color="success"
           startIcon={<SaveIcon />}
-          onClick={()=>{dispatch({ type: INCREMENT_PAGE_COUNT });}}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
           sx={{
             py: 1.5,
-            px: 6,
+            px: 4,
             borderRadius: 2,
-            boxShadow: 2,
+            fontSize: "1.1rem",
+            boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
           }}
-          
         >
-          Save Data
+          Save and Proceed
         </Button>
       </Box>
     </Container>

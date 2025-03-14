@@ -5,10 +5,15 @@ import {
   getAllUserPortfolios,
   getPortfolioDetailById,
 } from "../../redux/actions/portfolioActions";
-import { RESET_ALL_PORTFOLIO_DETAILS, RESET_PAGE_COUNT, SET_CURRENT_PORTFOLIO } from "../../redux/constants";
+import {
+  RESET_ALL_PORTFOLIO_DETAILS,
+  RESET_PAGE_COUNT,
+  SET_CURRENT_PORTFOLIO,
+} from "../../redux/constants";
 import { useNavigate } from "react-router-dom";
 import { Modal1, Modal2 } from "../../design/modals/Modals";
 import "./UserPortfolios.scss";
+import DefaultPortfolioImage from "../../assets/images/default_portfolio.jpg";
 
 // MUI Imports
 import {
@@ -26,31 +31,34 @@ import {
   useMediaQuery,
   Divider,
   Chip,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import CodeIcon from "@mui/icons-material/Code";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
-import WebIcon from "@mui/icons-material/Web";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import LinkIcon from "@mui/icons-material/Link";
 
 // Portfolio Card Component
 const PortfolioCard = ({ portfolio, onClick }) => {
-  const theme = useTheme();
+  const [copied, setCopied] = useState(false);
 
-  // Determine icon based on portfolio type (fallback to WebIcon)
-  const getPortfolioIcon = () => {
-    const type = portfolio.type?.toLowerCase() || "";
-    if (type.includes("code") || type.includes("dev")) return <CodeIcon />;
-    if (type.includes("design") || type.includes("ui"))
-      return <DesignServicesIcon />;
-    return <WebIcon />;
+  const isOnline = portfolio.isPublished;
+
+  const handleCopyLink = (e) => {
+    e.stopPropagation(); // Prevent the card click event
+    navigator.clipboard.writeText(import.meta.env.VITE_REACT_APP_TEMPLATE_URL + portfolio.details.websiteName);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // Get a color for the type chip
-  const getTypeColor = () => {
-    const type = portfolio.type?.toLowerCase() || "";
-    if (type.includes("code") || type.includes("dev")) return "primary";
-    if (type.includes("design") || type.includes("ui")) return "secondary";
-    return "default";
+  const handleLinkClick = (e) => {
+    e.stopPropagation(); // Prevent the card click event
+    window.open(
+      import.meta.env.VITE_REACT_APP_TEMPLATE_URL +
+        portfolio.details.websiteName,
+      "_blank"
+    );
   };
 
   return (
@@ -78,11 +86,7 @@ const PortfolioCard = ({ portfolio, onClick }) => {
           <CardMedia
             component="img"
             height="180"
-            image={
-              (portfolio.logo
-                ? portfolio.logo.url
-                : `https://source.unsplash.com/random/300x200?creative`) || ""
-            }
+            image={portfolio.logo ? portfolio.logo.url : DefaultPortfolioImage}
             alt={portfolio.name || "Project thumbnail"}
             sx={{
               objectFit: "cover",
@@ -90,59 +94,141 @@ const PortfolioCard = ({ portfolio, onClick }) => {
             }}
           />
 
-          <Box
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              zIndex: 2,
-            }}
-          >
-            <Chip
-              icon={getPortfolioIcon()}
-              label={portfolio.type || "Web"}
-              size="small"
-              color={getTypeColor()}
-              sx={{
-                fontWeight: "bold",
-                backdropFilter: "blur(8px)",
-                background: "rgba(255, 255, 255, 0.85)",
-              }}
-            />
-          </Box>
-
-          <CardContent sx={{ flexGrow: 1, p: 3 }}>
+          <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
             <Typography
               variant="h5"
               component="h2"
               gutterBottom
               sx={{
                 fontWeight: "bold",
-                fontSize: "1.4rem",
+                fontSize: { xs: "1.2rem", sm: "1.4rem" },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
               }}
             >
               {portfolio.details.websiteName}
             </Typography>
 
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {portfolio.details.websiteUrl}
-            </Typography>
+            {/* Status indicator */}
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: isOnline
+                    ? "rgba(46, 125, 50, 0.1)"
+                    : "rgba(211, 47, 47, 0.1)",
+                  borderRadius: "12px",
+                  px: 1.5,
+                  py: 0.5,
+                  maxWidth: "fit-content",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    backgroundColor: isOnline ? "#2e7d32" : "#d32f2f",
+                    mr: 0.8,
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: isOnline ? "#2e7d32" : "#d32f2f",
+                    fontWeight: 500,
+                  }}
+                >
+                  {isOnline ? "Live" : "Offline"}
+                </Typography>
+              </Box>
+            </Box>
 
+            {/* Website URL with hyperlink if online */}
+            {isOnline && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color={isOnline ? "primary.main" : "text.secondary"}
+                  sx={{
+                    cursor: isOnline ? "pointer" : "default",
+                    display: "flex",
+                    alignItems: "center",
+                    mr: 1,
+                    maxWidth: "calc(100% - 40px)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  onClick={isOnline ? handleLinkClick : undefined}
+                >
+                  {import.meta.env.VITE_REACT_APP_TEMPLATE_URL +
+                    portfolio.details.websiteName}
+                  {isOnline && (
+                    <LinkIcon
+                      fontSize="small"
+                      sx={{ ml: 0.5, fontSize: "1rem", flexShrink: 0 }}
+                    />
+                  )}
+                </Typography>
+
+                {/* Copy button */}
+                <Tooltip title={copied ? "Copied!" : "Copy URL"}>
+                  <IconButton
+                    size="small"
+                    onClick={handleCopyLink}
+                    sx={{ p: 0.5, flexShrink: 0 }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 mt: "auto",
+                flexWrap: { xs: "wrap", sm: "nowrap" },
+                gap: { xs: 1, sm: 0 },
               }}
             >
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  order: { xs: 2, sm: 1 },
+                  width: { xs: "100%", sm: "auto" },
+                }}
+              >
                 {new Date(
                   portfolio.updatedAt || Date.now()
                 ).toLocaleDateString()}
               </Typography>
 
-              <Box sx={{ display: "flex", gap: 0.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 0.5,
+                  order: { xs: 1, sm: 2 },
+                  width: { xs: "100%", sm: "auto" },
+                  flexWrap: "wrap",
+                  justifyContent: { xs: "flex-start", sm: "flex-end" },
+                }}
+              >
                 {portfolio.tags
                   ?.slice(0, 3)
                   .map((tag, i) => (
@@ -274,7 +360,7 @@ const UserPortfolio = () => {
   );
 
   useEffect(() => {
-      dispatch(getAllUserPortfolios());
+    dispatch(getAllUserPortfolios());
   }, []);
 
   const handleModalClick = () => {
@@ -373,19 +459,9 @@ const UserPortfolio = () => {
             WebkitTextFillColor: "transparent",
             fontSize: isMobile ? "2rem" : "2.5rem",
           }}
+          className="text-color-1"
         >
-          My Portfolio Collection
-        </Typography>
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{
-            mb: 3,
-            maxWidth: 700,
-            fontWeight: "normal",
-          }}
-        >
-          Showcasing my creative work, projects, and professional achievements
+          Your Portfolio Collection
         </Typography>
         <Divider sx={{ width: "100%", mb: 2 }} />
       </Box>
@@ -427,7 +503,7 @@ const UserPortfolio = () => {
         <Modal2
           showModal={showModal}
           setShowModal={setShowModal}
-          title={"Only one free portfolio available"}
+          title={"Only one free portfolio available. Premium plans coming soon!"}
         />
       )}
     </Container>

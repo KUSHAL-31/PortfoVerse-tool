@@ -8,7 +8,6 @@ import {
   Container,
   Grid,
   IconButton,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
@@ -19,12 +18,12 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SaveIcon from "@mui/icons-material/Save";
-import WorkIcon from "@mui/icons-material/Work";
 import LinkIcon from "@mui/icons-material/Link";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { updateUserMetaData } from "../../redux/actions/userActions";
 import { INCREMENT_PAGE_COUNT } from "../../redux/constants";
 import { getPortfolioMetaData } from "../../redux/actions/portfolioActions";
-import ImageUploadSection from "./ImageUploadSection";
 
 const UserMetaData = () => {
   const theme = useTheme();
@@ -40,9 +39,10 @@ const UserMetaData = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [resume, setResume] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [isImageEdited, setIsImageEdited] = useState(false);
+
   // Inside your UserMetaData component, add these state variables:
-  const [portfolioImages, setPortfolioImages] = useState([]);
-  const [portfolioImageUrls, setPortfolioImageUrls] = useState([]);
 
   const socialMediaOptions = [
     "LinkedIn",
@@ -102,17 +102,32 @@ const UserMetaData = () => {
     );
   };
 
-  // Add this function inside your component
-// Use useCallback to memoize the function to prevent unnecessary re-renders
-const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
-  console.log("Image update called with:", { 
-    fileCount: imageFiles.length, 
-    urlCount: imageUrls.length 
-  });
-  
-  setPortfolioImages(imageFiles);
-  setPortfolioImageUrls(imageUrls);
-}, []);
+  // Handle image file upload using FileReader (like your example)
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size exceeds 5MB limit");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target.result);
+        setIsImageEdited(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle image removal
+  const handleRemoveImage = () => {
+    setProfileImage(null);
+    setIsImageEdited(true); // Mark as edited to indicate the image was removed
+  };
+
   // Initialize data when portfolioMetaData changes
   useEffect(() => {
     if (
@@ -123,6 +138,11 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
       setTitle(portfolioMetaData?.title);
       setDescription(portfolioMetaData?.description);
       setResume(portfolioMetaData?.resume);
+      // Set the profile image if it exists in metadata
+      if (portfolioMetaData?.images.length > 0) {
+        setProfileImage(portfolioMetaData.images[0].url);
+        setIsImageEdited(false);
+      }
       if (portfolioMetaData?.roles && !roles.length) {
         setRoles(
           portfolioMetaData.roles.map((role) => ({
@@ -147,24 +167,6 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
     }
   }, [portfolioLoading]);
 
-  // Save metadata function
-  // const saveMetaData = async () => {
-  //   const portfolioData = {
-  //     portfolioId: portfolio._id,
-  //     title,
-  //     description,
-  //     resume,
-  //     roles: roles.map((role) => role.text),
-  //     socials: socials.map((social) => ({
-  //       name: social.selected,
-  //       url: social.url,
-  //     })),
-  //   };
-  //   const doesExist = portfolioMetaData !== null ? true : false;
-  //   // dispatch(updateUserMetaData(doesExist, portfolioData));
-  //   dispatch({ type: INCREMENT_PAGE_COUNT });
-  // };
-
   // Modify your saveMetaData function to include images
   const saveMetaData = async () => {
     var portfolioData = {
@@ -177,17 +179,14 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
         name: social.selected,
         url: social.url,
       })),
-      // Add this line to include existing image URLs
-      // existingImages: portfolioImageUrls,
+      image: profileImage,
+      isImageEdited: isImageEdited,
     };
 
     const doesExist = portfolioMetaData !== null ? true : false;
 
-    // // Create a FormData object if there are new images to upload
-    // if (portfolioImages.length > 0) {
-    //   portfolioData = {...portfolioData, images: portfolioImages};
-    // }
-    // dispatch(updateUserMetaData(doesExist, portfolioData));
+    dispatch(updateUserMetaData(doesExist, portfolioData));
+// 
     dispatch({ type: INCREMENT_PAGE_COUNT });
   };
 
@@ -292,6 +291,129 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
           </Card>
         </Grid>
 
+        {/* Image Upload Section */}
+        <Grid item xs={12}>
+          <Card
+            elevation={3}
+            sx={{
+              borderRadius: 2,
+              overflow: "visible",
+              transition: "all 0.3s",
+              "&:hover": {
+                boxShadow: 6,
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography
+                variant="h5"
+                component="div"
+                fontWeight="bold"
+                sx={{ mb: 3 }}
+              >
+                Portfolio Image
+              </Typography>
+
+              <Grid container spacing={3} alignItems="center">
+                <Grid item xs={12} md={6}>
+                  <Box
+                    sx={{
+                      border: "1px dashed",
+                      borderColor: "divider",
+                      borderRadius: 2,
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minHeight: 200,
+                      backgroundColor: "background.paper",
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {profileImage ? (
+                      <Box
+                        component="img"
+                        src={profileImage}
+                        alt="Portfolio Profile"
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                        }}
+                      />
+                    ) : (
+                      <Typography color="textSecondary" align="center">
+                        No image uploaded yet
+                      </Typography>
+                    )}
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      height: "100%",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      Upload a professional image for your portfolio. The
+                      recommended size is 800x600 pixels.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ mb: 2 }}
+                    >
+                      Supported formats: JPG, PNG (max 5MB)
+                    </Typography>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="portfolio-image-upload"
+                      style={{ display: "none" }}
+                      onChange={handleImageUpload}
+                    />
+                    <label htmlFor="portfolio-image-upload">
+                      <Button
+                        variant="contained"
+                        component="span"
+                        startIcon={
+                          profileImage ? <AutorenewIcon /> : <CloudUploadIcon />
+                        }
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      >
+                        {profileImage ? "Change Image" : "Upload Image"}
+                      </Button>
+                    </label>
+
+                    {profileImage && (
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={handleRemoveImage}
+                      >
+                        Remove Image
+                      </Button>
+                    )}
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
         {/* Professional Roles Section */}
         <Grid item xs={12}>
           <Card
@@ -323,6 +445,7 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
                   onClick={addRole}
                   disabled={roles.length >= 4}
                   size={isMobile ? "small" : "medium"}
+                  color="primary"
                 >
                   Add Role
                 </Button>
@@ -355,7 +478,6 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
                         mb: 2,
                       }}
                     >
-                      <WorkIcon sx={{ mr: 1, color: "text.secondary" }} />
                       <TextField
                         fullWidth
                         label="Role"
@@ -505,8 +627,6 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
           variant="contained"
-          size="large"
-          color="success"
           startIcon={<SaveIcon />}
           onClick={saveMetaData}
           sx={{
@@ -515,6 +635,7 @@ const handleImagesUpdate = useCallback((imageFiles, imageUrls) => {
             borderRadius: 2,
             fontSize: "1.1rem",
             boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
           }}
         >
           Save and Proceed

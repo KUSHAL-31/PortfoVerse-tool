@@ -164,16 +164,6 @@ const UserSkills = () => {
     });
   };
 
-  // Save all skills data
-  const saveSkills = () => {
-    // Here you would typically dispatch an action to save to Redux or API
-    // console.log("Saving skills data:", skillSections);
-    // // Example dispatch (uncomment and modify as needed):
-    // // dispatch(saveUserSkills(skillSections));
-    // alert("Skills saved successfully!");
-    dispatch({ type: INCREMENT_PAGE_COUNT });
-  };
-
   useEffect(() => {
     if (
       portfolioSkills &&
@@ -311,19 +301,18 @@ const UserSkills = () => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
         <Button
           variant="contained"
-          size="large"
-          color="success"
           startIcon={<SaveIcon />}
-          onClick={saveSkills}
+          onClick={() => dispatch({ type: INCREMENT_PAGE_COUNT })}
           sx={{
             py: 1.5,
             px: 4,
             borderRadius: 2,
             fontSize: "1.1rem",
             boxShadow: 3,
+            width: "100%", // Full width/ Align with left edge
           }}
         >
-          Save Skills Profile
+          Save and Proceed
         </Button>
       </Box>
 
