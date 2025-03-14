@@ -1,18 +1,18 @@
 import "./PortfolioSteps.scss";
-import { AssetVaultData } from "../../data";
+import { SliderData } from "../../data";
 import { useEffect, useState } from "react";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import SkillsImg from "../../assets/images/skills.png";
-import ContactImg from "../../assets/images/contact.png";
+import SliderImage0 from "../../assets/images/slider_image_0.png";
+import SliderImage4 from "../../assets/images/slider_image_4.png";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PortfolioSteps = () => {
-  const { section3 } = AssetVaultData;
+  const { section3 } = SliderData;
   const carouselData = [
-    { img: SkillsImg },
+    { img: SliderImage0 },
     ...section3.carouselData,
-    { img: ContactImg },
+    { img: SliderImage4 },
   ];
 
   const [selectedSlide, setSelectedSlide] = useState(1);
