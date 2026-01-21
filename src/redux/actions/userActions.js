@@ -23,7 +23,7 @@ import {
   SEND_OTP,
 } from "../constants";
 
-import axios from "axios";
+import apiClient from "../service/api_client";
 import {
   createUserMetaDataUrl,
   getUserDetailsUrl,
@@ -34,6 +34,11 @@ import {
   userLogoutUrl,
   verifyOtpUrl,
 } from "../service/api_url";
+import {
+  clearAuthToken,
+  getAuthToken,
+  setAuthToken,
+} from "../service/auth";
 import store from "../store";
 
 export const registerUser = (username) => async (dispatch) => {
@@ -44,14 +49,12 @@ export const registerUser = (username) => async (dispatch) => {
   try {
     dispatch({ type: REGISTER_REQUEST });
 
-    // Set `withCredentials` to allow cross-origin cookies
-    const { data } = await axios.post(registerUrl, {
+    const { data } = await apiClient.post(registerUrl, {
       username,
       email,
-    }, {
-      withCredentials: true, // This ensures cookies are saved from the response
     });
 
+    setAuthToken(data.token);
     dispatch({ type: REGISTER_SUCCESS, payload: data.user });
 
     dispatch({ type: TOGGLE_LOGIN_BOX });
@@ -69,9 +72,7 @@ export const registerUser = (username) => async (dispatch) => {
 //     try {
 //         dispatch({ type: LOGIN_REQUEST });
 
-//         // Add withCredentials to allow cookies to be stored
 //         const { data } = await axios.post(loginUrl, user, {
-//             withCredentials: true, // This allows cross-origin cookies to be set
 //         });
 
 //         dispatch({ type: LOGIN_SUCCESS, payload: data.user });
@@ -88,12 +89,17 @@ export const registerUser = (username) => async (dispatch) => {
 
 export const loadUser = () => async (dispatch) => {
   try {
+    const token = getAuthToken();
+    if (!token) {
+      dispatch({
+        type: LOAD_USER_FAILURE,
+        payload: "No auth token found",
+      });
+      return;
+    }
     dispatch({ type: LOAD_USER_REQUEST });
 
-    // Set withCredentials to include cookies in the request
-    const { data } = await axios.get(getUserDetailsUrl, {
-      withCredentials: true, // Ensures cookies are included
-    });
+    const { data } = await apiClient.get(getUserDetailsUrl);
 
     dispatch({ type: LOAD_USER_SUCCESS, payload: data.user });
   } catch (error) {
@@ -105,22 +111,18 @@ export const loadUser = () => async (dispatch) => {
 };
 
 export const logoutUser = () => async (dispatch) => {
+  dispatch({ type: LOGOUT_REQUEST });
   try {
-    dispatch({ type: LOGOUT_REQUEST });
-
-    // Set withCredentials to include cookies in the request
-    await axios.get(userLogoutUrl, {
-      withCredentials: true, // Ensures cookies are included
-    });
-
-    dispatch({ type: LOGOUT_SUCCESS });
-
-    dispatch({ type: RESET_ALL_PORTFOLIO_DETAILS });
+    await apiClient.get(userLogoutUrl);
   } catch (error) {
     dispatch({
       type: LOGOUT_FAILURE,
       payload: error.response?.data?.message || "An error occurred",
     });
+  } finally {
+    clearAuthToken();
+    dispatch({ type: LOGOUT_SUCCESS });
+    dispatch({ type: RESET_ALL_PORTFOLIO_DETAILS });
   }
 };
 
@@ -130,13 +132,9 @@ export const updateUserMetaData =
       dispatch({ type: UPDATE_USER_META_DATA_REQUEST });
       var data;
       if (doesExist) {
-        data = await axios.patch(updateUserMetaDataUrl, portfolioData, {
-          withCredentials: true,
-        });
+        data = await apiClient.patch(updateUserMetaDataUrl, portfolioData);
       } else {
-        data = await axios.post(createUserMetaDataUrl, portfolioData, {
-          withCredentials: true,
-        });
+        data = await apiClient.post(createUserMetaDataUrl, portfolioData);
       }
       dispatch({
         type: UPDATE_USER_META_DATA_SUCCESS,
@@ -153,7 +151,7 @@ export const updateUserMetaData =
 export const sendOtp = (email) => async (dispatch) => {
   try {
     dispatch({ type: SEND_OTP });
-    const { data } = await axios.post(sendOtpUrl, { email });
+    const { data } = await apiClient.post(sendOtpUrl, { email });
   } catch (error) {
     console.log(error);
   }
@@ -162,16 +160,13 @@ export const sendOtp = (email) => async (dispatch) => {
 export const verifyOtp = (email, otp) => async (dispatch) => {
   try {
     dispatch({ type: OTP_VERIFICATION_REQUEST });
-    const { data } = await axios.post(verifyOtpUrl, { email, otp },
-      {
-        withCredentials: true, // This allows cross-origin cookies to be set
-      }
-    );
+    const { data } = await apiClient.post(verifyOtpUrl, { email, otp });
     if (data.success) {
        dispatch({ type: TOGGLE_LOGIN_BOX });
       if (data.isNewUser) {
         dispatch({ type: SHOW_REGISTER_FORM, payload: email });
       } else {
+        setAuthToken(data.token);
         dispatch({
           type: OTP_VERIFICATION_SUCCESS,
           payload: data.user,
@@ -194,15 +189,13 @@ export const verifyOtp = (email, otp) => async (dispatch) => {
 export const googleLoginUser = (email) => async (dispatch) => {
   try {
     dispatch({ type: GOOGLE_LOGIN_REQUEST });
-    // Add withCredentials to allow cookies to be stored
-    const { data } = await axios.post(googleLoginUrl, {email}, {
-      withCredentials: true, // This allows cross-origin cookies to be set
-    });
+    const { data } = await apiClient.post(googleLoginUrl, { email });
     if (data.success) {
       dispatch({ type: TOGGLE_LOGIN_BOX });
       if (data.isNewUser) {
         dispatch({ type: SHOW_REGISTER_FORM, payload: email });
       } else {
+        setAuthToken(data.token);
         dispatch({ type: GOOGLE_LOGIN_SUCCESS, payload: data.user });
       }
     } else {
